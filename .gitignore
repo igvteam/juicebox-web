@@ -1,0 +1,5 @@
+/.idea/
+/node_modules/
+/dist/
+/juicebox-web.iml
+/juiceboxConfig-private.js
