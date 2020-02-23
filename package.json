@@ -1,48 +1,33 @@
 {
-  "name": "juicebox-web",
-  "version": "1.4.2",
-  "files": [
-    "dist/**"
-  ],
+  "name": "web-app",
+  "license": "MIT",
   "author": {
-    "name": "Douglass Turner"
+    "name": "Jim Robinson"
   },
   "contributors": [
     {
-      "name": "Jim Robinson"
+      "name": "Douglass Turner"
     }
   ],
-  "bugs": {
-    "url": "https://github.com/igvteam/juicebox-web/issues"
-  },
   "scripts": {
-    "build": "npx terser --compress --mangle --source-map \"url='site-bundle.map'\" --output  website/dist/js/site-bundle.min.js -- website/dist/js/site-bundle.js",
-    "prepack": "npm run build",
-    "http-server": "npx http-server ."
+    "start": "http-server -a localhost dist",
+    "build": "rollup -c && node scripts/injectRuntime.js && node scripts/copyArtifacts.js"
   },
-  "keywords": [
-    "conformation capture",
-    "hic",
-    "visualization"
-  ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/igvteam/juicebox.js.git"
+  "dependencies": {
+    "data-modal": "github:igvteam/data-modal",
+    "igv-widgets": "github:igvteam/igv-widgets",
+    "igv-ui": "github:igvteam/igv-ui",
+    "igv-utils": "github:igvteam/igv-utils",
+    "juicebox.js": "^1.5.0-rc.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.7.7",
-    "@babel/plugin-transform-regenerator": "^7.7.5",
-    "@babel/plugin-transform-runtime": "^7.7.6",
-    "@babel/preset-env": "^7.7.7",
-    "data-modal": "github:igvteam/data-modal",
-    "finalhandler": "^1.1.2",
+    "@babel/core": "^7.6.0",
+    "@babel/plugin-transform-regenerator": "^7.4.5",
+    "@babel/preset-env": "^7.6.0",
     "fs-extra": "^8.1.0",
-    "juicebox.js": "https://igv.org/web/jb/latest/juicebox.js-1.4.2.tgz",
-    "rollup": "^1.29.0",
+    "rollup": "^1.21.2",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-strip": "^1.2.2",
-    "terser": "^4.6.2"
+    "rollup-plugin-strip": "^1.2.2"
   }
 }

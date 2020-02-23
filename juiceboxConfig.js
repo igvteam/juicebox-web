@@ -4,8 +4,8 @@
 
 export default {
     mapMenu: {
-        id: 'dataset_selector',
-        items: 'res/mapMenuData.txt'
+        id: 'contact-map-selector',
+        items: 'https://aidenlab.org/juicebox/res/mapMenuData.txt'
     },
     trackMenu: {
         id: 'annotation-selector',
