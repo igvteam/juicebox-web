@@ -38,8 +38,6 @@ import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 //import hic from "../node_modules/juicebox.js/js/index.js";
 
 
-let allBrowsers;
-
 async function init(container, config) {
 
     const versionElem = document.getElementById("hic-version-number");
@@ -47,18 +45,20 @@ async function init(container, config) {
         versionElem.innerText = `version ${hic.version}`;
     }
 
-    allBrowsers = hic.allBrowsers;
-
     config = config || {};
 
-    await hic.initApp(container, config);
+    try {
+        await hic.initApp(container, config);
+    } catch (e) {
+        alert(`Error initializing app ${e}`)
+    }
 
     await initializationHelper(container, config);
 
 
 }
 
-export { init, allBrowsers }
+export { init }
 
 
 

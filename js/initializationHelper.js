@@ -1,5 +1,4 @@
 import QRCode from "./qrcode.js";
-import { allBrowsers } from './site.js';
 import SessionController from "./sessionController.js";
 import { Alert, createGenericSelectModal } from '../node_modules/igv-ui/src/index.js'
 import { TrackUtils, StringUtils, } from '../node_modules/igv-utils/src/index.js'
@@ -56,7 +55,7 @@ const initializationHelper = async (container, config) => {
 
     hic.EventBus.globalBus.subscribe("GenomeChange", genomeChangeListener);
 
-    for (let browser of allBrowsers) {
+    for (let browser of hic.allBrowsers) {
         browser.eventBus.subscribe("MapLoad", checkBDropdown);
         updateBDropdown(browser);
     }
@@ -455,7 +454,7 @@ function loadHicFile(url, name) {
 
     var synchState, browsersWithMaps, isControl, browser, query, config, uriDecode;
 
-    browsersWithMaps = allBrowsers.filter(function (browser) {
+    browsersWithMaps = hic.allBrowsers.filter(function (browser) {
         return browser.dataset !== undefined;
     });
 
@@ -486,7 +485,7 @@ function loadHicFile(url, name) {
     } else {
         browser.reset();
 
-        browsersWithMaps = allBrowsers.filter(function (browser) {
+        browsersWithMaps = hic.allBrowsers.filter(function (browser) {
             return browser.dataset !== undefined;
         });
 
@@ -499,7 +498,7 @@ function loadHicFile(url, name) {
             .loadHicFile(config)
             .then(function (ignore) {
                 if (!isControl) {
-                    hic.syncBrowsers(allBrowsers);
+                    hic.syncBrowsers(hic.allBrowsers);
                 }
                 $('#hic-control-map-dropdown').removeClass('disabled');
             });

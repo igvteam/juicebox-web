@@ -486,10 +486,12 @@
     </div>
 </div>
 
+<script type="text/javascript" src="./juiceboxConfig.js"></script>
+
 <script type="module">
 
     import { init } from './js/site.js';
-    import config from './juiceboxConfig.js';
+    const config = juiceboxConfig;
 
     (async () => {
         await init(document.getElementById('app-container'), config);

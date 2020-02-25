@@ -1,5 +1,13 @@
 {
+  "exclude": "node_modules/**",
   "presets": [
-    ["@babel/env", {"modules": false}]
+    [
+      "@babel/preset-env",
+      {
+        "targets": "> 1%, not dead",
+        "useBuiltIns": "usage",
+        "corejs": 3
+      }
+    ]
   ]
 }
