@@ -4,7 +4,7 @@
 
 const juiceboxConfig = {
     mapMenu: {
-        id: 'contact-map-selector',
+        id: 'contact-map-datalist',
         items: 'https://aidenlab.org/juicebox/res/mapMenuData.txt'
     },
     trackMenu: {

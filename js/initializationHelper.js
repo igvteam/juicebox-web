@@ -313,7 +313,7 @@ const createSelectModals = root => {
 
     $(root).append(createGenericSelectModal('hic-annotation-select-modal', 'annotation-selector'));
     $(root).append(createGenericSelectModal('hic-annotation-2D-select-modal', 'annotation-2D-selector'));
-    $(root).append(createGenericSelectModal('hic-contact-map-select-modal', 'contact-map-selector'));
+    $(root).append(createGenericDataListModal('hic-contact-map-datalist-modal', 'contact-map-input', 'contact-map-datalist'));
 
     let modal;
     modal = root.querySelector('#hic-annotation-select-modal');
@@ -322,7 +322,7 @@ const createSelectModals = root => {
     modal = root.querySelector('#hic-annotation-2D-select-modal');
     modal.querySelector('.modal-title').textContent = '2D Annotations';
 
-    modal = root.querySelector('#hic-contact-map-select-modal');
+    modal = root.querySelector('#hic-contact-map-datalist-modal');
     modal.querySelector('.modal-title').textContent = 'Select Contact Map';
 
     // Annotation Select Modal
@@ -367,11 +367,14 @@ const createSelectModals = root => {
     });
 
     // Contact Map Select Modal
-    const $contact_map_selector = $('#contact-map-selector');
-    $contact_map_selector.on('change', function (e) {
+    const $contact_map_input = $('#contact-map-input');
+    $contact_map_input.on('change', function (e) {
 
-        const url = $contact_map_selector.val();
-        const $selected = $contact_map_selector.find('option:selected');
+        const key = $contact_map_input.val();
+
+        const $option = $('#contact-map-datalist option').filter(function () { return key === $(this).html(); });
+
+        const url = $option.data('url');
 
         const browser = hic.HICBrowser.getCurrentBrowser();
         if (undefined === browser) {
@@ -380,12 +383,44 @@ const createSelectModals = root => {
             loadHicFile(url, $selected.text());
         }
 
-        $('#hic-contact-map-select-modal').modal('hide');
+        $('#hic-contact-map-datalist-modal').modal('hide');
 
-        $contact_map_selector.find('option').removeAttr("selected");
+        $contact_map_input.find('option').removeAttr("selected");
 
     });
 
+};
+
+const createGenericDataListModal = (id, input_id, datalist_id) => {
+
+    const generic_select_modal_string =
+        `<div id="${ id }" class="modal">
+
+            <div class="modal-dialog modal-lg">
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <div class="modal-title"></div>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+        
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input id="${ input_id }" list="${ datalist_id }" class="form-control">
+                            <datalist id="${ datalist_id }"></datalist>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>`;
+
+    return generic_select_modal_string;
 };
 
 const createEncodeTable = genomeId => encodeModal.setDatasource(new EncodeDataSource(genomeId));
@@ -543,17 +578,14 @@ const populatePulldown = async menu => {
 
         const lines = StringUtils.splitLines(data);
 
-        const nadda = '-';
-
         const parent = $(`#${ id }`);
-        parent.append($(`<option value=${ nadda }>${ nadda }</option>`));
 
         for (let line of lines) {
 
             const tokens = line.split('\t');
             if (tokens.length > 1) {
                 const [ value, label ] = tokens;
-                parent.append($(`<option value=${ value }>${ label }</option>`));
+                parent.append($(`<option data-url="${ value }">${ label }</option>`));
             }
 
         }
