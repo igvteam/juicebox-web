@@ -8,11 +8,11 @@ const juiceboxConfig = {
         items: 'https://aidenlab.org/juicebox/res/mapMenuData.txt'
     },
     trackMenu: {
-        id: 'annotation-selector',
+        id: 'annotation-datalist',
         items: 'https://hicfiles.s3.amazonaws.com/internal/tracksMenu_$GENOME_ID.txt'
     },
     trackMenu2D: {
-        id: 'annotation-2D-selector',
+        id: 'annotation-2D-datalist',
         items: 'https://hicfiles.s3.amazonaws.com/internal/tracksMenu_2D.$GENOME_ID.txt'
     },
 
