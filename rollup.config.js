@@ -8,7 +8,7 @@ import {terser} from "rollup-plugin-terser"
 export default [
     {
         //input: 'test/testBabel.js',
-        input: 'js/site.js',
+        input: 'js/app.js',
         output: [
             {file: 'dist/js/site-bundle.esm.js', format: 'es'},
             {file: 'dist/js/site-bundle.esm.min.js', format: 'es', sourcemap: true},

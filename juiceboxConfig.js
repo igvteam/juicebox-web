@@ -48,4 +48,6 @@ const juiceboxConfig = {
                 'https://www.googleapis.com/auth/drive.readonly'
             ]
     }
-}
+};
+
+export { juiceboxConfig }

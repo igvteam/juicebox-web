@@ -311,9 +311,9 @@ const appendAndConfigureLoadURLModal = (root, id, input_handler) => {
 
 const createDatalistModals = root => {
 
-    $(root).append(createGenericDataListModal('hic-annotation-datalist-modal', 'annotation-input', 'annotation-datalist'));
-    $(root).append(createGenericDataListModal('hic-annotation-2D-datalist-modal', 'annotation-2D-input', 'annotation-2D-datalist'));
-    $(root).append(createGenericDataListModal('hic-contact-map-datalist-modal', 'contact-map-input', 'contact-map-datalist'));
+    $(root).append(createGenericDataListModal('hic-annotation-datalist-modal', 'annotation-input', 'annotation-datalist', 'Enter annotation file name'));
+    $(root).append(createGenericDataListModal('hic-annotation-2D-datalist-modal', 'annotation-2D-input', 'annotation-2D-datalist', 'Enter 2D annotation file name'));
+    $(root).append(createGenericDataListModal('hic-contact-map-datalist-modal', 'contact-map-input', 'contact-map-datalist', 'Enter contact map file name'));
 
     let modal;
     modal = root.querySelector('#hic-annotation-datalist-modal');
@@ -349,7 +349,7 @@ const createDatalistModals = root => {
         }
 
         $('#hic-annotation-datalist-modal').modal('hide');
-        $annotation_input.val('');
+        // $annotation_input.val('');
 
     });
 
@@ -370,7 +370,7 @@ const createDatalistModals = root => {
         }
 
         $('#hic-annotation-2D-datalist-modal').modal('hide');
-        $annotation_2D_input.val('');
+        // $annotation_2D_input.val('');
     });
 
     // Contact Map Datalist Modal
@@ -392,14 +392,13 @@ const createDatalistModals = root => {
         }
 
         $('#hic-contact-map-datalist-modal').modal('hide');
-
-        $contact_map_input.val('');
+        // $contact_map_input.val('');
 
     });
 
 };
 
-const createGenericDataListModal = (id, input_id, datalist_id) => {
+const createGenericDataListModal = (id, input_id, datalist_id, placeholder) => {
 
     const generic_select_modal_string =
         `<div id="${ id }" class="modal">
@@ -417,7 +416,7 @@ const createGenericDataListModal = (id, input_id, datalist_id) => {
         
                     <div class="modal-body">
                         <div class="form-group">
-                            <input id="${ input_id }" list="${ datalist_id }" class="form-control">
+                            <input type="text" id="${ input_id }" list="${ datalist_id }" placeholder="${ placeholder }" class="form-control">
                             <datalist id="${ datalist_id }"></datalist>
                         </div>
                     </div>
