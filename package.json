@@ -2,16 +2,16 @@
   "name": "web-app",
   "license": "MIT",
   "author": {
-    "name": "Jim Robinson"
+    "name":  "Douglass Turner"
   },
   "contributors": [
     {
-      "name": "Douglass Turner"
+      "name": "Jim Robinson"
     }
   ],
   "scripts": {
     "start": "http-server -a localhost dist",
-    "build": "rollup -c && node scripts/injectRuntime.js && node scripts/copyArtifacts.js"
+    "build": "npx rollup -c"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
