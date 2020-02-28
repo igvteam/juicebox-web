@@ -4,7 +4,8 @@ const columns =
     [
         '-0-',
         '-1-',
-        '-2-'
+        '-2-',
+        'url'
     ];
 
 class ContactMapDatasource {
@@ -20,6 +21,15 @@ class ContactMapDatasource {
     async tableData() {
         return fetchData(this.path);
     }
+
+    tableSelectionHandler(selectionList){
+
+        const obj = selectionList.shift();
+        const url = obj[ 'url' ];
+        const name = obj[ '-0-' ];
+        return { url, name }
+    };
+
 }
 
 const fetchData = async path => {
@@ -45,28 +55,48 @@ const parseData = data => {
     const regex = /[ \t]+/;
 
     const lines = data.split('\n').filter(line => "" !== line);
-    for (let line of lines) {
+
+    const result = lines.map(line => {
 
         const list = line.split(regex);
         const path = list.shift();
 
         const string = list.join(' ');
         const parts = string.split('|').map(part => part.trim());
+
+        const obj = {};
         switch (parts.length) {
             case 1:
-                console.log('String0 n/a n/a');
-                break;
+            {
+                obj[ columns[ 0 ] ] = parts[ 0 ];
+                obj[ columns[ 1 ] ] = '-';
+                obj[ columns[ 2 ] ] = '-';
+                obj[ columns[ 3 ] ] = path;
+                return obj;
+            }
             case 2:
-                console.log('String0 String1 n/a');
-                break;
+            {
+                obj[ columns[ 0 ] ] = parts[ 0 ];
+                obj[ columns[ 1 ] ] = parts[ 1 ];
+                obj[ columns[ 2 ] ] = '-';
+                obj[ columns[ 3 ] ] = path;
+                return obj;
+            }
             case 3:
-                console.log('String0 String1 String2');
-                break;
+            {
+                obj[ columns[ 0 ] ] = parts[ 0 ];
+                obj[ columns[ 1 ] ] = parts[ 1 ];
+                obj[ columns[ 2 ] ] = parts[ 2 ];
+                obj[ columns[ 3 ] ] = path;
+                return obj;
+            }
             default:
                 console.error('something is borked');
         }
-    }
-    return '';
+
+    });
+
+    return result;
 };
 
 export default ContactMapDatasource
