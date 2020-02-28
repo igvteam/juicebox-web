@@ -41,7 +41,31 @@ const fetchData = async path => {
 };
 
 const parseData = data => {
+
+    const regex = /[ \t]+/;
+
     const lines = data.split('\n').filter(line => "" !== line);
+    for (let line of lines) {
+
+        const list = line.split(regex);
+        const path = list.shift();
+
+        const string = list.join(' ');
+        const parts = string.split('|').map(part => part.trim());
+        switch (parts.length) {
+            case 1:
+                console.log('String0 n/a n/a');
+                break;
+            case 2:
+                console.log('String0 String1 n/a');
+                break;
+            case 3:
+                console.log('String0 String1 String2');
+                break;
+            default:
+                console.error('something is borked');
+        }
+    }
     return '';
 };
 
