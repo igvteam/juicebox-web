@@ -1,14 +1,12 @@
-import QRCode from "./qrcode.js";
-import SessionController from "./sessionController.js";
-import { Alert, createGenericSelectModal } from '../node_modules/igv-ui/src/index.js'
+import { Alert } from '../node_modules/igv-ui/src/index.js'
 import { TrackUtils, StringUtils, } from '../node_modules/igv-utils/src/index.js'
 import { SessionFileLoad } from '../node_modules/igv-widgets/dist/igv-widgets.js';
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import EncodeDataSource from '../node_modules/data-modal/js/encodeDataSource.js';
-
-// The "hic" object.  By default get from the juicebox bundle, but for efficient debugging get from the source (index.js)
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
-//import hic from "../node_modules/juicebox.js/js/index.js";
+import ContactMapDatasource from "./contactMapDatasource.js";
+import QRCode from "./qrcode.js";
+import SessionController from "./sessionController.js";
 
 // The igv object. TODO eliminate this dependency
 const igv = hic.igv;
@@ -23,6 +21,7 @@ let sessionController;
 let $hic_share_url_modal;
 
 const encodeModal = new ModalTable({ id: 'hic-encode-modal', title: 'ENCODE', selectHandler: selected => loadTracks(selected) });
+const contactMapModal = new ModalTable({ id: 'hic-contact-map-modal', title: 'Contact Map', selectHandler: selected => loadHicFile(selected) });
 
 const initializationHelper = async (container, config) => {
 
@@ -116,7 +115,10 @@ const initializationHelper = async (container, config) => {
     });
 
     if (config.mapMenu) {
-        await populatePulldown(config.mapMenu);
+        const { items: path } = config.mapMenu;
+        contactMapModal.setDatasource(new ContactMapDatasource(path));
+        const dev_null = contactMapModal.datasource.tableData();
+        // await populatePulldown(config.mapMenu);
     }
 
     $hic_share_url_modal = $('#hic-share-url-modal');
