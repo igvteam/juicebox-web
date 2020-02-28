@@ -10,8 +10,8 @@ export default [
         //input: 'test/testBabel.js',
         input: 'js/app.js',
         output: [
-            {file: 'dist/js/site-bundle.esm.js', format: 'es'},
-            {file: 'dist/js/site-bundle.esm.min.js', format: 'es', sourcemap: true},
+            {file: 'dist/js/jb-bundle.esm.js', format: 'es'},
+            {file: 'dist/js/jb-bundle.esm.min.js', format: 'es', sourcemap: true},
         ],
         plugins: [
             strip({
