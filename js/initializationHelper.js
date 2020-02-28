@@ -35,12 +35,12 @@ const initializationHelper = async (container, config) => {
                 lastGenomeId = genomeId;
                 if (config.trackMenu) {
                     let tracksURL = config.trackMenu.items.replace("$GENOME_ID", genomeId);
-                    await loadAnnotationSelector($(`#${ config.trackMenu.id}`), tracksURL, "1D");
+                    await loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
                 }
 
                 if (config.trackMenu2D) {
                     let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", genomeId);
-                    await loadAnnotationSelector($(`#${ config.trackMenu2D.id}`), annotations2dURL, "2D");
+                    await loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
                 }
 
                 if (EncodeDataSource.supportsGenome(genomeId)) {
@@ -85,7 +85,7 @@ const initializationHelper = async (container, config) => {
         };
     sessionController = new SessionController(sessionControllerConfig);
 
-    createSelectModals(document.querySelector('#hic-main'));
+    createDatalistModals(document.querySelector('#hic-main'));
 
     appendAndConfigureLoadURLModal(document.querySelector('#hic-main'), 'hic-load-url-modal', function (e) {
 
@@ -309,90 +309,132 @@ const appendAndConfigureLoadURLModal = (root, id, input_handler) => {
     return html;
 };
 
-const createSelectModals = root => {
+const createDatalistModals = root => {
 
-    $(root).append(createGenericSelectModal('hic-annotation-select-modal', 'annotation-selector'));
-    $(root).append(createGenericSelectModal('hic-annotation-2D-select-modal', 'annotation-2D-selector'));
-    $(root).append(createGenericSelectModal('hic-contact-map-select-modal', 'contact-map-selector'));
+    $(root).append(createGenericDataListModal('hic-annotation-datalist-modal', 'annotation-input', 'annotation-datalist', 'Enter annotation file name'));
+    $(root).append(createGenericDataListModal('hic-annotation-2D-datalist-modal', 'annotation-2D-input', 'annotation-2D-datalist', 'Enter 2D annotation file name'));
+    $(root).append(createGenericDataListModal('hic-contact-map-datalist-modal', 'contact-map-input', 'contact-map-datalist', 'Enter contact map file name'));
 
     let modal;
-    modal = root.querySelector('#hic-annotation-select-modal');
+    modal = root.querySelector('#hic-annotation-datalist-modal');
     modal.querySelector('.modal-title').textContent = 'Annotations';
 
-    modal = root.querySelector('#hic-annotation-2D-select-modal');
+    modal = root.querySelector('#hic-annotation-2D-datalist-modal');
     modal.querySelector('.modal-title').textContent = '2D Annotations';
 
-    modal = root.querySelector('#hic-contact-map-select-modal');
+    modal = root.querySelector('#hic-contact-map-datalist-modal');
     modal.querySelector('.modal-title').textContent = 'Select Contact Map';
 
-    // Annotation Select Modal
-    const $annotation_selector = $('#annotation-selector');
-    $annotation_selector.on('change', function (e) {
+    // Annotation Datalist Modal
+    const $annotation_input = $('#annotation-input');
+    $annotation_input.on('change', function (e) {
 
         if (undefined === hic.HICBrowser.getCurrentBrowser()) {
             Alert.presentAlert('ERROR: you must select a map panel.');
         } else {
 
-            const path = $annotation_selector.val();
-            const name = $annotation_selector.find('option:selected').text();
+            const name = $annotation_input.val();
+            const $option = $('#annotation-datalist option').filter(function () {
+                const str = $(this).text().trim();
+                return /*str.includes(name)*/str === name;
+            });
+            const path = $option.data('url');
 
-            let config = {url: path, name };
+            let config = { url: path, name };
+
             if (path.indexOf("hgdownload.cse.ucsc.edu") > 0) {
-                config.indexed = false   //UCSC files are never indexed
+                config.indexed = false
             }
             loadTracks([config]);
         }
 
-        $('#hic-annotation-select-modal').modal('hide');
-        $annotation_selector.find('option').removeAttr("selected");
+        $('#hic-annotation-datalist-modal').modal('hide');
+        // $annotation_input.val('');
 
     });
 
-    // 2D Annotation Select Modal
-    const $annotation_2D_selector = $('#annotation-2D-selector');
-    $annotation_2D_selector.on('change', function (e) {
+    // 2D Annotation Datalist Modal
+    const $annotation_2D_input = $('#annotation-2D-input');
+    $annotation_2D_input.on('change', function (e) {
 
         if (undefined === hic.HICBrowser.getCurrentBrowser()) {
             Alert.presentAlert('ERROR: you must select a map panel.');
         } else {
-
-            const path = $annotation_2D_selector.val();
-            const name = $annotation_2D_selector.find('option:selected').text();
-
-            loadTracks([{url: path, name}]);
+            const name = $annotation_2D_input.val();
+            const $option = $('#annotation-2D-datalist option').filter(function () {
+                const str = $(this).text().trim();
+                return /*str.includes(name)*/str === name;
+            });
+            const path = $option.data('url');
+            loadTracks([ { url: path, name } ]);
         }
 
-        $('#hic-annotation-2D-select-modal').modal('hide');
-        $annotation_2D_selector.find('option').removeAttr("selected");
+        $('#hic-annotation-2D-datalist-modal').modal('hide');
+        // $annotation_2D_input.val('');
     });
 
-    // Contact Map Select Modal
-    const $contact_map_selector = $('#contact-map-selector');
-    $contact_map_selector.on('change', function (e) {
+    // Contact Map Datalist Modal
+    const $contact_map_input = $('#contact-map-input');
+    $contact_map_input.on('change', function (e) {
 
-        const url = $contact_map_selector.val();
-        const $selected = $contact_map_selector.find('option:selected');
+        const key = $contact_map_input.val();
+        const $option = $('#contact-map-datalist option').filter(function () {
+            const str = $(this).text().trim();
+            return /*str.includes(key)*/str === key;
+        });
+        const url = $option.data('url');
 
         const browser = hic.HICBrowser.getCurrentBrowser();
         if (undefined === browser) {
             Alert.presentAlert('ERROR: you must select a map panel by clicking the panel header.');
         } else {
-            loadHicFile(url, $selected.text());
+            loadHicFile(url,key);
         }
 
-        $('#hic-contact-map-select-modal').modal('hide');
-
-        $contact_map_selector.find('option').removeAttr("selected");
+        $('#hic-contact-map-datalist-modal').modal('hide');
+        // $contact_map_input.val('');
 
     });
 
 };
 
+const createGenericDataListModal = (id, input_id, datalist_id, placeholder) => {
+
+    const generic_select_modal_string =
+        `<div id="${ id }" class="modal">
+
+            <div class="modal-dialog modal-lg">
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+                        <div class="modal-title"></div>
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+        
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="text" id="${ input_id }" list="${ datalist_id }" placeholder="${ placeholder }" class="form-control">
+                            <datalist id="${ datalist_id }"></datalist>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>`;
+
+    return generic_select_modal_string;
+};
+
 const createEncodeTable = genomeId => encodeModal.setDatasource(new EncodeDataSource(genomeId));
 
-const loadAnnotationSelector = async ($container, url, type) => {
+const loadAnnotationDatalist = async ($datalist, url, type) => {
 
-    $container.empty();
+    $datalist.empty();
 
     let data = undefined;
 
@@ -403,7 +445,7 @@ const loadAnnotationSelector = async ($container, url, type) => {
             //  This is an expected condition, not all assemblies have track menus
             console.log(`No track menu found ${url}`);
         } else {
-            console.log(`Error loading track menu: ${url} ${e}`)
+            console.log(`Error loading track menu: ${url} ${e}`);
             Alert.presentAlert(`Error loading track menu: ${url} ${e}`);
         }
     }
@@ -411,19 +453,17 @@ const loadAnnotationSelector = async ($container, url, type) => {
     let lines = data ? StringUtils.splitLines(data) : [];
     if (lines.length > 0) {
 
-        let elements = [];
-        elements.push('<option value=' + '-' + '>' + '-' + '</option>');
-
         for (let line of lines) {
+
             const tokens = line.split('\t');
+
             if (tokens.length > 1 && ("2D" === type || igvSupports(tokens[1]))) {
-                elements.push('<option value=' + tokens[1] + '>' + tokens[0] + '</option>');
+
+                const [ label, value ] = tokens;
+                $datalist.append($(`<option data-url="${ value }">${ label }</option>`));
+
             }
-
         }
-
-        $container.append(elements.join(''));
-
     }
 
 };
@@ -543,17 +583,14 @@ const populatePulldown = async menu => {
 
         const lines = StringUtils.splitLines(data);
 
-        const nadda = '-';
-
         const parent = $(`#${ id }`);
-        parent.append($(`<option value=${ nadda }>${ nadda }</option>`));
 
         for (let line of lines) {
 
             const tokens = line.split('\t');
             if (tokens.length > 1) {
                 const [ value, label ] = tokens;
-                parent.append($(`<option value=${ value }>${ label }</option>`));
+                parent.append($(`<option data-url="${ value }">${ label }</option>`));
             }
 
         }

@@ -37,8 +37,13 @@ import initializationHelper from "./initializationHelper.js";
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 //import hic from "../node_modules/juicebox.js/js/index.js";
 
+import { juiceboxConfig } from "../juiceboxConfig.js";
 
-async function init(container, config) {
+document.addEventListener("DOMContentLoaded", async (event) => {
+    await init(document.getElementById('app-container'), juiceboxConfig);
+});
+
+const init = async (container, config) => {
 
     const versionElem = document.getElementById("hic-version-number");
     if(versionElem) {
@@ -55,10 +60,7 @@ async function init(container, config) {
 
     await initializationHelper(container, config);
 
-
-}
-
-export { init }
+};
 
 
 

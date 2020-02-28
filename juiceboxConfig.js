@@ -4,15 +4,15 @@
 
 const juiceboxConfig = {
     mapMenu: {
-        id: 'contact-map-selector',
+        id: 'contact-map-datalist',
         items: 'https://aidenlab.org/juicebox/res/mapMenuData.txt'
     },
     trackMenu: {
-        id: 'annotation-selector',
+        id: 'annotation-datalist',
         items: 'https://hicfiles.s3.amazonaws.com/internal/tracksMenu_$GENOME_ID.txt'
     },
     trackMenu2D: {
-        id: 'annotation-2D-selector',
+        id: 'annotation-2D-datalist',
         items: 'https://hicfiles.s3.amazonaws.com/internal/tracksMenu_2D.$GENOME_ID.txt'
     },
 
@@ -48,4 +48,6 @@ const juiceboxConfig = {
                 'https://www.googleapis.com/auth/drive.readonly'
             ]
     }
-}
+};
+
+export { juiceboxConfig }
