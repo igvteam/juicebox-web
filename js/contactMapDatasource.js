@@ -11,7 +11,18 @@ const columns =
 class ContactMapDatasource {
 
     constructor(path) {
+
         this.path = path;
+
+        this.columnDefs =
+            [
+                {
+                    targets: [ 3 ], // hide url column
+                    visible: false,
+                    searchable: false
+                }
+            ];
+
     }
 
     async tableColumns() {
@@ -25,8 +36,8 @@ class ContactMapDatasource {
     tableSelectionHandler(selectionList){
 
         const obj = selectionList.shift();
-        const url = obj[ 'url' ];
-        const name = obj[ '-0-' ];
+        const url   = obj[ columns[ 3 ] ];
+        const name  = obj[ columns[ 0 ] ];
         return { url, name }
     };
 
