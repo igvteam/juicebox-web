@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "start": "http-server -a localhost dist",
-    "build": "npx rollup -c"
+    "build": "npx rollup -c && node scripts/copyArtifacts.js"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
