@@ -276,7 +276,6 @@ const initializationHelper = async (container, config) => {
         updateBDropdown(event.data);
     });
 
-
     // Must manually trigger the genome change event on initial load
     if (hic.HICBrowser.currentBrowser && hic.HICBrowser.currentBrowser.genome) {
         await genomeChangeListener.receiveEvent({data: hic.HICBrowser.currentBrowser.genome.id})
@@ -321,21 +320,14 @@ const appendAndConfigureLoadURLModal = (root, id, input_handler) => {
 
 const createDatalistModals = root => {
 
-    $(root).append(createGenericDataListModal('hic-annotation-datalist-modal', 'annotation-input', 'annotation-datalist', 'Enter annotation file name'));
-    $(root).append(createGenericDataListModal('hic-annotation-2D-datalist-modal', 'annotation-2D-input', 'annotation-2D-datalist', 'Enter 2D annotation file name'));
-    $(root).append(createGenericDataListModal('hic-contact-map-datalist-modal', 'contact-map-input', 'contact-map-datalist', 'Enter contact map file name'));
-
     let modal;
+
+    // Annotation Datalist Modal
+    $(root).append(createGenericDataListModal('hic-annotation-datalist-modal', 'annotation-input', 'annotation-datalist', 'Enter annotation file name'));
+
     modal = root.querySelector('#hic-annotation-datalist-modal');
     modal.querySelector('.modal-title').textContent = 'Annotations';
 
-    modal = root.querySelector('#hic-annotation-2D-datalist-modal');
-    modal.querySelector('.modal-title').textContent = '2D Annotations';
-
-    modal = root.querySelector('#hic-contact-map-datalist-modal');
-    modal.querySelector('.modal-title').textContent = 'Select Contact Map';
-
-    // Annotation Datalist Modal
     const $annotation_input = $('#annotation-input');
     $annotation_input.on('change', function (e) {
 
@@ -364,6 +356,11 @@ const createDatalistModals = root => {
     });
 
     // 2D Annotation Datalist Modal
+    $(root).append(createGenericDataListModal('hic-annotation-2D-datalist-modal', 'annotation-2D-input', 'annotation-2D-datalist', 'Enter 2D annotation file name'));
+
+    modal = root.querySelector('#hic-annotation-2D-datalist-modal');
+    modal.querySelector('.modal-title').textContent = '2D Annotations';
+
     const $annotation_2D_input = $('#annotation-2D-input');
     $annotation_2D_input.on('change', function (e) {
 
@@ -381,29 +378,6 @@ const createDatalistModals = root => {
 
         $('#hic-annotation-2D-datalist-modal').modal('hide');
         // $annotation_2D_input.val('');
-    });
-
-    // Contact Map Datalist Modal
-    const $contact_map_input = $('#contact-map-input');
-    $contact_map_input.on('change', function (e) {
-
-        const key = $contact_map_input.val();
-        const $option = $('#contact-map-datalist option').filter(function () {
-            const str = $(this).text().trim();
-            return /*str.includes(key)*/str === key;
-        });
-        const url = $option.data('url');
-
-        const browser = hic.HICBrowser.getCurrentBrowser();
-        if (undefined === browser) {
-            Alert.presentAlert('ERROR: you must select a map panel by clicking the panel header.');
-        } else {
-            loadHicFile(url,key);
-        }
-
-        $('#hic-contact-map-datalist-modal').modal('hide');
-        // $contact_map_input.val('');
-
     });
 
 };
