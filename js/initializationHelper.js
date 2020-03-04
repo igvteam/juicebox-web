@@ -29,7 +29,7 @@ const contactMapSelectHandler = selectionList => {
     loadHicFile(url, name);
 };
 
-const contactMapModal = new ModalTable({ id: 'hic-contact-map-modal', title: 'Contact Map', selectHandler:contactMapSelectHandler });
+const contactMapModal = new ModalTable({ id: 'hic-contact-map-modal', title: 'Contact Map', selectHandler:contactMapSelectHandler, pageLength: 100 });
 
 const initializationHelper = async (container, config) => {
 
@@ -351,7 +351,7 @@ const createDatalistModals = root => {
         }
 
         $('#hic-annotation-datalist-modal').modal('hide');
-        // $annotation_input.val('');
+        $annotation_input.val('');
 
     });
 
@@ -377,7 +377,7 @@ const createDatalistModals = root => {
         }
 
         $('#hic-annotation-2D-datalist-modal').modal('hide');
-        // $annotation_2D_input.val('');
+        $annotation_2D_input.val('');
     });
 
 };
