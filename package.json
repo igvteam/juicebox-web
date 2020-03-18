@@ -21,6 +21,7 @@
     "@babel/preset-env": "^7.8.6",
     "core-js": "^3.6.4",
     "data-modal": "github:igvteam/data-modal",
+    "fs-extra": "^8.1.0",
     "igv-ui": "github:igvteam/igv-ui",
     "igv-utils": "github:igvteam/igv-utils",
     "igv-widgets": "github:igvteam/igv-widgets",
