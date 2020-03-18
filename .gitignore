@@ -3,3 +3,4 @@
 /dist/
 /juicebox-web.iml
 /juiceboxConfig-private.js
+/deploy.sh
