@@ -65,18 +65,20 @@ const parseData = data => {
 
     const regex = /[ \t]+/;
 
-    const lines = data.split('\n').filter(line => "" !== line);
+    let lines = data.split('\n').filter(line => "" !== line);
+    // lines.unshift('../node_modules/igv-ui/src/index.js A || B', '../node_modules/igv-ui/src/index.js A | B | C | D | E');
 
-    const result = lines.map(line => {
+    return lines.map(line => {
 
         const list = line.split(regex);
         const path = list.shift();
 
         const string = list.join(' ');
-        const parts = string.split('|').map(part => part.trim());
+        let parts = string.split('|').map(part => part.trim());
 
         const obj = {};
         switch (parts.length) {
+
             case 1:
             {
                 obj[ columns[ 0 ] ] = parts[ 0 ];
@@ -85,6 +87,7 @@ const parseData = data => {
                 obj[ columns[ 3 ] ] = path;
                 return obj;
             }
+
             case 2:
             {
                 obj[ columns[ 0 ] ] = parts[ 0 ];
@@ -93,6 +96,7 @@ const parseData = data => {
                 obj[ columns[ 3 ] ] = path;
                 return obj;
             }
+
             case 3:
             {
                 obj[ columns[ 0 ] ] = parts[ 0 ];
@@ -101,13 +105,24 @@ const parseData = data => {
                 obj[ columns[ 3 ] ] = path;
                 return obj;
             }
+
             default:
-                console.error('something is borked');
-        }
+                if (parts.length > 3) {
+                    obj[ columns[ 0 ] ] = parts[ 0 ];
+                    obj[ columns[ 1 ] ] = parts[ 1 ];
+
+                    parts.shift(); // discard
+                    parts.shift(); // discard
+                    obj[ columns[ 2 ] ] = parts.join('|');
+
+                    obj[ columns[ 3 ] ] = path;
+
+                }
+
+        } // switch()
 
     });
 
-    return result;
 };
 
 export default ContactMapDatasource
