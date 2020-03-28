@@ -20,7 +20,7 @@ let sessionController;
 
 let $hic_share_url_modal;
 
-const encodeModal = new ModalTable({ id: 'hic-encode-modal', title: 'ENCODE', selectionStyle: 'multi', pageLength: 100, selectHandler: selected => loadTracks(selected) });
+const encodeModal = new ModalTable({ id: 'hic-encode-modal', title: 'ENCODE', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => loadTracks(selected) });
 
 let contactMapDatasource = undefined;
 
@@ -29,7 +29,7 @@ const contactMapSelectHandler = selectionList => {
     loadHicFile(url, name);
 };
 
-const contactMapModal = new ModalTable({ id: 'hic-contact-map-modal', title: 'Contact Map', selectionStyle: 'single', pageLength: 100, selectHandler:contactMapSelectHandler });
+const contactMapModal = new ModalTable({ id: 'hic-contact-map-modal', title: 'Contact Map', selectionStyle: 'single', pageLength: 10, selectHandler:contactMapSelectHandler });
 
 const initializationHelper = async (container, config) => {
 
