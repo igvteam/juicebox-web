@@ -33,6 +33,11 @@ const contactMapModal = new ModalTable({ id: 'hic-contact-map-modal', title: 'Co
 
 const initializationHelper = async (container, config) => {
 
+    const { google } = config;
+    const { apiKey, clientId } = google;
+
+    googleEnabled = (google && apiKey && apiKey !== 'ABCD' && clientId && clientId !== 'GOOGLE_CLIENT_ID');
+    
     const genomeChangeListener = {
 
         receiveEvent: async event => {

@@ -37,7 +37,8 @@ import initializationHelper from "./initializationHelper.js";
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 //import hic from "../node_modules/juicebox.js/js/index.js";
 
-import { juiceboxConfig } from "../juiceboxConfig.js";
+// import { juiceboxConfig } from "../juiceboxConfig.js";
+import { juiceboxConfig } from "../juiceboxConfig-private.js";
 
 document.addEventListener("DOMContentLoaded", async (event) => {
     await init(document.getElementById('app-container'), juiceboxConfig);
