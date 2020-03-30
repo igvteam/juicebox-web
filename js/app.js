@@ -55,9 +55,11 @@ const init = async (container, config) => {
     }
 
     config = config || {};
+
     const { google } = config;
     const { clientId } = google;
-    if (clientId && 'CLIENT_ID' !== clientId) {
+
+    if (clientId && 'GOOGLE_CLIENT_ID' !== clientId) {
 
         const gapiConfig =
             {
@@ -92,6 +94,8 @@ const init = async (container, config) => {
 
 
 };
+
+export { googleEnabled }
 
 
 

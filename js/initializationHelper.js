@@ -7,17 +7,15 @@ import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 import ContactMapDatasource from "./contactMapDatasource.js";
 import QRCode from "./qrcode.js";
 import SessionController from "./sessionController.js";
+import { googleEnabled } from './app.js';
 
 // The igv object. TODO eliminate this dependency
 const igv = hic.igv;
-
-let googleEnabled = false;
 
 let lastGenomeId = undefined;
 let qrcode = undefined;
 let currentContactMapDropdownButtonID = undefined;
 let sessionController;
-
 let $hic_share_url_modal;
 
 const encodeModal = new ModalTable({ id: 'hic-encode-modal', title: 'ENCODE', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => loadTracks(selected) });
@@ -26,18 +24,13 @@ let contactMapDatasource = undefined;
 
 const contactMapSelectHandler = selectionList => {
     const { url, name } = contactMapDatasource.tableSelectionHandler(selectionList);
-    loadHicFile(url, name);
+    loadHicFile(url, name, 'contact-map');
 };
 
 const contactMapModal = new ModalTable({ id: 'hic-contact-map-modal', title: 'Contact Map', selectionStyle: 'single', pageLength: 10, selectHandler:contactMapSelectHandler });
 
 const initializationHelper = async (container, config) => {
 
-    const { google } = config;
-    const { apiKey, clientId } = google;
-
-    googleEnabled = (google && apiKey && apiKey !== 'ABCD' && clientId && clientId !== 'GOOGLE_CLIENT_ID');
-    
     const genomeChangeListener = {
 
         receiveEvent: async event => {
@@ -72,7 +65,6 @@ const initializationHelper = async (container, config) => {
         updateBDropdown(browser);
     }
 
-
     // session file load config
     const sessionFileLoadConfig =
         {
@@ -99,13 +91,13 @@ const initializationHelper = async (container, config) => {
 
     createDatalistModals(document.querySelector('#hic-main'));
 
-    appendAndConfigureLoadURLModal(document.querySelector('#hic-main'), 'hic-load-url-modal', function (e) {
+    appendAndConfigureLoadURLModal(document.querySelector('#hic-main'), 'hic-load-url-modal', async () => {
 
         if (undefined === hic.HICBrowser.getCurrentBrowser()) {
             Alert.presentAlert('ERROR: you must select a map panel.');
         } else {
             const url = $(this).val();
-            loadHicFile( url, undefined );
+            await loadHicFile( url, undefined, 'contact-map' );
         }
 
         $(this).val("");
@@ -208,7 +200,7 @@ const initializationHelper = async (container, config) => {
         $('#hic-qr-code-image').toggle();
     });
 
-    $('#hic-load-local-file').on('change', function (e) {
+    $('div[id$="-map-dropdown-menu"] input').on('change', function (e) {
 
         if (undefined === hic.HICBrowser.getCurrentBrowser()) {
             Alert.presentAlert('ERROR: you must select a map panel.');
@@ -220,16 +212,28 @@ const initializationHelper = async (container, config) => {
             const suffix = name.substr(name.lastIndexOf('.') + 1);
 
             if ('hic' === suffix) {
-                loadHicFile(file, name);
+                const mapType = $(this).attr('name');
+                loadHicFile(file, name, mapType);
             } else {
                 loadTracks([{ url: file, name }]);
             }
         }
 
         $(this).val("");
-        $('#hic-load-local-file-modal').modal('hide');
-
     });
+
+    $('div[id$="-map-dropdown-menu"]').find('div[id$="-map-dropdown-dropbox-button"]').on('click', () => {
+        console.log('Dropbox button click');
+    });
+
+    if (true === googleEnabled) {
+        $('div[id$="-map-dropdown-menu"]').find('div[id$="-map-dropdown-google-drive-button"]').on('click', () => {
+            console.log('Google button click');
+        })
+    }
+
+
+
 
     $('.juicebox-app-clone-button').on('click', async () => {
 
@@ -479,60 +483,42 @@ function loadTracks(tracks) {
     hic.HICBrowser.getCurrentBrowser().loadTracks(tracks);
 }
 
-function loadHicFile(url, name) {
+const loadHicFile = async (url, name, mapType) => {
 
-    var synchState, browsersWithMaps, isControl, browser, query, config, uriDecode;
+    let browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
 
-    browsersWithMaps = hic.allBrowsers.filter(function (browser) {
-        return browser.dataset !== undefined;
-    });
+    const isControl = ('control-map' === mapType);
 
-    if (browsersWithMaps.length > 0) {
-        synchState = browsersWithMaps[0].getSyncState();
-    }
+    const browser = hic.HICBrowser.getCurrentBrowser();
 
-    isControl = currentContactMapDropdownButtonID === 'hic-control-map-dropdown';
-
-    browser = hic.HICBrowser.getCurrentBrowser();
-
-    config = {url: url, name: name, isControl: isControl};
-
+    const config = { url, name, isControl };
 
     if (StringUtils.isString(url) && url.includes("?")) {
-        query = hic.extractQuery(url);
-        uriDecode = url.includes("%2C");
+        const query = hic.extractQuery(url);
+        const uriDecode = url.includes("%2C");
         hic.decodeQuery(query, config, uriDecode);
     }
 
-
     if (isControl) {
-        browser
-            .loadHicControlFile(config)
-            .then(function (dataset) {
-
-            });
+        await browser.loadHicControlFile(config)
     } else {
         browser.reset();
 
-        browsersWithMaps = hic.allBrowsers.filter(function (browser) {
-            return browser.dataset !== undefined;
-        });
+        browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
 
         if (browsersWithMaps.length > 0) {
             config["synchState"] = browsersWithMaps[0].getSyncState();
         }
 
+        await browser.loadHicFile(config);
 
-        browser
-            .loadHicFile(config)
-            .then(function (ignore) {
-                if (!isControl) {
-                    hic.syncBrowsers(hic.allBrowsers);
-                }
-                $('#hic-control-map-dropdown').removeClass('disabled');
-            });
+        if (!isControl) {
+            hic.syncBrowsers(hic.allBrowsers);
+        }
+
+        $('#hic-control-map-dropdown').removeClass('disabled');
     }
-}
+};
 
 async function getEmbeddableSnippet($container, config) {
     const base = (config.embedTarget || getEmbedTarget())
