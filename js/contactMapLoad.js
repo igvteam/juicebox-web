@@ -1,10 +1,9 @@
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 import { loadHicFile } from "./initializationHelper.js";
-import { googleEnabled } from "./app.js";
+import * as app_google from './app-google.js';
 
 const igv = hic.igv;
 
-let currentDropdownButtonID = undefined;
 let mapType = undefined;
 
 class ContactMapLoad {
@@ -21,7 +20,7 @@ class ContactMapLoad {
             // Set currentDropdownButtonID to id
             mapType = 'hic-contact-map-dropdown' === id ? 'contact-map' : 'control-map';
 
-            console.log(`Current contact map dropdown: ${ currentDropdownButtonID }`);
+            console.log(`Current contact map type: ${ mapType }`);
         });
 
         $localFileInputs.on('change', async function (e) {
@@ -52,12 +51,26 @@ class ContactMapLoad {
 
         });
 
+        if (false === googleEnabled) {
+            $googleDriveButtons.parent().hide();
+        }
+
         if (true === googleEnabled) {
+
             $googleDriveButtons.on('click', () => {
-                console.log('Google button click');
-            })
-        } else {
-            // hide google drive buttons
+
+                app_google.createDropdownButtonPicker(true, async responses => {
+
+                    const paths = responses.map(({ name, url: google_url }) => {
+                        return { filename: name, name, google_url };
+                    });
+
+                    let { name, google_url: path } = paths[ 0 ];
+                    await loadHicFile(path, name, mapType);
+
+                });
+
+            });
         }
 
     }

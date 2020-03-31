@@ -147,13 +147,6 @@ const initializationHelper = async (container, config) => {
 
     contactMapLoad = new ContactMapLoad(contactMapLoadConfig);
 
-
-    if (true === googleEnabled) {
-        $('div[id$="-map-dropdown-menu"]').find('div[id$="-map-dropdown-google-drive-button"]').on('click', () => {
-            console.log('Google button click');
-        })
-    }
-
     configureShareModal();
 
     hic.EventBus.globalBus.subscribe("BrowserSelect", function (event) {
