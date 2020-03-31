@@ -3,7 +3,6 @@ import { TrackUtils, StringUtils, } from '../node_modules/igv-utils/src/index.js
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import EncodeDataSource from '../node_modules/data-modal/js/encodeDataSource.js';
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
-import ContactMapDatasource from "./contactMapDatasource.js";
 import QRCode from "./qrcode.js";
 import SessionController, { sessionControllerConfigurator }from "./sessionController.js";
 import { googleEnabled } from './app.js';
@@ -14,21 +13,11 @@ const igv = hic.igv;
 
 let lastGenomeId = undefined;
 let qrcode = undefined;
-let currentContactMapDropdownButtonID = undefined;
 let sessionController;
 
 const encodeModal = new ModalTable({ id: 'hic-encode-modal', title: 'ENCODE', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => loadTracks(selected) });
 
 let contactMapLoad = undefined;
-
-let contactMapDatasource = undefined;
-
-const contactMapSelectHandler = selectionList => {
-    const { url, name } = contactMapDatasource.tableSelectionHandler(selectionList);
-    loadHicFile(url, name, 'contact-map');
-};
-
-const contactMapModal = new ModalTable({ id: 'hic-contact-map-modal', title: 'Contact Map', selectionStyle: 'single', pageLength: 10, selectHandler:contactMapSelectHandler });
 
 const initializationHelper = async (container, config) => {
 
@@ -70,41 +59,11 @@ const initializationHelper = async (container, config) => {
 
     sessionController = new SessionController(sessionControllerConfigurator());
 
-    createDatalistModals(document.querySelector('#hic-main'));
+    createAnnotationDatalistModals(document.querySelector('#hic-main'));
 
-    appendAndConfigureLoadURLModal(document.querySelector('#hic-main'), 'hic-load-url-modal', async () => {
-
-        if (undefined === hic.HICBrowser.getCurrentBrowser()) {
-            Alert.presentAlert('ERROR: you must select a map panel.');
-        } else {
-            const url = $(this).val();
-            await loadHicFile( url, undefined, 'contact-map' );
-        }
-
-        $(this).val("");
-        $('#hic-load-url-modal').modal('hide');
-
+    appendAndConfigureLoadURLModal(document.querySelector('#hic-main'), 'track-load-url-modal', path => {
+        loadTracks([ { url: path } ]);
     });
-
-    appendAndConfigureLoadURLModal(document.querySelector('#hic-main'), 'track-load-url-modal', function (e) {
-
-        if (undefined === hic.HICBrowser.getCurrentBrowser()) {
-            Alert.presentAlert('ERROR: you must select a map panel.');
-        } else {
-            const url = $(this).val();
-            loadTracks([ { url } ]);
-        }
-
-        $(this).val("");
-        $('#track-load-url-modal').modal('hide');
-
-    });
-
-    if (config.mapMenu) {
-        const { items: path } = config.mapMenu;
-        contactMapDatasource = new ContactMapDatasource(path);
-        contactMapModal.setDatasource(contactMapDatasource);
-    }
 
     $('.juicebox-app-clone-button').on('click', async () => {
 
@@ -130,19 +89,20 @@ const initializationHelper = async (container, config) => {
         }
     });
 
-
-
-
-    // ::::::::::::::::::::::::::::: Contact map GUI items :::::::::::::::::::::::::::::
     const $dropdownButtons = $('button[id$=-map-dropdown]');
     const $dropdowns = $dropdownButtons.parent();
+
     const contactMapLoadConfig =
         {
+            rootContainer: document.querySelector('#hic-main'),
             $dropdowns,
             $localFileInputs: $dropdowns.find('input'),
+            urlLoadModalId: 'hic-load-url-modal',
+            dataModalId: 'hic-contact-map-modal',
             $dropboxButtons: $dropdowns.find('div[id$="-map-dropdown-dropbox-button"]'),
             $googleDriveButtons: $dropdowns.find('div[id$="-map-dropdown-google-drive-button"]'),
-            googleEnabled
+            googleEnabled,
+            mapMenu: config.mapMenu
         };
 
     contactMapLoad = new ContactMapLoad(contactMapLoadConfig);
@@ -282,12 +242,22 @@ const appendAndConfigureLoadURLModal = (root, id, input_handler) => {
     $(root).append(html);
 
     const $modal = $(root).find(`#${ id }`);
-    $modal.find('input').on('change', input_handler);
+    $modal.find('input').on('change', function () {
+
+        const path = $(this).val();
+        $(this).val("");
+
+        $(`#${ id }`).modal('hide');
+
+        input_handler(path);
+
+
+    });
 
     return html;
 };
 
-const createDatalistModals = root => {
+const createAnnotationDatalistModals = root => {
 
     let modal;
 
@@ -443,7 +413,7 @@ function loadTracks(tracks) {
     hic.HICBrowser.getCurrentBrowser().loadTracks(tracks);
 }
 
-export const loadHicFile = async (url, name, mapType) => {
+const loadHicFile = async (url, name, mapType) => {
 
     let browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
 
@@ -547,5 +517,7 @@ function updateBDropdown(browser) {
         }
     }
 }
+
+export { appendAndConfigureLoadURLModal, loadHicFile }
 
 export default initializationHelper

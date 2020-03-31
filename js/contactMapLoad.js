@@ -1,26 +1,29 @@
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
-import { loadHicFile } from "./initializationHelper.js";
+import { loadHicFile, appendAndConfigureLoadURLModal } from "./initializationHelper.js";
 import * as app_google from './app-google.js';
+import ModalTable from '../node_modules/data-modal/js/modalTable.js';
+import ContactMapDatasource from "./contactMapDatasource.js";
 
 const igv = hic.igv;
 
 let mapType = undefined;
+let contactMapDatasource = undefined;
 
 class ContactMapLoad {
-    constructor({ $dropdowns, $localFileInputs, $dropboxButtons, $googleDriveButtons, googleEnabled }) {
+
+    constructor({ rootContainer, $dropdowns, $localFileInputs, urlLoadModalId, dataModalId, $dropboxButtons, $googleDriveButtons, googleEnabled, mapMenu }) {
 
         $dropdowns.on('show.bs.dropdown', function () {
 
-            // Contact or Control dropdown button - from above pair - now active
+            // Contact or Control dropdown button
             const $child = $(this).children('.dropdown-toggle');
 
             // button id
             const id = $child.attr('id');
 
-            // Set currentDropdownButtonID to id
+            // Set map type based on dropdown selected
             mapType = 'hic-contact-map-dropdown' === id ? 'contact-map' : 'control-map';
 
-            console.log(`Current contact map type: ${ mapType }`);
         });
 
         $localFileInputs.on('change', async function (e) {
@@ -56,7 +59,6 @@ class ContactMapLoad {
         }
 
         if (true === googleEnabled) {
-
             $googleDriveButtons.on('click', () => {
 
                 app_google.createDropdownButtonPicker(true, async responses => {
@@ -71,6 +73,26 @@ class ContactMapLoad {
                 });
 
             });
+        }
+
+        appendAndConfigureLoadURLModal(rootContainer, urlLoadModalId, path => {
+            const name = igv.getFilename(path);
+            loadHicFile( path, name, mapType );
+        });
+
+        if (mapMenu) {
+
+            this.contactMapModal = new ModalTable({ id: dataModalId, title: 'Contact Map', selectionStyle: 'single', pageLength: 10 });
+
+            const { items: path } = mapMenu;
+            contactMapDatasource = new ContactMapDatasource(path);
+
+            this.contactMapModal.setDatasource(contactMapDatasource);
+
+            this.contactMapModal.selectHandler = async selectionList => {
+                const { url, name } = contactMapDatasource.tableSelectionHandler(selectionList);
+                await loadHicFile(url, name, mapType);
+            };
         }
 
     }
