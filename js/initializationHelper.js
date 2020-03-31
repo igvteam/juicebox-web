@@ -7,6 +7,7 @@ import ContactMapDatasource from "./contactMapDatasource.js";
 import QRCode from "./qrcode.js";
 import SessionController, { sessionControllerConfigurator }from "./sessionController.js";
 import { googleEnabled } from './app.js';
+import ContactMapLoad from "./contactMapLoad.js";
 
 // The igv object. TODO eliminate this dependency
 const igv = hic.igv;
@@ -17,6 +18,8 @@ let currentContactMapDropdownButtonID = undefined;
 let sessionController;
 
 const encodeModal = new ModalTable({ id: 'hic-encode-modal', title: 'ENCODE', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => loadTracks(selected) });
+
+let contactMapLoad = undefined;
 
 let contactMapDatasource = undefined;
 
@@ -131,49 +134,19 @@ const initializationHelper = async (container, config) => {
 
 
     // ::::::::::::::::::::::::::::: Contact map GUI items :::::::::::::::::::::::::::::
+    const $dropdownButtons = $('button[id$=-map-dropdown]');
+    const $dropdowns = $dropdownButtons.parent();
+    const contactMapLoadConfig =
+        {
+            $dropdowns,
+            $localFileInputs: $dropdowns.find('input'),
+            $dropboxButtons: $dropdowns.find('div[id$="-map-dropdown-dropbox-button"]'),
+            $googleDriveButtons: $dropdowns.find('div[id$="-map-dropdown-google-drive-button"]'),
+            googleEnabled
+        };
 
-    // Contact Map - contact and control - dropdown buttons
-    const $contactMapDropdownButtons = $('button[id$=-map-dropdown]');
-    // Associated parent (containing) dropdowns
-    const $contactMapDropdowns = $contactMapDropdownButtons.parent();
+    contactMapLoad = new ContactMapLoad(contactMapLoadConfig);
 
-    $contactMapDropdowns.on('show.bs.dropdown', function () {
-
-        // Contact or Control dropdown button - from above pair - now active
-        const $child = $(this).children('.dropdown-toggle');
-        // button id
-        const id = $child.attr('id');
-
-        // Set currentContactMapDropdownButtonID to id
-        currentContactMapDropdownButtonID = id;
-        console.log(`Current contact map dropdown: ${ currentContactMapDropdownButtonID }`);
-    });
-
-    $('div[id$="-map-dropdown-menu"] input').on('change', function (e) {
-
-        if (undefined === hic.HICBrowser.getCurrentBrowser()) {
-            Alert.presentAlert('ERROR: you must select a map panel.');
-        } else {
-
-            const file = ($(this).get(0).files)[0];
-
-            const { name } = file;
-            const suffix = name.substr(name.lastIndexOf('.') + 1);
-
-            if ('hic' === suffix) {
-                const mapType = $(this).attr('name');
-                loadHicFile(file, name, mapType);
-            } else {
-                loadTracks([{ url: file, name }]);
-            }
-        }
-
-        $(this).val("");
-    });
-
-    $('div[id$="-map-dropdown-menu"]').find('div[id$="-map-dropdown-dropbox-button"]').on('click', () => {
-        console.log('Dropbox button click');
-    });
 
     if (true === googleEnabled) {
         $('div[id$="-map-dropdown-menu"]').find('div[id$="-map-dropdown-google-drive-button"]').on('click', () => {
@@ -477,7 +450,7 @@ function loadTracks(tracks) {
     hic.HICBrowser.getCurrentBrowser().loadTracks(tracks);
 }
 
-const loadHicFile = async (url, name, mapType) => {
+export const loadHicFile = async (url, name, mapType) => {
 
     let browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
 
