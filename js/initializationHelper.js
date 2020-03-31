@@ -1,12 +1,11 @@
 import { Alert } from '../node_modules/igv-ui/src/index.js'
 import { TrackUtils, StringUtils, } from '../node_modules/igv-utils/src/index.js'
-import { SessionFileLoad } from '../node_modules/igv-widgets/dist/igv-widgets.js';
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import EncodeDataSource from '../node_modules/data-modal/js/encodeDataSource.js';
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 import ContactMapDatasource from "./contactMapDatasource.js";
 import QRCode from "./qrcode.js";
-import SessionController from "./sessionController.js";
+import SessionController, { sessionControllerConfigurator }from "./sessionController.js";
 import { googleEnabled } from './app.js';
 
 // The igv object. TODO eliminate this dependency
@@ -16,7 +15,6 @@ let lastGenomeId = undefined;
 let qrcode = undefined;
 let currentContactMapDropdownButtonID = undefined;
 let sessionController;
-let $hic_share_url_modal;
 
 const encodeModal = new ModalTable({ id: 'hic-encode-modal', title: 'ENCODE', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => loadTracks(selected) });
 
@@ -30,6 +28,8 @@ const contactMapSelectHandler = selectionList => {
 const contactMapModal = new ModalTable({ id: 'hic-contact-map-modal', title: 'Contact Map', selectionStyle: 'single', pageLength: 10, selectHandler:contactMapSelectHandler });
 
 const initializationHelper = async (container, config) => {
+
+    Alert.init(container);
 
     const genomeChangeListener = {
 
@@ -65,29 +65,7 @@ const initializationHelper = async (container, config) => {
         updateBDropdown(browser);
     }
 
-    // session file load config
-    const sessionFileLoadConfig =
-        {
-            localFileInput: document.querySelector('#igv-app-dropdown-local-session-file-input'),
-            dropboxButton: document.querySelector('#igv-app-dropdown-dropbox-session-file-button'),
-            googleEnabled,
-            googleDriveButton: document.querySelector('#igv-app-dropdown-google-drive-session-file-button'),
-            loadHandler: config => {
-                hic.loadSession(config)
-            },
-            igvxhr: igv.xhr,
-            oauth: igv.oauth
-        };
-
-    // Session Controller
-    const sessionControllerConfig =
-        {
-            sessionLoadModal: document.querySelector('#igv-app-session-from-url-modal'),
-            sessionSaveModal: document.querySelector('#igv-app-session-save-modal'),
-            sessionFileLoad: new SessionFileLoad(sessionFileLoadConfig),
-            JSONProvider: () => hic.toJSON()
-        };
-    sessionController = new SessionController(sessionControllerConfig);
+    sessionController = new SessionController(sessionControllerConfigurator());
 
     createDatalistModals(document.querySelector('#hic-main'));
 
@@ -121,12 +99,103 @@ const initializationHelper = async (container, config) => {
 
     if (config.mapMenu) {
         const { items: path } = config.mapMenu;
-
         contactMapDatasource = new ContactMapDatasource(path);
         contactMapModal.setDatasource(contactMapDatasource);
     }
 
-    $hic_share_url_modal = $('#hic-share-url-modal');
+    $('.juicebox-app-clone-button').on('click', async () => {
+
+        let browser = undefined;
+        try {
+            browser = await hic.createBrowser(container, { initFromUrl: false, updateHref: false });
+        } catch (e) {
+            console.error(e);
+        }
+
+        if (browser) {
+            hic.HICBrowser.setCurrentBrowser(browser);
+        }
+
+    });
+
+    $('#hic-track-dropdown-menu').parent().on('shown.bs.dropdown', function () {
+
+        const browser = hic.HICBrowser.getCurrentBrowser();
+
+        if (undefined === browser || undefined === browser.dataset) {
+            Alert.presentAlert('Contact map must be loaded and selected before loading tracks');
+        }
+    });
+
+
+
+
+    // ::::::::::::::::::::::::::::: Contact map GUI items :::::::::::::::::::::::::::::
+
+    // Contact Map - contact and control - dropdown buttons
+    const $contactMapDropdownButtons = $('button[id$=-map-dropdown]');
+    // Associated parent (containing) dropdowns
+    const $contactMapDropdowns = $contactMapDropdownButtons.parent();
+
+    $contactMapDropdowns.on('show.bs.dropdown', function () {
+
+        // Contact or Control dropdown button - from above pair - now active
+        const $child = $(this).children('.dropdown-toggle');
+        // button id
+        const id = $child.attr('id');
+
+        // Set currentContactMapDropdownButtonID to id
+        currentContactMapDropdownButtonID = id;
+        console.log(`Current contact map dropdown: ${ currentContactMapDropdownButtonID }`);
+    });
+
+    $('div[id$="-map-dropdown-menu"] input').on('change', function (e) {
+
+        if (undefined === hic.HICBrowser.getCurrentBrowser()) {
+            Alert.presentAlert('ERROR: you must select a map panel.');
+        } else {
+
+            const file = ($(this).get(0).files)[0];
+
+            const { name } = file;
+            const suffix = name.substr(name.lastIndexOf('.') + 1);
+
+            if ('hic' === suffix) {
+                const mapType = $(this).attr('name');
+                loadHicFile(file, name, mapType);
+            } else {
+                loadTracks([{ url: file, name }]);
+            }
+        }
+
+        $(this).val("");
+    });
+
+    $('div[id$="-map-dropdown-menu"]').find('div[id$="-map-dropdown-dropbox-button"]').on('click', () => {
+        console.log('Dropbox button click');
+    });
+
+    if (true === googleEnabled) {
+        $('div[id$="-map-dropdown-menu"]').find('div[id$="-map-dropdown-google-drive-button"]').on('click', () => {
+            console.log('Google button click');
+        })
+    }
+
+    configureShareModal();
+
+    hic.EventBus.globalBus.subscribe("BrowserSelect", function (event) {
+        updateBDropdown(event.data);
+    });
+
+    // Must manually trigger the genome change event on initial load
+    if (hic.HICBrowser.currentBrowser && hic.HICBrowser.currentBrowser.genome) {
+        await genomeChangeListener.receiveEvent({data: hic.HICBrowser.currentBrowser.genome.id})
+    }
+};
+
+const configureShareModal = () => {
+
+    const $hic_share_url_modal = $('#hic-share-url-modal');
 
     $hic_share_url_modal.on('show.bs.modal', async function (e) {
 
@@ -181,73 +250,14 @@ const initializationHelper = async (container, config) => {
         $('#hic-qr-code-image').hide();
     });
 
-    $('#hic-track-dropdown').parent().on('shown.bs.dropdown', function () {
-        var browser;
-
-        browser = hic.HICBrowser.getCurrentBrowser();
-        if (undefined === browser || undefined === browser.dataset) {
-            Alert.presentAlert('Contact map must be loaded and selected before loading tracks');
-        }
-    });
-
-    $('#hic-embed-button').on('click', function (e) {
-        $('#hic-qr-code-image').hide();
-        $('#hic-embed-container').toggle();
-    });
-
     $('#hic-qr-code-button').on('click', function (e) {
         $('#hic-embed-container').hide();
         $('#hic-qr-code-image').toggle();
     });
 
-    $('div[id$="-map-dropdown-menu"] input').on('change', function (e) {
-
-        if (undefined === hic.HICBrowser.getCurrentBrowser()) {
-            Alert.presentAlert('ERROR: you must select a map panel.');
-        } else {
-
-            const file = ($(this).get(0).files)[0];
-
-            const { name } = file;
-            const suffix = name.substr(name.lastIndexOf('.') + 1);
-
-            if ('hic' === suffix) {
-                const mapType = $(this).attr('name');
-                loadHicFile(file, name, mapType);
-            } else {
-                loadTracks([{ url: file, name }]);
-            }
-        }
-
-        $(this).val("");
-    });
-
-    $('div[id$="-map-dropdown-menu"]').find('div[id$="-map-dropdown-dropbox-button"]').on('click', () => {
-        console.log('Dropbox button click');
-    });
-
-    if (true === googleEnabled) {
-        $('div[id$="-map-dropdown-menu"]').find('div[id$="-map-dropdown-google-drive-button"]').on('click', () => {
-            console.log('Google button click');
-        })
-    }
-
-
-
-
-    $('.juicebox-app-clone-button').on('click', async () => {
-
-        let browser = undefined;
-        try {
-            browser = await hic.createBrowser(container, { initFromUrl: false, updateHref: false });
-        } catch (e) {
-            console.error(e);
-        }
-
-        if (browser) {
-            hic.HICBrowser.setCurrentBrowser(browser);
-        }
-
+    $('#hic-embed-button').on('click', function (e) {
+        $('#hic-qr-code-image').hide();
+        $('#hic-embed-container').toggle();
     });
 
     $('#hic-copy-link').on('click', function (e) {
@@ -272,23 +282,7 @@ const initializationHelper = async (container, config) => {
         }
     });
 
-    const $e = $('button[id$=-map-dropdown]');
-    $e.parent().on('show.bs.dropdown', function () {
-        currentContactMapDropdownButtonID = $(this).children('.dropdown-toggle').attr('id');
-    });
 
-    $e.parent().on('hide.bs.dropdown', function () {
-        console.log("hide contact/control map");
-    });
-
-    hic.EventBus.globalBus.subscribe("BrowserSelect", function (event) {
-        updateBDropdown(event.data);
-    });
-
-    // Must manually trigger the genome change event on initial load
-    if (hic.HICBrowser.currentBrowser && hic.HICBrowser.currentBrowser.genome) {
-        await genomeChangeListener.receiveEvent({data: hic.HICBrowser.currentBrowser.genome.id})
-    }
 };
 
 const appendAndConfigureLoadURLModal = (root, id, input_handler) => {

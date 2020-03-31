@@ -111,7 +111,7 @@
                             Local Map ...
                         </div>
                         <div>
-                            <input name="contact-map" type="file" style="display: none;">
+                            <input name="contact-map" data-maptype="contact-map" type="file" style="display: none;">
                         </div>
                     </div>
                 </label>
@@ -119,7 +119,7 @@
                 <!-- Dropbox -->
                 <div class="dropdown-item">
 
-                    <div id="hic-contact-map-dropdown-dropbox-button" class="igv-app-dropdown-item-cloud-storage">
+                    <div id="hic-contact-map-dropdown-dropbox-button" data-maptype="contact-map" class="igv-app-dropdown-item-cloud-storage">
 
                         <div>Dropbox</div>
                         <div>
@@ -133,7 +133,7 @@
 
                 <!-- Google Drive -->
                 <div class="dropdown-item">
-                    <div id="hic-contact-map-dropdown-google-drive-button" class="igv-app-dropdown-item-cloud-storage">
+                    <div id="hic-contact-map-dropdown-google-drive-button" data-maptype="contact-map" class="igv-app-dropdown-item-cloud-storage">
                         <div>Google Drive</div>
                         <div><img src="./img/googledrive-dropdown-menu-item.png" width="18" height="18"></div>
                         <div>...</div>
@@ -165,7 +165,7 @@
                             Local Map ...
                         </div>
                         <div>
-                            <input name="control-map" type="file" style="display: none;">
+                            <input name="control-map" data-maptype="control-map" type="file" style="display: none;">
                         </div>
                     </div>
                 </label>
@@ -183,7 +183,7 @@
                 Load Tracks
             </button>
 
-            <div class="dropdown-menu">
+            <div id="hic-track-dropdown-menu" class="dropdown-menu">
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-encode-modal" id="hic-encode-modal-button">ENCODE</a>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-annotation-datalist-modal">Genome Annotations</a>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-annotation-2D-datalist-modal">2D Annotations</a>
