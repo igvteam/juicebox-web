@@ -22,9 +22,9 @@
  */
 
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
-import {FileLoadManager, FileLoadWidget, Utils} from '../node_modules/igv-widgets/dist/igv-widgets.js';
+import {FileLoadManager, FileLoadWidget, Utils} from '../node_modules/igv-widgets/src/index.js';
 import {FileUtils} from '../node_modules/igv-utils/src/index.js';
-import { SessionFileLoad } from '../node_modules/igv-widgets/dist/igv-widgets.js';
+import SessionFileLoad from "./sessionFileLoad.js";
 import { googleEnabled } from "./app.js";
 
 const igv = hic.igv;
@@ -116,7 +116,7 @@ export const sessionControllerConfigurator = () => {
                 await hic.loadSession(config)
             },
             igvxhr: igv.xhr,
-            oauth: igv.oauth
+            google: igv.google
         };
 
     // Session Controller

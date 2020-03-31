@@ -21,9 +21,11 @@
  *
  */
 
-//import igv from '../node_modules/igv/dist/igv.esm.min.js';
-
+import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 import { Alert } from '../node_modules/igv-ui/src/index.js'
+
+// The igv object. TODO eliminate this dependency
+const igv = hic.igv;
 
 let picker;
 

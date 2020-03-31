@@ -21,22 +21,9 @@
  *
  */
 
-/**
- * Created by Jim Robinson on 3/4/17.
- *
- * Page (site specific) code for the example pages.
- *
- */
-
-
-// This file depends on bootstrap modifications to jQuery => jquery & bootstrap are required.  Do not import jquery here, need the jquery from the page.
-
 import * as app_google from './app-google.js';
 import initializationHelper from "./initializationHelper.js";
-
-// The "hic" object.  By default get from the juicebox bundle, but for efficient debugging get from the source (index.js)
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
-//import hic from "../node_modules/juicebox.js/js/index.js";
 
 // import { juiceboxConfig } from "../juiceboxConfig.js";
 import { juiceboxConfig } from "../juiceboxConfig-private.js";
