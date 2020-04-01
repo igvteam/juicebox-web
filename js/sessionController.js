@@ -22,7 +22,7 @@
  */
 
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
-import {FileLoadManager, FileLoadWidget, Utils} from '../node_modules/igv-widgets/src/index.js';
+import {FileLoadManager, FileLoadWidget, Utils} from '../node_modules/igv-widgets/dist/igv-widgets.js';
 import {FileUtils} from '../node_modules/igv-utils/src/index.js';
 import SessionFileLoad from "./sessionFileLoad.js";
 import { googleEnabled } from "./app.js";
