@@ -6,8 +6,8 @@ const juiceboxConfig = {
     mapMenu: {
         id: 'contact-map-datalist',
         // items: 'https://aidenlab.org/juicebox/res/mapMenuData.txt'
-        // items: 'http://hicfiles.tc4ga.com.s3.amazonaws.com/public/hicfiles.json'
-        items: 'hicfiles.json'
+        items: 'https://aidenlab.org/juicebox/res/hicfiles.json'
+        // items: 'hicfiles.json'
     },
     trackMenu: {
         id: 'annotation-datalist',
