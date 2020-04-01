@@ -26,7 +26,9 @@ import initializationHelper from "./initializationHelper.js";
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 
 
-init(document.getElementById('app-container'));
+document.addEventListener("DOMContentLoaded", async (event) => {
+    await init(document.getElementById('app-container'), juiceboxConfig);
+});
 
 let googleEnabled = false;
 
