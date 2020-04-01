@@ -11,17 +11,30 @@ import ContactMapLoad from "./contactMapLoad.js";
 // The igv object. TODO eliminate this dependency
 const igv = hic.igv;
 
-let lastGenomeId = undefined;
-let qrcode = undefined;
+let lastGenomeId;
 let sessionController;
+let contactMapLoad;
 
 const encodeModal = new ModalTable({ id: 'hic-encode-modal', title: 'ENCODE', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => loadTracks(selected) });
-
-let contactMapLoad = undefined;
 
 const initializationHelper = async (container, config) => {
 
     Alert.init(container);
+
+    $('.juicebox-app-clone-button').on('click', async () => {
+
+        let browser = undefined;
+        try {
+            browser = await hic.createBrowser(container, { initFromUrl: false, updateHref: false });
+        } catch (e) {
+            console.error(e);
+        }
+
+        if (browser) {
+            hic.HICBrowser.setCurrentBrowser(browser);
+        }
+
+    });
 
     const genomeChangeListener = {
 
@@ -42,7 +55,7 @@ const initializationHelper = async (container, config) => {
 
                 if (EncodeDataSource.supportsGenome(genomeId)) {
                     $('#hic-encode-modal-button').show();
-                    createEncodeTable(genomeId);
+                    encodeModal.setDatasource(new EncodeDataSource(genomeId));
                 } else {
                     $('#hic-encode-modal-button').hide();
                 }
@@ -59,27 +72,6 @@ const initializationHelper = async (container, config) => {
 
     sessionController = new SessionController(sessionControllerConfigurator());
 
-    createAnnotationDatalistModals(document.querySelector('#hic-main'));
-
-    appendAndConfigureLoadURLModal(document.querySelector('#hic-main'), 'track-load-url-modal', path => {
-        loadTracks([ { url: path } ]);
-    });
-
-    $('.juicebox-app-clone-button').on('click', async () => {
-
-        let browser = undefined;
-        try {
-            browser = await hic.createBrowser(container, { initFromUrl: false, updateHref: false });
-        } catch (e) {
-            console.error(e);
-        }
-
-        if (browser) {
-            hic.HICBrowser.setCurrentBrowser(browser);
-        }
-
-    });
-
     $('#hic-track-dropdown-menu').parent().on('shown.bs.dropdown', function () {
 
         const browser = hic.HICBrowser.getCurrentBrowser();
@@ -88,6 +80,14 @@ const initializationHelper = async (container, config) => {
             Alert.presentAlert('Contact map must be loaded and selected before loading tracks');
         }
     });
+
+    createAnnotationDatalistModals(document.querySelector('#hic-main'));
+
+    appendAndConfigureLoadURLModal(document.querySelector('#hic-main'), 'track-load-url-modal', path => {
+        loadTracks([ { url: path } ]);
+    });
+
+    configureLocalTrackFileLoad($('#hic-local-track-file-input'));
 
     const $dropdownButtons = $('button[id$=-map-dropdown]');
     const $dropdowns = $dropdownButtons.parent();
@@ -119,6 +119,28 @@ const initializationHelper = async (container, config) => {
     }
 };
 
+const configureLocalTrackFileLoad = $input => {
+
+    $input.on('change', () => {
+
+        const file = ($input.get(0).files)[ 0 ];
+        const { name } = file;
+
+        $input.val("");
+
+        const config =
+            {
+                name,
+                filename: name,
+                url: file
+            };
+
+        loadTracks([ config ]);
+    });
+
+};
+
+let qrcode = undefined;
 const configureShareModal = () => {
 
     const $hic_share_url_modal = $('#hic-share-url-modal');
@@ -352,8 +374,6 @@ const createGenericDataListModal = (id, input_id, datalist_id, placeholder) => {
 
     return generic_select_modal_string;
 };
-
-const createEncodeTable = genomeId => encodeModal.setDatasource(new EncodeDataSource(genomeId));
 
 const loadAnnotationDatalist = async ($datalist, url, type) => {
 
