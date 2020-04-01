@@ -21,14 +21,12 @@
  *
  */
 
+import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 import {FileLoadManager, FileLoadWidget, Utils} from '../node_modules/igv-widgets/dist/igv-widgets.js';
 import {FileUtils} from '../node_modules/igv-utils/src/index.js';
+import SessionFileLoad from "./sessionFileLoad.js";
+import { googleEnabled } from "./app.js";
 
-// The "hic" object.  By default get from the juicebox bundle, but for efficient debugging get from the source (index.js)
-// Note -- for convenient debugging get hic from ../../js/index.js
-import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
-//import * as hic from "../node_modules/juicebox.js/js/index.js";
-// The igv object. TODO eliminate this dependency
 const igv = hic.igv;
 
 class SessionController {
@@ -104,5 +102,33 @@ function configureSaveSessionModal(JSONProvider, sessionSaveModal) {
     });
 
 }
+
+export const sessionControllerConfigurator = () => {
+
+    // Session File Load
+    const sessionFileLoadConfig =
+        {
+            localFileInput: document.querySelector('#igv-app-dropdown-local-session-file-input'),
+            dropboxButton: document.querySelector('#igv-app-dropdown-dropbox-session-file-button'),
+            googleEnabled,
+            googleDriveButton: document.querySelector('#igv-app-dropdown-google-drive-session-file-button'),
+            loadHandler: async config => {
+                await hic.loadSession(config)
+            },
+            igvxhr: igv.xhr,
+            google: igv.google
+        };
+
+    // Session Controller
+    const sessionControllerConfig =
+        {
+            sessionLoadModal: document.querySelector('#igv-app-session-from-url-modal'),
+            sessionSaveModal: document.querySelector('#igv-app-session-save-modal'),
+            sessionFileLoad: new SessionFileLoad(sessionFileLoadConfig),
+            JSONProvider: () => hic.toJSON()
+        };
+
+    return sessionControllerConfig;
+};
 
 export default SessionController;

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -96,50 +95,145 @@
 
     <div id="hic-modal-button-container">
 
-        <!-- Contact Map: Select | Local File | URL -->
+        <!-- Contact Map -->
         <div class="dropdown">
 
             <button id="hic-contact-map-dropdown" class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
                 Load Map
             </button>
 
-            <div class="dropdown-menu">
+            <div id="hic-contact-map-dropdown-menu" class="dropdown-menu">
+
+                <!-- Select -->
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-contact-map-modal">Select Map File</a>
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-load-local-file-modal">Local Map File</a>
+
+                <!-- Local Map File -->
+                <label class="dropdown-item btn btn-default btn-file">
+                    <div class="igv-app-dropdown-item-cloud-storage">
+                        <div>
+                            Local Map ...
+                        </div>
+                        <div>
+                            <input name="contact-map" type="file" style="display: none;">
+                        </div>
+                    </div>
+                </label>
+
+                <!-- Dropbox -->
+                <div class="dropdown-item">
+
+                    <div id="hic-contact-map-dropdown-dropbox-button" class="igv-app-dropdown-item-cloud-storage">
+
+                        <div>Dropbox</div>
+                        <div>
+                            <img src="./img/dropbox-dropdown-menu-item.png" width="18" height="18">
+                        </div>
+                        <div>...</div>
+
+                    </div>
+
+                </div>
+
+                <!-- Google Drive -->
+                <div class="dropdown-item">
+                    <div id="hic-contact-map-dropdown-google-drive-button" class="igv-app-dropdown-item-cloud-storage">
+                        <div>Google Drive</div>
+                        <div><img src="./img/googledrive-dropdown-menu-item.png" width="18" height="18"></div>
+                        <div>...</div>
+                    </div>
+                </div>
+
+                <!-- URL -->
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-load-url-modal">Map URL</a>
             </div>
 
         </div>
 
-        <!-- Control Map: Select | Local File | URL -->
+        <!-- Control Map -->
         <div class="dropdown">
 
             <button id="hic-control-map-dropdown" class="btn btn-outline-dark btn-sm dropdown-toggle disabled" type="button" data-toggle="dropdown">
                 Load "B" Map
             </button>
 
-            <div class="dropdown-menu">
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-contact-map-modal">Select Map
-                    File</a>
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-load-local-file-modal">Local Map
-                    File</a>
+            <div id="hic-control-map-dropdown-menu" class="dropdown-menu">
+
+                <!-- Select -->
+                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-contact-map-modal">Select Map File</a>
+
+                <!-- Local Map File -->
+                <label class="dropdown-item btn btn-default btn-file">
+                    <div class="igv-app-dropdown-item-cloud-storage">
+                        <div>
+                            Local Map ...
+                        </div>
+                        <div>
+                            <input name="control-map" type="file" style="display: none;">
+                        </div>
+                    </div>
+                </label>
+
+                <!-- Dropbox -->
+                <div class="dropdown-item">
+
+                    <div id="hic-control-map-dropdown-dropbox-button" class="igv-app-dropdown-item-cloud-storage">
+
+                        <div>Dropbox</div>
+                        <div>
+                            <img src="./img/dropbox-dropdown-menu-item.png" width="18" height="18">
+                        </div>
+                        <div>...</div>
+
+                    </div>
+
+                </div>
+
+                <!-- Google Drive -->
+                <div class="dropdown-item">
+                    <div id="hic-control-map-dropdown-google-drive-button" class="igv-app-dropdown-item-cloud-storage">
+                        <div>Google Drive</div>
+                        <div><img src="./img/googledrive-dropdown-menu-item.png" width="18" height="18"></div>
+                        <div>...</div>
+                    </div>
+                </div>
+
+                <!-- URL -->
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-load-url-modal">Map URL</a>
             </div>
 
         </div>
 
-        <!-- Track File: ENCODE | Annotations | Local File | URL -->
+        <!-- Track -->
         <div class="dropdown">
 
             <button id="hic-track-dropdown-button" class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
                 Load Tracks
             </button>
 
-            <div class="dropdown-menu">
+            <div id="hic-track-dropdown-menu" class="dropdown-menu">
+
+                <!-- ENCODE -->
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-encode-modal" id="hic-encode-modal-button">ENCODE</a>
+
+                <!-- Genome Annotations -->
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-annotation-datalist-modal">Genome Annotations</a>
+
+                <!-- 2D Annotations -->
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-annotation-2D-datalist-modal">2D Annotations</a>
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-load-local-file-modal">Local Track File</a>
+
+                <!-- Local Track -->
+                <label class="dropdown-item btn btn-default btn-file">
+                    <div class="igv-app-dropdown-item-cloud-storage">
+                        <div>
+                            Local Track File ...
+                        </div>
+                        <div>
+                            <input id="hic-local-track-file-input" name="local-track-file" type="file" style="display: none;">
+                        </div>
+                    </div>
+                </label>
+
+                <!-- Track URL -->
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#track-load-url-modal">Track URL</a>
             </div>
 
@@ -184,8 +278,7 @@
 
                 <!-- Load Google Drive hosted session file -->
                 <div class="dropdown-item">
-                    <div id="igv-app-dropdown-google-drive-session-file-button"
-                         class="igv-app-dropdown-item-cloud-storage">
+                    <div id="igv-app-dropdown-google-drive-session-file-button" class="igv-app-dropdown-item-cloud-storage">
                         <div>Google Drive</div>
                         <div><img src="./img/googledrive-dropdown-menu-item.png" width="18" height="18"></div>
                         <div>...</div>
@@ -208,14 +301,14 @@
 
         </div>
 
-        <!-- Share (generate URL) -->
+        <!-- Share -->
         <div title="Share">
             <button id="hic-share-button" class="btn btn-outline-dark btn-sm" type="button" data-toggle="modal" data-target="#hic-share-url-modal">
                 Share
             </button>
         </div>
 
-        <!-- App clone button -->
+        <!-- App Clone -->
         <div class="juicebox-app-clone-button" title="Add Map Panel">
             <i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i>
         </div>
@@ -424,32 +517,6 @@
                         </div>
 
                     </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- Load Local File Modal -->
-    <div id="hic-load-local-file-modal" class="modal fade">
-        <div class="modal-dialog  modal-lg">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <div class="modal-title">Load Local File</div>
-
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-
-                </div>
-
-                <div class="modal-body">
-
-                    <div class="form-group">
-                        <input id="hic-load-local-file" type="file" title="Load Local File"/>
-                    </div>
-
                 </div>
 
             </div>

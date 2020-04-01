@@ -6,8 +6,8 @@ const juiceboxConfig = {
     mapMenu: {
         id: 'contact-map-datalist',
         // items: 'https://aidenlab.org/juicebox/res/mapMenuData.txt'
-        // items: 'http://hicfiles.tc4ga.com.s3.amazonaws.com/public/hicfiles.json'
-        items: 'hicfiles.json'
+        items: 'https://aidenlab.org/juicebox/res/hicfiles.json'
+        // items: 'hicfiles.json'
     },
     trackMenu: {
         id: 'annotation-datalist',
@@ -18,20 +18,12 @@ const juiceboxConfig = {
         items: 'https://hicfiles.s3.amazonaws.com/internal/tracksMenu_2D.$GENOME_ID.txt'
     },
 
-    // List of URL shorteners.  First in the list is the default and will be used for shortening URLs
-    // Others potentiall used for expanding short URLs.  At least 1 shortener is required for the
-    // "Share" button.
-    // NOTE: you must provide an API key (Google) or access token (Bitly) to use these services on your site
-    urlShortener: [
-        {
-            provider: 'tinyURL'
-        },
-        {
-            provider: "bitly",
-            apiKey: "BITLY_KEY",        // TODO -- add with your Bitly access token, or delete this entry
-            hostname: 'bit.ly'
-        }
-    ],
+    urlShortener:
+        [
+            {
+                provider: 'tinyURL'
+            }
+        ],
 
     // Supply a Google client id to enable loading of private Google files.  Supply an API key to
     // enable loading of public Google files without login.

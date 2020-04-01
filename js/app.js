@@ -21,27 +21,18 @@
  *
  */
 
-/**
- * Created by Jim Robinson on 3/4/17.
- *
- * Page (site specific) code for the example pages.
- *
- */
-
-
-// This file depends on bootstrap modifications to jQuery => jquery & bootstrap are required.  Do not import jquery here, need the jquery from the page.
-
+import * as app_google from './app-google.js';
 import initializationHelper from "./initializationHelper.js";
-
-// The "hic" object.  By default get from the juicebox bundle, but for efficient debugging get from the source (index.js)
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
-//import hic from "../node_modules/juicebox.js/js/index.js";
 
 import { juiceboxConfig } from "../juiceboxConfig.js";
+// import { juiceboxConfig } from "../juiceboxConfig-private.js";
 
 document.addEventListener("DOMContentLoaded", async (event) => {
     await init(document.getElementById('app-container'), juiceboxConfig);
 });
+
+let googleEnabled = false;
 
 const init = async (container, config) => {
 
@@ -52,15 +43,46 @@ const init = async (container, config) => {
 
     config = config || {};
 
-    try {
+    const { google } = config;
+    const { clientId } = google;
+
+    if (clientId && 'GOOGLE_CLIENT_ID' !== clientId) {
+
+        const gapiConfig =
+            {
+                callback: async () => {
+
+                    let ignore = await app_google.init(clientId);
+
+                    await hic.initApp(container, config);
+
+                    googleEnabled = true;
+
+                    app_google.postInit();
+
+                    await initializationHelper(container, config);
+
+                },
+                onerror: async error => {
+
+                    console.log('gapi.client:auth2 - failed to load!');
+
+                    console.error(error);
+
+                    await initializationHelper(container, config);
+                }
+            };
+
+        gapi.load('client:auth2', gapiConfig);
+    } else {
         await hic.initApp(container, config);
-    } catch (e) {
-        alert(`Error initializing app ${e}`)
+        await initializationHelper(container, config);
     }
 
-    await initializationHelper(container, config);
 
 };
+
+export { googleEnabled }
 
 
 
