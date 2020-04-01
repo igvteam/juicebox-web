@@ -44,9 +44,8 @@ const init = async (container, config) => {
     config = config || {};
 
     const { google } = config;
-    const { clientId } = google;
 
-    if (clientId && 'GOOGLE_CLIENT_ID' !== clientId) {
+    if (google && google.clientId && 'GOOGLE_CLIENT_ID' !== google.clientId) {
 
         const gapiConfig =
             {
