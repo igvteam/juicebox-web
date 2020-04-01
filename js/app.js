@@ -41,11 +41,11 @@ async function init(container) {
     const google = config.google;
     const clientId = google ? google.clientId : undefined;
 
-    if (clientId && 'GOOGLE_CLIENT_ID' !== clientId && window.location.protocol !== "https:") {
+    if (clientId && 'GOOGLE_CLIENT_ID' !== clientId && (window.location.protocol !== "https:" && window.location.host !== "localhost")) {
         console.warn("To enable Google Drive use https://")
     }
 
-    if (clientId && 'GOOGLE_CLIENT_ID' !== clientId && window.location.protocol === "https:") {
+    if (clientId && 'GOOGLE_CLIENT_ID' !== clientId && (window.location.protocol === "https:" || window.location.host === "localhost")) {
         const gapiConfig =
             {
                 callback: async () => {
