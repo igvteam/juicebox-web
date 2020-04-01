@@ -25,50 +25,40 @@ import * as app_google from './app-google.js';
 import initializationHelper from "./initializationHelper.js";
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 
-import { juiceboxConfig } from "../juiceboxConfig.js";
-// import { juiceboxConfig } from "../juiceboxConfig-private.js";
 
-document.addEventListener("DOMContentLoaded", async (event) => {
-    await init(document.getElementById('app-container'), juiceboxConfig);
-});
+init(document.getElementById('app-container'));
 
 let googleEnabled = false;
 
-const init = async (container, config) => {
+async function init(container) {
 
     const versionElem = document.getElementById("hic-version-number");
-    if(versionElem) {
+
+    if (versionElem) {
         versionElem.innerText = `version ${hic.version}`;
     }
+    const config = juiceboxConfig || {};   // From script include.  Optional.
+    const google = config.google;
+    const clientId = google ? google.clientId : undefined;
 
-    config = config || {};
+    if (clientId && 'GOOGLE_CLIENT_ID' !== clientId && window.location.protocol !== "https:") {
+        console.warn("To enable Google Drive use https://")
+    }
 
-    const { google } = config;
-    const { clientId } = google;
-
-    if (clientId && 'GOOGLE_CLIENT_ID' !== clientId) {
-
+    if (clientId && 'GOOGLE_CLIENT_ID' !== clientId && window.location.protocol === "https:") {
         const gapiConfig =
             {
                 callback: async () => {
-
                     let ignore = await app_google.init(clientId);
-
                     await hic.initApp(container, config);
-
                     googleEnabled = true;
-
                     app_google.postInit();
-
                     await initializationHelper(container, config);
 
                 },
                 onerror: async error => {
-
                     console.log('gapi.client:auth2 - failed to load!');
-
                     console.error(error);
-
                     await initializationHelper(container, config);
                 }
             };
@@ -78,11 +68,9 @@ const init = async (container, config) => {
         await hic.initApp(container, config);
         await initializationHelper(container, config);
     }
+}
 
-
-};
-
-export { googleEnabled }
+export {googleEnabled}
 
 
 
