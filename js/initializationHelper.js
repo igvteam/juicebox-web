@@ -7,6 +7,7 @@ import QRCode from "./qrcode.js";
 import SessionController, { sessionControllerConfigurator }from "./sessionController.js";
 import { googleEnabled } from './app.js';
 import ContactMapLoad from "./contactMapLoad.js";
+import TrackLoad from "./trackLoad.js";
 
 // The igv object. TODO eliminate this dependency
 const igv = hic.igv;
@@ -14,8 +15,11 @@ const igv = hic.igv;
 let lastGenomeId;
 let sessionController;
 let contactMapLoad;
+let trackLoad;
 
-const encodeModal = new ModalTable({ id: 'hic-encode-modal', title: 'ENCODE', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => loadTracks(selected) });
+const encodeModal = new ModalTable({ id: 'hic-encode-modal', title: 'ENCODE', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => {
+    loadTracks(selected)
+    } });
 
 const initializationHelper = async (container, config) => {
 
@@ -63,8 +67,6 @@ const initializationHelper = async (container, config) => {
         }
     };
 
-    hic.EventBus.globalBus.subscribe("GenomeChange", genomeChangeListener);
-
     for (let browser of hic.allBrowsers) {
         browser.eventBus.subscribe("MapLoad", checkBDropdown);
         updateBDropdown(browser);
@@ -81,13 +83,19 @@ const initializationHelper = async (container, config) => {
         }
     });
 
-    createAnnotationDatalistModals(document.querySelector('#hic-main'));
+    const trackLoadConfig =
+        {
+            rootContainer: document.querySelector('#hic-main'),
+            $localFileInput: $('#hic-local-track-file-input'),
+            urlLoadModalId: 'track-load-url-modal',
+            $dropboxButtons: $('#hic-track-dropdown-dropbox-button'),
+            $googleDriveButtons: $('#hic-track-dropdown-google-drive-button'),
+            googleEnabled,
+            loadHandler: (configurations) => loadTracks(configurations)
+        };
 
-    appendAndConfigureLoadURLModal(document.querySelector('#hic-main'), 'track-load-url-modal', path => {
-        loadTracks([ { url: path } ]);
-    });
+    trackLoad = new TrackLoad(trackLoadConfig);
 
-    configureLocalTrackFileLoad($('#hic-local-track-file-input'));
 
     const $dropdownButtons = $('button[id$=-map-dropdown]');
     const $dropdowns = $dropdownButtons.parent();
@@ -102,12 +110,15 @@ const initializationHelper = async (container, config) => {
             $dropboxButtons: $dropdowns.find('div[id$="-map-dropdown-dropbox-button"]'),
             $googleDriveButtons: $dropdowns.find('div[id$="-map-dropdown-google-drive-button"]'),
             googleEnabled,
-            mapMenu: config.mapMenu
+            mapMenu: config.mapMenu,
+            loadHandler: (path, name, mapType) => loadHicFile(path, name, mapType)
         };
 
     contactMapLoad = new ContactMapLoad(contactMapLoadConfig);
 
     configureShareModal();
+
+    hic.EventBus.globalBus.subscribe("GenomeChange", genomeChangeListener);
 
     hic.EventBus.globalBus.subscribe("BrowserSelect", function (event) {
         updateBDropdown(event.data);
@@ -117,27 +128,6 @@ const initializationHelper = async (container, config) => {
     if (hic.HICBrowser.currentBrowser && hic.HICBrowser.currentBrowser.genome) {
         await genomeChangeListener.receiveEvent({data: hic.HICBrowser.currentBrowser.genome.id})
     }
-};
-
-const configureLocalTrackFileLoad = $input => {
-
-    $input.on('change', () => {
-
-        const file = ($input.get(0).files)[ 0 ];
-        const { name } = file;
-
-        $input.val("");
-
-        const config =
-            {
-                name,
-                filename: name,
-                url: file
-            };
-
-        loadTracks([ config ]);
-    });
-
 };
 
 let qrcode = undefined;
@@ -493,37 +483,6 @@ function getEmbedTarget() {
 
 }
 
-const populatePulldown = async menu => {
-
-    const { id, items } = menu;
-
-    let data = undefined;
-    try {
-        data = await igv.xhr.loadString(items)
-    } catch (e) {
-        console.error(e);
-    }
-
-    if (data) {
-
-        const lines = StringUtils.splitLines(data);
-
-        const parent = $(`#${ id }`);
-
-        for (let line of lines) {
-
-            const tokens = line.split('\t');
-            if (tokens.length > 1) {
-                const [ value, label ] = tokens;
-                parent.append($(`<option data-url="${ value }">${ label }</option>`));
-            }
-
-        }
-
-    }
-
-};
-
 function checkBDropdown() {
     updateBDropdown(hic.HICBrowser.getCurrentBrowser());
 }
@@ -538,6 +497,6 @@ function updateBDropdown(browser) {
     }
 }
 
-export { appendAndConfigureLoadURLModal, loadHicFile }
+export { appendAndConfigureLoadURLModal, createAnnotationDatalistModals, loadHicFile }
 
 export default initializationHelper

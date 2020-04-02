@@ -1,8 +1,8 @@
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
-import { loadHicFile, appendAndConfigureLoadURLModal } from "./initializationHelper.js";
 import * as app_google from './app-google.js';
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import ContactMapDatasource from "./contactMapDatasource.js";
+import { appendAndConfigureLoadURLModal } from "./initializationHelper.js";
 
 const igv = hic.igv;
 
@@ -11,7 +11,7 @@ let contactMapDatasource = undefined;
 
 class ContactMapLoad {
 
-    constructor({ rootContainer, $dropdowns, $localFileInputs, urlLoadModalId, dataModalId, $dropboxButtons, $googleDriveButtons, googleEnabled, mapMenu }) {
+    constructor({ rootContainer, $dropdowns, $localFileInputs, urlLoadModalId, dataModalId, $dropboxButtons, $googleDriveButtons, googleEnabled, mapMenu, loadHandler }) {
 
         $dropdowns.on('show.bs.dropdown', function () {
 
@@ -31,7 +31,7 @@ class ContactMapLoad {
             $(this).val("");
 
             const { name } = file;
-            await loadHicFile(file, name, mapType);
+            await loadHandler(file, name, mapType);
         });
 
         $dropboxButtons.on('click', () => {
@@ -42,7 +42,7 @@ class ContactMapLoad {
                         const paths = dbFiles.map(dbFile => dbFile.link);
                         const path = paths[ 0 ];
                         const name = igv.getFilename(path);
-                        await loadHicFile(path, name, mapType);
+                        await loadHandler(path, name, mapType);
                     },
                     cancel: () => {},
                     linkType: 'preview',
@@ -68,7 +68,7 @@ class ContactMapLoad {
                     });
 
                     let { name, google_url: path } = paths[ 0 ];
-                    await loadHicFile(path, name, mapType);
+                    await loadHandler(path, name, mapType);
 
                 });
 
@@ -77,7 +77,7 @@ class ContactMapLoad {
 
         appendAndConfigureLoadURLModal(rootContainer, urlLoadModalId, path => {
             const name = igv.getFilename(path);
-            loadHicFile( path, name, mapType );
+            loadHandler( path, name, mapType );
         });
 
         if (mapMenu) {
@@ -91,7 +91,7 @@ class ContactMapLoad {
 
             this.contactMapModal.selectHandler = async selectionList => {
                 const { url, name } = contactMapDatasource.tableSelectionHandler(selectionList);
-                await loadHicFile(url, name, mapType);
+                await loadHandler(url, name, mapType);
             };
         }
 
