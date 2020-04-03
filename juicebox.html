@@ -217,12 +217,6 @@
                 <!-- ENCODE -->
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-encode-modal" id="hic-encode-modal-button">ENCODE</a>
 
-                <!-- Genome Annotations -->
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-annotation-datalist-modal">Genome Annotations</a>
-
-                <!-- 2D Annotations -->
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-annotation-2D-datalist-modal">2D Annotations</a>
-
                 <!-- Local Track -->
                 <label class="dropdown-item btn btn-default btn-file">
                     <div class="igv-app-dropdown-item-cloud-storage">
@@ -234,6 +228,36 @@
                         </div>
                     </div>
                 </label>
+
+                <!-- Dropbox -->
+                <div class="dropdown-item">
+
+                    <div id="hic-track-dropdown-dropbox-button" class="igv-app-dropdown-item-cloud-storage">
+
+                        <div>Dropbox</div>
+                        <div>
+                            <img src="./img/dropbox-dropdown-menu-item.png" width="18" height="18">
+                        </div>
+                        <div>...</div>
+
+                    </div>
+
+                </div>
+
+                <!-- Google Drive -->
+                <div class="dropdown-item">
+                    <div id="hic-track-dropdown-google-drive-button" class="igv-app-dropdown-item-cloud-storage">
+                        <div>Google Drive</div>
+                        <div><img src="./img/googledrive-dropdown-menu-item.png" width="18" height="18"></div>
+                        <div>...</div>
+                    </div>
+                </div>
+
+                <!-- Genome Annotations -->
+                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-annotation-datalist-modal">Genome Annotations</a>
+
+                <!-- 2D Annotations -->
+                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-annotation-2D-datalist-modal">2D Annotations</a>
 
                 <!-- Track URL -->
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#track-load-url-modal">Track URL</a>
