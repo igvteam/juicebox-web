@@ -21,7 +21,7 @@ const encodeModal = new ModalTable({ id: 'hic-encode-modal', title: 'ENCODE', se
     loadTracks(selected)
     } });
 
-const initializationHelper = async (container, config) => {
+async function initializationHelper (container, config)  {
 
     Alert.init(container);
 
@@ -29,7 +29,7 @@ const initializationHelper = async (container, config) => {
 
         let browser = undefined;
         try {
-            browser = await hic.createBrowser(container, { initFromUrl: false, updateHref: false });
+            browser = await hic.createBrowser(container, {initFromUrl: false, updateHref: false});
         } catch (e) {
             console.error(e);
         }
@@ -43,7 +43,7 @@ const initializationHelper = async (container, config) => {
     const genomeChangeListener = {
 
         receiveEvent: async event => {
-            const { data: genomeId } = event;
+            const {data: genomeId} = event;
 
             if (lastGenomeId !== genomeId) {
                 lastGenomeId = genomeId;
@@ -128,100 +128,103 @@ const initializationHelper = async (container, config) => {
     if (hic.HICBrowser.currentBrowser && hic.HICBrowser.currentBrowser.genome) {
         await genomeChangeListener.receiveEvent({data: hic.HICBrowser.currentBrowser.genome.id})
     }
-};
 
-let qrcode = undefined;
-const configureShareModal = () => {
 
-    const $hic_share_url_modal = $('#hic-share-url-modal');
+    let qrcode = undefined;
+    function configureShareModal ()  {
 
-    $hic_share_url_modal.on('show.bs.modal', async function (e) {
+        const $hic_share_url_modal = $('#hic-share-url-modal');
 
-        let href = new String(window.location.href);
+        $hic_share_url_modal.on('show.bs.modal', async function (e) {
 
-        // This js file is specific to the aidenlab site, and we know we have only juicebox parameters.
-        // Strip href of current parameters, if any
-        let idx = href.indexOf("?");
-        if (idx > 0) href = href.substring(0, idx);
+            let href = new String(window.location.href);
 
-        const jbUrl = await hic.shortJuiceboxURL(href);
+            // This js file is specific to the aidenlab site, and we know we have only juicebox parameters.
+            // Strip href of current parameters, if any
+            let idx = href.indexOf("?");
+            if (idx > 0) href = href.substring(0, idx);
 
-        const embedSnippet = await getEmbeddableSnippet($(container), config);
-        const $hic_embed_url = $('#hic-embed');
-        $hic_embed_url.val(embedSnippet);
-        $hic_embed_url.get(0).select();
+            const jbUrl = await hic.shortJuiceboxURL(href);
 
-        let shareUrl = jbUrl;
+            const embedSnippet = await getEmbeddableSnippet($(container), config);
+            const $hic_embed_url = $('#hic-embed');
+            $hic_embed_url.val(embedSnippet);
+            $hic_embed_url.get(0).select();
 
-        // Shorten second time
-        // e.g. converts https://aidenlab.org/juicebox?juiceboxURL=https://goo.gl/WUb1mL  to https://goo.gl/ERHp5u
+            let shareUrl = jbUrl;
 
-        const $hic_share_url = $('#hic-share-url');
-        $hic_share_url.val(shareUrl);
-        $hic_share_url.get(0).select();
+            // Shorten second time
+            // e.g. converts https://aidenlab.org/juicebox?juiceboxURL=https://goo.gl/WUb1mL  to https://goo.gl/ERHp5u
 
-        const tweetContainer = $('#tweetButtonContainer');
-        tweetContainer.empty();
+            const $hic_share_url = $('#hic-share-url');
+            $hic_share_url.val(shareUrl);
+            $hic_share_url.get(0).select();
 
-        $('#emailButton').attr('href', 'mailto:?body=' + shareUrl);
+            const tweetContainer = $('#tweetButtonContainer');
+            tweetContainer.empty();
 
-        if (shareUrl.length < 100) {
+            $('#emailButton').attr('href', 'mailto:?body=' + shareUrl);
 
-            await window.twttr.widgets.createShareButton(shareUrl, tweetContainer.get(0), { text: 'Contact map: ' });
-            console.log("Tweet button updated");
+            if (shareUrl.length < 100) {
 
-            // QR code generation
-            if (qrcode) {
-                qrcode.clear();
-                $('hic-qr-code-image').empty();
-            } else {
-                qrcode = new QRCode(document.getElementById("hic-qr-code-image"), { width: 128, height: 128, correctLevel: QRCode.CorrectLevel.H });
+                await window.twttr.widgets.createShareButton(shareUrl, tweetContainer.get(0), {text: 'Contact map: '});
+                console.log("Tweet button updated");
+
+                // QR code generation
+                if (qrcode) {
+                    qrcode.clear();
+                    $('hic-qr-code-image').empty();
+                } else {
+                    qrcode = new QRCode(document.getElementById("hic-qr-code-image"), {
+                        width: 128,
+                        height: 128,
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                }
+
+                qrcode.makeCode(shareUrl);
             }
 
-            qrcode.makeCode(shareUrl);
-        }
+        });
 
-    });
+        $hic_share_url_modal.on('hidden.bs.modal', function (e) {
+            $('#hic-embed-container').hide();
+            $('#hic-qr-code-image').hide();
+        });
 
-    $hic_share_url_modal.on('hidden.bs.modal', function (e) {
-        $('#hic-embed-container').hide();
-        $('#hic-qr-code-image').hide();
-    });
+        $('#hic-qr-code-button').on('click', function (e) {
+            $('#hic-embed-container').hide();
+            $('#hic-qr-code-image').toggle();
+        });
 
-    $('#hic-qr-code-button').on('click', function (e) {
-        $('#hic-embed-container').hide();
-        $('#hic-qr-code-image').toggle();
-    });
+        $('#hic-embed-button').on('click', function (e) {
+            $('#hic-qr-code-image').hide();
+            $('#hic-embed-container').toggle();
+        });
 
-    $('#hic-embed-button').on('click', function (e) {
-        $('#hic-qr-code-image').hide();
-        $('#hic-embed-container').toggle();
-    });
+        $('#hic-copy-link').on('click', function (e) {
+            var success;
+            $('#hic-share-url')[0].select();
+            success = document.execCommand('copy');
+            if (success) {
+                $('#hic-share-url-modal').modal('hide');
+            } else {
+                alert("Copy not successful");
+            }
+        });
 
-    $('#hic-copy-link').on('click', function (e) {
-        var success;
-        $('#hic-share-url')[0].select();
-        success = document.execCommand('copy');
-        if (success) {
-            $('#hic-share-url-modal').modal('hide');
-        } else {
-            alert("Copy not successful");
-        }
-    });
-
-    $('#hic-embed-copy-link').on('click', function (e) {
-        var success;
-        $('#hic-embed')[0].select();
-        success = document.execCommand('copy');
-        if (success) {
-            $('#hic-share-url-modal').modal('hide');
-        } else {
-            alert("Copy not successful");
-        }
-    });
-
-
-};
+        $('#hic-embed-copy-link').on('click', function (e) {
+            var success;
+            $('#hic-embed')[0].select();
+            success = document.execCommand('copy');
+            if (success) {
+                $('#hic-share-url-modal').modal('hide');
+            } else {
+                alert("Copy not successful");
+            }
+        });
+    }
+}
 
 const appendAndConfigureLoadURLModal = (root, id, input_handler) => {
 
