@@ -428,38 +428,37 @@ function loadTracks(tracks) {
 
 const loadHicFile = async (url, name, mapType) => {
 
-    let browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
+    try {
+        let browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
+        const isControl = ('control-map' === mapType);
+        const browser = hic.HICBrowser.getCurrentBrowser();
+        const config = {url, name, isControl};
 
-    const isControl = ('control-map' === mapType);
-
-    const browser = hic.HICBrowser.getCurrentBrowser();
-
-    const config = { url, name, isControl };
-
-    if (StringUtils.isString(url) && url.includes("?")) {
-        const query = hic.extractQuery(url);
-        const uriDecode = url.includes("%2C");
-        hic.decodeQuery(query, config, uriDecode);
-    }
-
-    if (isControl) {
-        await browser.loadHicControlFile(config)
-    } else {
-        browser.reset();
-
-        browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
-
-        if (browsersWithMaps.length > 0) {
-            config["synchState"] = browsersWithMaps[0].getSyncState();
+        if (StringUtils.isString(url) && url.includes("?")) {
+            const query = hic.extractQuery(url);
+            const uriDecode = url.includes("%2C");
+            hic.decodeQuery(query, config, uriDecode);
         }
 
-        await browser.loadHicFile(config);
+        if (isControl) {
+            await browser.loadHicControlFile(config)
+        } else {
+            browser.reset();
+            browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
+            if (browsersWithMaps.length > 0) {
+                
+                
+                config["synchState"] = browsersWithMaps[0].getSyncState();
+            }
+            await browser.loadHicFile(config);
+            if (!isControl) {
+                hic.syncBrowsers(hic.allBrowsers);
+            }
 
-        if (!isControl) {
-            hic.syncBrowsers(hic.allBrowsers);
+            $('#hic-control-map-dropdown').removeClass('disabled');
         }
-
-        $('#hic-control-map-dropdown').removeClass('disabled');
+    } catch (e) {
+        igv.presentAler(`Error loading ${url}: ${e}`);
     }
 };
 
