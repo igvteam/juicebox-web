@@ -20,7 +20,7 @@
     "@babel/plugin-transform-runtime": "^7.9.0",
     "@babel/preset-env": "^7.9.0",
     "core-js": "^3.6.4",
-     "fs-extra": "^8.1.0",
+    "fs-extra": "^8.1.0",
     "regenerator-runtime": "^0.13.5",
     "rollup": "^1.32.1",
     "rollup-plugin-babel": "^4.4.0",
@@ -35,6 +35,6 @@
     "igv-ui": "github:igvteam/igv-ui",
     "igv-utils": "github:igvteam/igv-utils",
     "igv-widgets": "github:igvteam/igv-widgets",
-    "juicebox.js": "^1.5.0"
+    "juicebox.js": "^1.5.0-rc.3"
   }
 }
