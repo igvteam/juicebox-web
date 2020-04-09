@@ -1,6 +1,6 @@
 {
   "name": "juicebox-web",
-  "version": "2.0.0",
+  "version": "1.5.0",
   "license": "MIT",
   "author": {
     "name": "Douglass Turner"
@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "start": "http-server -a localhost dist",
-    "build": "npx rollup -c && node scripts/copyArtifacts.js"
+    "build": "npx rollup -c && node scripts/generateHtml.js ./navbars/aidenlab.html juicebox.html && node scripts/generateHtml.js ./navbars/generic.html index.html"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
@@ -20,7 +20,7 @@
     "@babel/plugin-transform-runtime": "^7.9.0",
     "@babel/preset-env": "^7.9.0",
     "core-js": "^3.6.4",
-     "fs-extra": "^8.1.0",
+    "fs-extra": "^8.1.0",
     "regenerator-runtime": "^0.13.5",
     "rollup": "^1.32.1",
     "rollup-plugin-babel": "^4.4.0",

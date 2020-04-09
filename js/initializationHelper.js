@@ -1,11 +1,11 @@
-import { Alert } from '../node_modules/igv-ui/src/index.js'
-import { TrackUtils, StringUtils, } from '../node_modules/igv-utils/src/index.js'
+import {Alert} from '../node_modules/igv-ui/src/index.js'
+import {StringUtils, TrackUtils,} from '../node_modules/igv-utils/src/index.js'
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import EncodeDataSource from '../node_modules/data-modal/js/encodeDataSource.js';
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 import QRCode from "./qrcode.js";
-import SessionController, { sessionControllerConfigurator }from "./sessionController.js";
-import { googleEnabled } from './app.js';
+import SessionController, {sessionControllerConfigurator} from "./sessionController.js";
+import {googleEnabled} from './app.js';
 import ContactMapLoad from "./contactMapLoad.js";
 import TrackLoad from "./trackLoad.js";
 
@@ -17,11 +17,13 @@ let sessionController;
 let contactMapLoad;
 let trackLoad;
 
-const encodeModal = new ModalTable({ id: 'hic-encode-modal', title: 'ENCODE', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => {
-    loadTracks(selected)
-    } });
+const encodeModal = new ModalTable({
+    id: 'hic-encode-modal', title: 'ENCODE', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => {
+        loadTracks(selected)
+    }
+});
 
-async function initializationHelper (container, config)  {
+async function initializationHelper(container, config) {
 
     Alert.init(container);
 
@@ -131,7 +133,8 @@ async function initializationHelper (container, config)  {
 
 
     let qrcode = undefined;
-    function configureShareModal ()  {
+
+    function configureShareModal() {
 
         const $hic_share_url_modal = $('#hic-share-url-modal');
 
@@ -229,7 +232,7 @@ async function initializationHelper (container, config)  {
 const appendAndConfigureLoadURLModal = (root, id, input_handler) => {
 
     const html =
-        `<div id="${ id }" class="modal fade">
+        `<div id="${id}" class="modal fade">
             <div class="modal-dialog  modal-lg">
                 <div class="modal-content">
 
@@ -256,13 +259,13 @@ const appendAndConfigureLoadURLModal = (root, id, input_handler) => {
 
     $(root).append(html);
 
-    const $modal = $(root).find(`#${ id }`);
+    const $modal = $(root).find(`#${id}`);
     $modal.find('input').on('change', function () {
 
         const path = $(this).val();
         $(this).val("");
 
-        $(`#${ id }`).modal('hide');
+        $(`#${id}`).modal('hide');
 
         input_handler(path);
 
@@ -296,7 +299,7 @@ const createAnnotationDatalistModals = root => {
             });
             const path = $option.data('url');
 
-            let config = { url: path, name };
+            let config = {url: path, name};
 
             if (path.indexOf("hgdownload.cse.ucsc.edu") > 0) {
                 config.indexed = false
@@ -327,7 +330,7 @@ const createAnnotationDatalistModals = root => {
                 return /*str.includes(name)*/str === name;
             });
             const path = $option.data('url');
-            loadTracks([ { url: path, name } ]);
+            loadTracks([{url: path, name}]);
         }
 
         $('#hic-annotation-2D-datalist-modal').modal('hide');
@@ -339,7 +342,7 @@ const createAnnotationDatalistModals = root => {
 const createGenericDataListModal = (id, input_id, datalist_id, placeholder) => {
 
     const generic_select_modal_string =
-        `<div id="${ id }" class="modal">
+        `<div id="${id}" class="modal">
 
             <div class="modal-dialog modal-lg">
 
@@ -354,8 +357,8 @@ const createGenericDataListModal = (id, input_id, datalist_id, placeholder) => {
         
                     <div class="modal-body">
                         <div class="form-group">
-                            <input type="text" id="${ input_id }" list="${ datalist_id }" placeholder="${ placeholder }" class="form-control">
-                            <datalist id="${ datalist_id }"></datalist>
+                            <input type="text" id="${input_id}" list="${datalist_id}" placeholder="${placeholder}" class="form-control">
+                            <datalist id="${datalist_id}"></datalist>
                         </div>
                     </div>
 
@@ -377,7 +380,7 @@ const loadAnnotationDatalist = async ($datalist, url, type) => {
     try {
         data = await igv.xhr.loadString(url);
     } catch (e) {
-        if(e.message.includes("404")) {
+        if (e.message.includes("404")) {
             //  This is an expected condition, not all assemblies have track menus
             console.log(`No track menu found ${url}`);
         } else {
@@ -395,8 +398,8 @@ const loadAnnotationDatalist = async ($datalist, url, type) => {
 
             if (tokens.length > 1 && ("2D" === type || igvSupports(tokens[1]))) {
 
-                const [ label, value ] = tokens;
-                $datalist.append($(`<option data-url="${ value }">${ label }</option>`));
+                const [label, value] = tokens;
+                $datalist.append($(`<option data-url="${value}">${label}</option>`));
 
             }
         }
@@ -411,7 +414,7 @@ function igvSupports(path) {
         return false;
     }
 
-    let config = { url: path };
+    let config = {url: path};
     TrackUtils.inferTrackTypes(config);
     return config.type !== undefined;
 
@@ -419,14 +422,14 @@ function igvSupports(path) {
 
 function loadTracks(tracks) {
     // Set some juicebox specific defaults
-    for(let t of tracks) {
+    for (let t of tracks) {
         t.autoscale = true;
         t.displayMode = "COLLAPSED"
     }
     hic.HICBrowser.getCurrentBrowser().loadTracks(tracks);
 }
 
-const loadHicFile = async (url, name, mapType) => {
+async function loadHicFile(url, name, mapType) {
 
     try {
         let browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
@@ -446,8 +449,8 @@ const loadHicFile = async (url, name, mapType) => {
             browser.reset();
             browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
             if (browsersWithMaps.length > 0) {
-                
-                
+
+
                 config["synchState"] = browsersWithMaps[0].getSyncState();
             }
             await browser.loadHicFile(config);
@@ -458,13 +461,13 @@ const loadHicFile = async (url, name, mapType) => {
             $('#hic-control-map-dropdown').removeClass('disabled');
         }
     } catch (e) {
-        igv.presentAler(`Error loading ${url}: ${e}`);
+        Alert.presentAlert(`Error loading ${url}: ${e}`);
     }
 };
 
 async function getEmbeddableSnippet($container, config) {
     const base = (config.embedTarget || getEmbedTarget())
-    const embedUrl =  await hic.shortJuiceboxURL(base);
+    const embedUrl = await hic.shortJuiceboxURL(base);
     const height = $container.height();
     return '<iframe src="' + embedUrl + '" width="100%" height="' + height + '" frameborder="0" style="border:0" allowfullscreen></iframe>';
 }
@@ -499,6 +502,6 @@ function updateBDropdown(browser) {
     }
 }
 
-export { appendAndConfigureLoadURLModal, createAnnotationDatalistModals, loadHicFile }
+export {appendAndConfigureLoadURLModal, createAnnotationDatalistModals, loadHicFile}
 
 export default initializationHelper

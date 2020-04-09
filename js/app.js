@@ -33,11 +33,6 @@ let googleEnabled = false;
 
 async function init(container) {
 
-    const versionElem = document.getElementById("hic-version-number");
-
-    if (versionElem) {
-        versionElem.innerText = `version ${hic.version}`;
-    }
     const config = juiceboxConfig || {};   // From script include.  Optional.
     const google = config.google;
     const clientId = google ? google.clientId : undefined;
