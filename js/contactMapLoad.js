@@ -2,16 +2,18 @@ import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 import * as app_google from './app-google.js';
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import ContactMapDatasource from "./contactMapDatasource.js";
-import { appendAndConfigureLoadURLModal } from "./initializationHelper.js";
+import EncodeContactMapDatasource from "./encodeContactMapDatasource.js";
+import { currentGenomeId, appendAndConfigureLoadURLModal } from "./initializationHelper.js";
 
 const igv = hic.igv;
 
 let mapType = undefined;
 let contactMapDatasource = undefined;
+let encodeContactMapDatasource = undefined;
 
 class ContactMapLoad {
 
-    constructor({ rootContainer, $dropdowns, $localFileInputs, urlLoadModalId, dataModalId, $dropboxButtons, $googleDriveButtons, googleEnabled, mapMenu, loadHandler }) {
+    constructor({ rootContainer, $dropdowns, $localFileInputs, urlLoadModalId, dataModalId, encodeHostedModalId, $dropboxButtons, $googleDriveButtons, googleEnabled, mapMenu, loadHandler }) {
 
         $dropdowns.on('show.bs.dropdown', function () {
 
@@ -93,6 +95,25 @@ class ContactMapLoad {
                 const { url, name } = contactMapDatasource.tableSelectionHandler(selectionList);
                 await loadHandler(url, name, mapType);
             };
+        }
+
+        this.encodeHostedContactMapModal = new ModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
+
+        this.encodeHostedContactMapModal.selectHandler = async selectionList => {
+            const { url, name } = this.encodeHostedContactMapModal.datasource.tableSelectionHandler(selectionList);
+            await loadHandler(url, name, mapType);
+        };
+
+        hic.EventBus.globalBus.subscribe("GenomeChange", this);
+
+    }
+
+    async receiveEvent(event) {
+
+        const { data: genomeId } = event;
+
+        if (currentGenomeId !== genomeId) {
+            this.encodeHostedContactMapModal.setDatasource(new EncodeContactMapDatasource(genomeId));
         }
 
     }

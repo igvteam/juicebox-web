@@ -12,7 +12,7 @@ import TrackLoad from "./trackLoad.js";
 // The igv object. TODO eliminate this dependency
 const igv = hic.igv;
 
-let lastGenomeId;
+let currentGenomeId;
 let sessionController;
 let contactMapLoad;
 let trackLoad;
@@ -47,8 +47,8 @@ async function initializationHelper(container, config) {
         receiveEvent: async event => {
             const {data: genomeId} = event;
 
-            if (lastGenomeId !== genomeId) {
-                lastGenomeId = genomeId;
+            if (currentGenomeId !== genomeId) {
+                currentGenomeId = genomeId;
                 if (config.trackMenu) {
                     let tracksURL = config.trackMenu.items.replace("$GENOME_ID", genomeId);
                     await loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
@@ -109,6 +109,7 @@ async function initializationHelper(container, config) {
             $localFileInputs: $dropdowns.find('input'),
             urlLoadModalId: 'hic-load-url-modal',
             dataModalId: 'hic-contact-map-modal',
+            encodeHostedModalId: 'hic-encode-hosted-contact-map-modal',
             $dropboxButtons: $dropdowns.find('div[id$="-map-dropdown-dropbox-button"]'),
             $googleDriveButtons: $dropdowns.find('div[id$="-map-dropdown-google-drive-button"]'),
             googleEnabled,
@@ -502,6 +503,6 @@ function updateBDropdown(browser) {
     }
 }
 
-export {appendAndConfigureLoadURLModal, createAnnotationDatalistModals, loadHicFile}
+export {appendAndConfigureLoadURLModal, createAnnotationDatalistModals, loadHicFile, currentGenomeId }
 
 export default initializationHelper
