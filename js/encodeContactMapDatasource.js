@@ -13,7 +13,17 @@ class EncodeContactMapDatasource {
         this.columnDefs =
             [
                 {
-                    targets: [ 10 ], // hide url column
+                    targets: [ 4 ], // Target. All blank values.
+                    visible: false,
+                    searchable: false
+                },
+                {
+                    targets: [ 6 ], // TechRep. Long list of comma separated.
+                    visible: false,
+                    searchable: false
+                },
+                {
+                    targets: [ 10 ], // Hide url
                     visible: false,
                     searchable: false
                 }
