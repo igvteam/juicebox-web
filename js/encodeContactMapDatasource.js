@@ -2,7 +2,7 @@ import { Alert } from '../node_modules/igv-ui/src/index.js'
 
 let columns = undefined;
 
-const urlPrefix = 'https://s3.amazonaws.com/igv.org.app/encode/hic';
+const urlPrefix = 'https://www.encodeproject.org';
 
 class EncodeContactMapDatasource {
 
