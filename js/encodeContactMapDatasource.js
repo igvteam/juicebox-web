@@ -54,7 +54,8 @@ class EncodeContactMapDatasource {
 
         if (response) {
             const str = await response.text();
-            return parseData(str);
+            const parsed = parseData(str);
+            return parsed;
         }
     }
 

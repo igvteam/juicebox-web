@@ -96,25 +96,26 @@ class ContactMapLoad {
         this.$encodeHostedModalPresentationButton = $encodeHostedModalPresentationButton;
 
         this.encodeHostedContactMapModal = new ModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
+        this.encodeHostedContactMapModal.setDatasource(new EncodeContactMapDatasource(this.$encodeHostedModalPresentationButton, 'hg19'));
 
         this.encodeHostedContactMapModal.selectHandler = async selectionList => {
             const { url, name } = this.encodeHostedContactMapModal.datasource.tableSelectionHandler(selectionList);
             await loadHandler(url, name, mapType);
         };
 
-        hic.EventBus.globalBus.subscribe('GenomeChange', this);
+        // hic.EventBus.globalBus.subscribe('GenomeChange', this);
 
     }
 
-    async receiveEvent(event) {
-
-        const { data:genomeId } = event;
-
-        if (currentGenomeId !== genomeId) {
-            this.encodeHostedContactMapModal.setDatasource(new EncodeContactMapDatasource(this.$encodeHostedModalPresentationButton, genomeId));
-        }
-
-    }
+    // async receiveEvent(event) {
+    //
+    //     const { data:genomeId } = event;
+    //
+    //     if (currentGenomeId !== genomeId) {
+    //         this.encodeHostedContactMapModal.setDatasource(new EncodeContactMapDatasource(this.$encodeHostedModalPresentationButton, genomeId));
+    //     }
+    //
+    // }
 }
 
 export default ContactMapLoad
