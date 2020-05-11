@@ -109,6 +109,7 @@ async function initializationHelper(container, config) {
             $localFileInputs: $dropdowns.find('input'),
             urlLoadModalId: 'hic-load-url-modal',
             dataModalId: 'hic-contact-map-modal',
+            $encodeHostedModalPresentationButton: $('#hic-encode-hosted-contact-map-presentation-button'),
             encodeHostedModalId: 'hic-encode-hosted-contact-map-modal',
             $dropboxButtons: $dropdowns.find('div[id$="-map-dropdown-dropbox-button"]'),
             $googleDriveButtons: $dropdowns.find('div[id$="-map-dropdown-google-drive-button"]'),

@@ -6,8 +6,13 @@ const urlPrefix = 'https://www.encodeproject.org';
 
 class EncodeContactMapDatasource {
 
-    constructor(genomeId) {
+    constructor($encodeHostedModalPresentationButton, genomeId) {
 
+        this.$encodeHostedModalPresentationButton = $encodeHostedModalPresentationButton;
+
+        this.$encodeHostedModalPresentationButton.removeClass('disabled');
+
+        this.genomeId = genomeId;
         this.path = `https://s3.amazonaws.com/igv.org.app/encode/hic/${ genomeId }.txt`;
 
         this.columnDefs =
@@ -36,7 +41,21 @@ class EncodeContactMapDatasource {
     }
 
     async tableData() {
-        return fetchData(this.path);
+
+        let response = undefined;
+
+        try {
+            response = await fetch(this.path);
+        } catch (e) {
+            this.$encodeHostedModalPresentationButton.addClass('disabled');
+            Alert.presentAlert(`Unsupported assembly: ${ this.genomeId }`);
+            return undefined;
+        }
+
+        if (response) {
+            const str = await response.text();
+            return parseData(str);
+        }
     }
 
     tableSelectionHandler(selectionList){
@@ -49,24 +68,6 @@ class EncodeContactMapDatasource {
     };
 
 }
-
-const fetchData = async path => {
-
-    let response = undefined;
-    try {
-        response = await fetch(path);
-    } catch (e) {
-        Alert.presentAlert(e.message);
-        return undefined;
-    }
-
-    if (response) {
-        const str = await response.text();
-        return parseData(str);
-    } else {
-        return undefined;
-    }
-};
 
 const parseData = str => {
 

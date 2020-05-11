@@ -8,12 +8,10 @@ import { currentGenomeId, appendAndConfigureLoadURLModal } from "./initializatio
 const igv = hic.igv;
 
 let mapType = undefined;
-let contactMapDatasource = undefined;
-let encodeContactMapDatasource = undefined;
 
 class ContactMapLoad {
 
-    constructor({ rootContainer, $dropdowns, $localFileInputs, urlLoadModalId, dataModalId, encodeHostedModalId, $dropboxButtons, $googleDriveButtons, googleEnabled, mapMenu, loadHandler }) {
+    constructor({ rootContainer, $dropdowns, $localFileInputs, urlLoadModalId, dataModalId, $encodeHostedModalPresentationButton, encodeHostedModalId, $dropboxButtons, $googleDriveButtons, googleEnabled, mapMenu, loadHandler }) {
 
         $dropdowns.on('show.bs.dropdown', function () {
 
@@ -87,15 +85,15 @@ class ContactMapLoad {
             this.contactMapModal = new ModalTable({ id: dataModalId, title: 'Contact Map', selectionStyle: 'single', pageLength: 10 });
 
             const { items: path } = mapMenu;
-            contactMapDatasource = new ContactMapDatasource(path);
-
-            this.contactMapModal.setDatasource(contactMapDatasource);
+            this.contactMapModal.setDatasource( new ContactMapDatasource(path) );
 
             this.contactMapModal.selectHandler = async selectionList => {
-                const { url, name } = contactMapDatasource.tableSelectionHandler(selectionList);
+                const { url, name } = this.contactMapModal.datasource.tableSelectionHandler(selectionList);
                 await loadHandler(url, name, mapType);
             };
         }
+
+        this.$encodeHostedModalPresentationButton = $encodeHostedModalPresentationButton;
 
         this.encodeHostedContactMapModal = new ModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
 
@@ -104,16 +102,16 @@ class ContactMapLoad {
             await loadHandler(url, name, mapType);
         };
 
-        hic.EventBus.globalBus.subscribe("GenomeChange", this);
+        hic.EventBus.globalBus.subscribe('GenomeChange', this);
 
     }
 
     async receiveEvent(event) {
 
-        const { data: genomeId } = event;
+        const { data:genomeId } = event;
 
         if (currentGenomeId !== genomeId) {
-            this.encodeHostedContactMapModal.setDatasource(new EncodeContactMapDatasource(genomeId));
+            this.encodeHostedContactMapModal.setDatasource(new EncodeContactMapDatasource(this.$encodeHostedModalPresentationButton, genomeId));
         }
 
     }
