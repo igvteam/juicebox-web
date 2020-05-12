@@ -13,22 +13,13 @@ class EncodeContactMapDatasource {
         this.$encodeHostedModalPresentationButton.removeClass('disabled');
 
         this.genomeId = genomeId;
-        this.path = `https://s3.amazonaws.com/igv.org.app/encode/hic/${ genomeId }.txt`;
+        // this.path = `https://s3.amazonaws.com/igv.org.app/encode/hic/${ genomeId }.txt`;
+        this.path = 'https://s3.amazonaws.com/igv.org.app/encode/hic/hic.txt';
 
         this.columnDefs =
             [
                 {
-                    targets: [ 4 ], // Target. All blank values.
-                    visible: false,
-                    searchable: false
-                },
-                {
-                    targets: [ 6 ], // TechRep. Long list of comma separated.
-                    visible: false,
-                    searchable: false
-                },
-                {
-                    targets: [ 10 ], // Hide url
+                    targets: [ 5 ], // Hide HREF (URL)
                     visible: false,
                     searchable: false
                 }
@@ -61,10 +52,15 @@ class EncodeContactMapDatasource {
 
     tableSelectionHandler(selectionList){
 
-        const obj = selectionList.shift();
-        let url   = obj[ columns[ 10 ] ];
+        const obj = selectionList[ 0 ];
+
+        // url
+        let url = obj[ columns[ 5 ] ];
         url = `${ urlPrefix }${ url }`;
-        const name  = obj[ columns[ 0 ] ];
+
+        // name
+        const name  = obj[ columns[ 3 ] ];
+
         return { url, name }
     };
 
