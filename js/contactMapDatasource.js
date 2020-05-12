@@ -35,7 +35,7 @@ class ContactMapDatasource {
 
     tableSelectionHandler(selectionList){
 
-        const obj = selectionList.shift();
+        const obj = selectionList[ 0 ];
         const url   = obj[ columns[ 10 ] ];
         const name  = obj[ columns[  1 ] ];
         return { url, name }
