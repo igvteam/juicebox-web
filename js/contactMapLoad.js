@@ -4,6 +4,7 @@ import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import ContactMapDatasource from "./contactMapDatasource.js";
 import EncodeContactMapDatasource from "./encodeContactMapDatasource.js";
 import { currentGenomeId, appendAndConfigureLoadURLModal } from "./initializationHelper.js";
+import HackedModalTable from "./hackedModalTable.js";
 
 const igv = hic.igv;
 
@@ -82,7 +83,7 @@ class ContactMapLoad {
 
         if (mapMenu) {
 
-            this.contactMapModal = new ModalTable({ id: dataModalId, title: 'Contact Map', selectionStyle: 'single', pageLength: 10 });
+            this.contactMapModal = new HackedModalTable({ id: dataModalId, title: 'Contact Map', selectionStyle: 'single', pageLength: 10 });
 
             const { items: path } = mapMenu;
             this.contactMapModal.setDatasource( new ContactMapDatasource(path) );
@@ -95,7 +96,7 @@ class ContactMapLoad {
 
         this.$encodeHostedModalPresentationButton = $encodeHostedModalPresentationButton;
 
-        this.encodeHostedContactMapModal = new ModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
+        this.encodeHostedContactMapModal = new HackedModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
         this.encodeHostedContactMapModal.setDatasource(new EncodeContactMapDatasource(this.$encodeHostedModalPresentationButton, 'hg19'));
 
         this.encodeHostedContactMapModal.selectHandler = async selectionList => {
