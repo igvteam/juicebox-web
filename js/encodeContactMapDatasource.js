@@ -19,6 +19,11 @@ class EncodeContactMapDatasource {
         this.columnDefs =
             [
                 {
+                    targets: [ 0 ], // Hide index
+                    visible: false,
+                    searchable: false
+                },
+                {
                     targets: [ 5 ], // Hide HREF (URL)
                     visible: false,
                     searchable: false
@@ -55,11 +60,11 @@ class EncodeContactMapDatasource {
         const obj = selectionList[ 0 ];
 
         // url
-        let url = obj[ columns[ 5 ] ];
+        let url = obj[ columns[ 6 ] ];
         url = `${ urlPrefix }${ url }`;
 
         // name
-        const name  = obj[ columns[ 3 ] ];
+        const name  = obj[ columns[ 4 ] ];
 
         return { url, name }
     };
@@ -71,10 +76,12 @@ const parseData = str => {
     const lines = str.split('\n').filter(line => "" !== line);
 
     columns = lines.shift().split('\t');
+    columns.unshift('index');
 
     return lines.map((line, index) => {
 
         const values = line.split('\t');
+        values.unshift(index)
 
         const obj = {};
         for (let key of columns) {
