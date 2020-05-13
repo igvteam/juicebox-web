@@ -1,6 +1,6 @@
 import { Alert } from '../node_modules/igv-ui/src/index.js'
 
-let columns = undefined;
+let columnDictionary = {};
 
 class ContactMapDatasource {
 
@@ -8,81 +8,92 @@ class ContactMapDatasource {
 
         this.path = path;
 
+    }
+
+    async tableColumns() {
+        return Object.keys(columnDictionary);
+    }
+
+    async tableData() {
+        return this.fetchData(this.path);
+    }
+
+    async fetchData(path){
+
+        let response = undefined;
+        try {
+            response = await fetch(path);
+        } catch (e) {
+            Alert.presentAlert(e.message);
+            return undefined;
+        }
+
+        if (response) {
+            const obj = await response.json();
+            return this.parseData(obj);
+        } else {
+            return undefined;
+        }
+    };
+
+    parseData(obj){
+
+        const [ path, template ] = Object.entries(obj)[ 0 ];
+
+        const columns = Object.keys(template);
+        columns.push('url');
+        // add index to support sort
+        columns.unshift('index');
+
+        for (let string of columns) {
+            columnDictionary[ string ] = string;
+        }
+
         this.columnDefs =
             [
                 {
-                    targets: [ 0 ], // NVI
+                    targets: [ Object.keys(columnDictionary).indexOf('index') ], // hide index
                     visible: false,
                     searchable: false
                 },
                 {
-                    targets: [ 10 ], // hide url column
+                    targets: [ Object.keys(columnDictionary).indexOf('NVI') ], // hide NVI
+                    visible: false,
+                    searchable: false
+                },
+                {
+                    targets: [ Object.keys(columnDictionary).indexOf('url') ], // hide url
                     visible: false,
                     searchable: false
                 }
 
             ];
 
-    }
+        return Object.entries(obj).map(([ path, record ], i) => {
 
-    async tableColumns() {
-        return columns;
-    }
+            const cooked = {};
+            Object.assign(cooked, record);
 
-    async tableData() {
-        return fetchData(this.path);
-    }
+            for (let key of Object.keys(template)) {
+                cooked[ key ] = cooked[ key ] || '-';
+            }
+
+            const output = {};
+            Object.assign(output, cooked);
+
+            output['url'] = '-' === cooked[ 'NVI' ] ? `${ path }` : `${ path }?nvi=${ cooked[ 'NVI' ] }`;
+
+            output['index'] = i;
+
+            return output;
+        });
+
+    };
 
     tableSelectionHandler(selectionList){
-
-        const obj = selectionList[ 0 ];
-        const url   = obj[ columns[ 10 ] ];
-        const name  = obj[ columns[  1 ] ];
-        return { url, name }
+        return selectionList[ 0 ];
     };
 
 }
-
-const fetchData = async path => {
-
-    let response = undefined;
-    try {
-        response = await fetch(path);
-    } catch (e) {
-        Alert.presentAlert(e.message);
-        return undefined;
-    }
-
-    if (response) {
-        const obj = await response.json();
-        return parseData(obj);
-    } else {
-        return undefined;
-    }
-};
-
-const parseData = obj => {
-
-    const [ path, template ] = Object.entries(obj)[ 0 ];
-    columns = Object.keys(template);
-    columns.push('url');
-
-    const result = Object.entries(obj).map(([ path, record ]) => {
-
-        const cooked = {};
-        Object.assign(cooked, record);
-
-        for (let key of Object.keys(template)) {
-            cooked[ key ] = cooked[ key ] || '-';
-        }
-
-        const output = {};
-        Object.assign(output, cooked);
-        output['url'] = '-' === cooked[ 'NVI' ] ? `${ path }` : `${ path }?nvi=${ cooked[ 'NVI' ] }`;
-        return output;
-    });
-
-    return result;
-};
 
 export default ContactMapDatasource
