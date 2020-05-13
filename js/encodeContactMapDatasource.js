@@ -89,7 +89,7 @@ class EncodeContactMapDatasource {
 
     tableSelectionHandler(selectionList){
 
-        let { Accession: name, HREF: url } = selectionList[ 0 ];
+        let { Experiment: name, HREF: url } = selectionList[ 0 ];
 
         url = `${ urlPrefix }${ url }`;
 
