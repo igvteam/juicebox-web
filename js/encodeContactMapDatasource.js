@@ -1,6 +1,6 @@
 import { Alert } from '../node_modules/igv-ui/src/index.js'
 
-let columns = undefined;
+let columnDictionary = {};
 
 const urlPrefix = 'https://www.encodeproject.org';
 
@@ -13,22 +13,13 @@ class EncodeContactMapDatasource {
         this.$encodeHostedModalPresentationButton.removeClass('disabled');
 
         this.genomeId = genomeId;
+
         // this.path = `https://s3.amazonaws.com/igv.org.app/encode/hic/${ genomeId }.txt`;
         this.path = 'https://s3.amazonaws.com/igv.org.app/encode/hic/hic.txt';
 
-        this.columnDefs =
-            [
-                {
-                    targets: [ 0 ], // Hide HREF (URL)
-                    visible: false,
-                    searchable: false
-                }
-
-            ];
-
     }
     async tableColumns() {
-        return columns;
+        return Object.keys(columnDictionary);
     }
 
     async tableData() {
@@ -44,47 +35,67 @@ class EncodeContactMapDatasource {
         }
 
         if (response) {
+
             const str = await response.text();
-            const parsed = parseData(str);
+
+            const parsed = this.parseData(str);
             return parsed;
         }
     }
 
+    parseData(str){
+
+        const lines = str.split('\n').filter(line => "" !== line);
+
+        const columns = lines.shift().split('\t');
+        columns.unshift('index');
+
+        for (let string of columns) {
+            columnDictionary[ string ] = string;
+        }
+
+        this.columnDefs =
+            [
+                {
+                    targets: [ Object.keys(columnDictionary).indexOf('index') ], // Hide index
+                    visible: false,
+                    searchable: false
+                },
+                {
+                    targets: [ Object.keys(columnDictionary).indexOf('HREF') ], // Hide HREF (URL)
+                    visible: false,
+                    searchable: false
+                }
+
+            ];
+
+        const keys = Object.keys(columnDictionary);
+
+        return lines.map((line, index) => {
+
+            const values = line.split('\t');
+            values.unshift(index)
+
+            const obj = {};
+            for (let key of keys) {
+                obj[ key ] = values[ keys.indexOf(key) ]
+                // obj[ key ] = '#%#'
+            }
+
+            return obj;
+        });
+
+    };
+
     tableSelectionHandler(selectionList){
 
-        const obj = selectionList[ 0 ];
+        let { Accession: name, HREF: url } = selectionList[ 0 ];
 
-        // url
-        let url = obj[ columns[ 0 ] ];
         url = `${ urlPrefix }${ url }`;
-
-        // name
-        const name  = obj[ columns[ 2 ] ];
 
         return { url, name }
     };
 
 }
-
-const parseData = str => {
-
-    const lines = str.split('\n').filter(line => "" !== line);
-
-    columns = lines.shift().split('\t');
-
-    return lines.map((line, index) => {
-
-        const values = line.split('\t');
-
-        const obj = {};
-        for (let key of columns) {
-            obj[ key ] = values[ columns.indexOf(key) ]
-            // obj[ key ] = '#%#'
-        }
-
-        return obj;
-    });
-
-};
 
 export default EncodeContactMapDatasource

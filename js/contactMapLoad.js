@@ -96,7 +96,7 @@ class ContactMapLoad {
 
         this.$encodeHostedModalPresentationButton = $encodeHostedModalPresentationButton;
 
-        this.encodeHostedContactMapModal = new ModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
+        this.encodeHostedContactMapModal = new HackedModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
         this.encodeHostedContactMapModal.setDatasource(new EncodeContactMapDatasource(this.$encodeHostedModalPresentationButton, 'hg19'));
 
         this.encodeHostedContactMapModal.selectHandler = async selectionList => {
