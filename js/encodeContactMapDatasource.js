@@ -19,7 +19,7 @@ class EncodeContactMapDatasource {
         this.columnDefs =
             [
                 {
-                    targets: [ 5 ], // Hide HREF (URL)
+                    targets: [ 0 ], // Hide HREF (URL)
                     visible: false,
                     searchable: false
                 }
@@ -55,11 +55,11 @@ class EncodeContactMapDatasource {
         const obj = selectionList[ 0 ];
 
         // url
-        let url = obj[ columns[ 5 ] ];
+        let url = obj[ columns[ 0 ] ];
         url = `${ urlPrefix }${ url }`;
 
         // name
-        const name  = obj[ columns[ 3 ] ];
+        const name  = obj[ columns[ 2 ] ];
 
         return { url, name }
     };
