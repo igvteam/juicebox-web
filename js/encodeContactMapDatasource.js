@@ -1,4 +1,4 @@
-import { Alert } from '../node_modules/igv-ui/src/index.js'
+import {Alert} from '../node_modules/igv-ui/src/index.js'
 
 let columnDictionary = {};
 
@@ -18,6 +18,7 @@ class EncodeContactMapDatasource {
         this.path = 'https://s3.amazonaws.com/igv.org.app/encode/hic/hic.txt';
 
     }
+
     async tableColumns() {
         return Object.keys(columnDictionary);
     }
@@ -30,7 +31,7 @@ class EncodeContactMapDatasource {
             response = await fetch(this.path);
         } catch (e) {
             this.$encodeHostedModalPresentationButton.addClass('disabled');
-            Alert.presentAlert(`Unsupported assembly: ${ this.genomeId }`);
+            Alert.presentAlert(`Unsupported assembly: ${this.genomeId}`);
             return undefined;
         }
 
@@ -43,7 +44,7 @@ class EncodeContactMapDatasource {
         }
     }
 
-    parseData(str){
+    parseData(str) {
 
         const lines = str.split('\n').filter(line => "" !== line);
 
@@ -51,18 +52,18 @@ class EncodeContactMapDatasource {
         columns.unshift('index');
 
         for (let string of columns) {
-            columnDictionary[ string ] = string;
+            columnDictionary[string] = string;
         }
 
         this.columnDefs =
             [
                 {
-                    targets: [ Object.keys(columnDictionary).indexOf('index') ], // Hide index
+                    targets: [Object.keys(columnDictionary).indexOf('index')], // Hide index
                     visible: false,
                     searchable: false
                 },
                 {
-                    targets: [ Object.keys(columnDictionary).indexOf('HREF') ], // Hide HREF (URL)
+                    targets: [Object.keys(columnDictionary).indexOf('HREF')], // Hide HREF (URL)
                     visible: false,
                     searchable: false
                 }
@@ -78,7 +79,7 @@ class EncodeContactMapDatasource {
 
             const obj = {};
             for (let key of keys) {
-                obj[ key ] = values[ keys.indexOf(key) ]
+                obj[key] = values[keys.indexOf(key)]
                 // obj[ key ] = '#%#'
             }
 
@@ -87,13 +88,11 @@ class EncodeContactMapDatasource {
 
     };
 
-    tableSelectionHandler(selectionList){
-
-        let { Experiment: name, HREF: url } = selectionList[ 0 ];
-
-        url = `${ urlPrefix }${ url }`;
-
-        return { url, name }
+    tableSelectionHandler(selectionList) {
+        const selection = selectionList[0];
+        const url = `${urlPrefix}${selection["HREF"]}`;
+        const name = selection["Description"]
+        return {url, name};
     };
 
 }
