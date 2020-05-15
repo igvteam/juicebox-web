@@ -1,14 +1,46 @@
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import * as app_google from './app-google.js';
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
-import ContactMapDatasource from "./contactMapDatasource.js";
-import EncodeContactMapDatasource from "./encodeContactMapDatasource.js";
+import GenericMapDatasource from "./generalized_data_source/genericDataSource.js";
 import { currentGenomeId, appendAndConfigureLoadURLModal } from "./initializationHelper.js";
 import HackedModalTable from "./hackedModalTable.js";
+import {encodeHostedContactMapDatasourceConfigurator} from "./encodeMapDatasourceConfig.js";
+import {aidenLabDatasourceConfigurator} from "./aidenLabMapDatasourceConfig";
 
 const igv = hic.igv;
 
 let mapType = undefined;
+
+const contactMapDatasourceConfiguration =
+    {
+        dataSetPath: 'https://aidenlab.org/juicebox/res/hicfiles.json',
+        genomeId: 'hg19',
+        urlPrefix: 'https://www.encodeproject.org',
+        addIndexColumn: true,
+        columns:
+            [
+                'index',
+                'url',
+                'NVI',
+                'name',
+                'author',
+                'journal',
+                'year',
+                'organism',
+                'reference genome',
+                'cell type',
+                'experiment type',
+                'protocol'
+            ],
+        hiddenColumns:
+            [
+                'index',
+                'NVI',
+                'url'
+            ],
+        selectionHandler: selectionList => selectionList[ 0 ]
+
+    }
 
 class ContactMapLoad {
 
@@ -85,8 +117,7 @@ class ContactMapLoad {
 
             this.contactMapModal = new HackedModalTable({ id: dataModalId, title: 'Contact Map', selectionStyle: 'single', pageLength: 10 });
 
-            const { items: path } = mapMenu;
-            this.contactMapModal.setDatasource( new ContactMapDatasource(path) );
+            this.contactMapModal.setDatasource( new GenericMapDatasource(aidenLabDatasourceConfigurator('hg19')) );
 
             this.contactMapModal.selectHandler = async selectionList => {
                 const { url, name } = this.contactMapModal.datasource.tableSelectionHandler(selectionList);
@@ -97,7 +128,7 @@ class ContactMapLoad {
         this.$encodeHostedModalPresentationButton = $encodeHostedModalPresentationButton;
 
         this.encodeHostedContactMapModal = new HackedModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
-        this.encodeHostedContactMapModal.setDatasource(new EncodeContactMapDatasource(this.$encodeHostedModalPresentationButton, 'hg19'));
+        this.encodeHostedContactMapModal.setDatasource(new GenericMapDatasource(encodeHostedContactMapDatasourceConfigurator('hg19')));
 
         this.encodeHostedContactMapModal.selectHandler = async selectionList => {
             const { url, name } = this.encodeHostedContactMapModal.datasource.tableSelectionHandler(selectionList);
