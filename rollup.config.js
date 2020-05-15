@@ -13,7 +13,9 @@ export default [
                     [
                         {src: 'node_modules/juicebox.js/dist/css/juicebox.css', dest: 'dist/css/'},
                         {src: 'node_modules/juicebox.js/dist/css/img', dest: 'dist/css/'},
-                        {src: 'css/app.css', dest: 'dist/css/'}
+                        {src: 'css/app.css', dest: 'dist/css/'},
+                        {src: 'img', dest: 'dist/'},
+                        {src: 'juiceboxConfig.js', dest: 'dist/'}
                     ]
             })
         ]
