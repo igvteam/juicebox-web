@@ -68,5 +68,4 @@ class GenericMapDatasource {
 
 }
 
-
 export default GenericMapDatasource

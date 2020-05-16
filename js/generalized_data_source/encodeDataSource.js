@@ -33,11 +33,10 @@
 
 import getDataWrapper from './dataWrapper.js'
 
-const discard = 'ID Assembly Biosample AssayType Target BioRep TechRep OutputType Format Lab HREF Accession Experiment'
 const columns = [
     'Biosample',
-    'Target',
     'Assay Type',
+    'Target',
     'Output Type',
     'Bio Rep',
     'Tech Rep',
