@@ -1,8 +1,8 @@
 import {Alert} from '../node_modules/igv-ui/src/index.js'
-import {StringUtils, TrackUtils,} from '../node_modules/igv-utils/src/index.js'
-import ModalTable from '../node_modules/data-modal/js/modalTable.js';
-import EncodeDataSource from '../node_modules/data-modal/js/encodeDataSource.js';
-import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
+import {StringUtils, TrackUtils} from '../node_modules/igv-utils/src/index.js'
+import { ModalTable } from '../node_modules/data-modal/js/index.js';
+import { EncodeTrackDatasource, encodeTrackDatasourceConfigurator } from '../node_modules/data-modal/js/index.js';
+import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 import QRCode from "./qrcode.js";
 import SessionController, {sessionControllerConfigurator} from "./sessionController.js";
 import {googleEnabled} from './app.js';
@@ -59,9 +59,9 @@ async function initializationHelper(container, config) {
                     await loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
                 }
 
-                if (EncodeDataSource.supportsGenome(genomeId)) {
+                if (EncodeTrackDatasource.supportsGenome(genomeId)) {
                     $('#hic-encode-modal-button').show();
-                    encodeModal.setDatasource(new EncodeDataSource(genomeId));
+                    encodeModal.setDatasource(new EncodeTrackDatasource(encodeTrackDatasourceConfigurator(genomeId)));
                 } else {
                     $('#hic-encode-modal-button').hide();
                 }
