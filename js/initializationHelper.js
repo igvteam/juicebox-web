@@ -77,13 +77,20 @@ async function initializationHelper(container, config) {
     sessionController = new SessionController(sessionControllerConfigurator());
 
     $('#hic-track-dropdown-menu').parent().on('shown.bs.dropdown', function () {
-
         const browser = hic.HICBrowser.getCurrentBrowser();
-
         if (undefined === browser || undefined === browser.dataset) {
             Alert.presentAlert('Contact map must be loaded and selected before loading tracks');
         }
     });
+
+    $('#hic-control-map-dropdown-menu').parent().on('shown.bs.dropdown', function () {
+        const browser = hic.HICBrowser.getCurrentBrowser();
+        if (undefined === browser || undefined === browser.dataset) {
+            Alert.presentAlert('Contact map must be loaded and selected before loading "B" map"');
+        }
+    });
+
+
 
     const trackLoadConfig =
         {
