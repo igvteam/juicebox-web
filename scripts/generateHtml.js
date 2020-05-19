@@ -16,7 +16,8 @@ let skipNavbar = false;
 for (let line of lines) {
 
     if(line.includes("<script") && line.includes("module") && line.includes("app.js")) {
-        fs.writeSync(fd, '<script src="js/app-bundle.esm.js" type="module"></script>\n', null, 'utf-8');
+        fs.writeSync(fd, '<script type="application/javascript" src="js/hic-app.min.js"></script>\n', null, 'utf-8');
+        //fs.writeSync(fd, '<script src="js/app-bundle.esm.js" type="module"></script>\n', null, 'utf-8');
     }
 
     else if(line.includes("juicebox.css")) {

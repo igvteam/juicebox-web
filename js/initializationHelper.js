@@ -2,7 +2,7 @@ import {Alert} from '../node_modules/igv-ui/src/index.js'
 import {StringUtils, TrackUtils,} from '../node_modules/igv-utils/src/index.js'
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import EncodeDataSource from '../node_modules/data-modal/js/encodeDataSource.js';
-import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
+import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import QRCode from "./qrcode.js";
 import SessionController, {sessionControllerConfigurator} from "./sessionController.js";
 import {googleEnabled} from './app.js';

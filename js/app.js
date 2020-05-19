@@ -23,7 +23,7 @@
 
 import * as app_google from './app-google.js';
 import initializationHelper from "./initializationHelper.js";
-import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
+import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 
 document.addEventListener("DOMContentLoaded", async (event) => {
     await init(document.getElementById('app-container'));

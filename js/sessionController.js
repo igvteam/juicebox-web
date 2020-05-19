@@ -21,7 +21,7 @@
  *
  */
 
-import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
+import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import {FileLoadManager, FileLoadWidget, Utils} from '../node_modules/igv-widgets/dist/igv-widgets.js';
 import {FileUtils} from '../node_modules/igv-utils/src/index.js';
 import SessionFileLoad from "./sessionFileLoad.js";

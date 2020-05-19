@@ -1,4 +1,4 @@
-import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
+import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import * as app_google from './app-google.js';
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import ContactMapDatasource from "./contactMapDatasource.js";
