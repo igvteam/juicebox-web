@@ -499,7 +499,7 @@ function updateBDropdown(browser) {
         if (browser.dataset) {
             $('#hic-control-map-dropdown').removeClass('disabled');
         } else {
-            $('#hic-control-map-dropdown').addClass('disabled');
+      //      $('#hic-control-map-dropdown').addClass('disabled');
         }
     }
 }
