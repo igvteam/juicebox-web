@@ -113,7 +113,7 @@ class HackedModalTable {
                         // scrollCollapse: true
                     };
 
-                if (Reflect.has(datasource, 'columnDefs')) {
+                if (datasource.columnDefs) {
                     config.columnDefs = datasource.columnDefs;
                 }
 

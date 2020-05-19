@@ -1,8 +1,6 @@
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import * as app_google from './app-google.js';
-import HackedModalTable from "./hackedModalTable.js";
-import { ModalTable } from '../node_modules/data-modal/js/index.js';
-import { GenericMapDatasource, encodeContactMapDatasourceConfigurator, aidenLabContactMapDatasourceConfigurator } from '../node_modules/data-modal/js/index.js';
+import { ModalTable, GenericMapDatasource, encodeContactMapDatasourceConfigurator, aidenLabContactMapDatasourceConfigurator } from '../node_modules/data-modal/js/index.js';
 import { currentGenomeId, appendAndConfigureLoadURLModal } from "./initializationHelper.js";
 
 const igv = hic.igv;
@@ -82,7 +80,7 @@ class ContactMapLoad {
 
         if (mapMenu) {
 
-            this.contactMapModal = new HackedModalTable({ id: dataModalId, title: 'Contact Map', selectionStyle: 'single', pageLength: 10 });
+            this.contactMapModal = new ModalTable({ id: dataModalId, title: 'Contact Map', selectionStyle: 'single', pageLength: 10 });
 
             this.contactMapModal.setDatasource( new GenericMapDatasource(aidenLabContactMapDatasourceConfigurator('hg19')) );
 
@@ -94,7 +92,7 @@ class ContactMapLoad {
 
         this.$encodeHostedModalPresentationButton = $encodeHostedModalPresentationButton;
 
-        this.encodeHostedContactMapModal = new HackedModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
+        this.encodeHostedContactMapModal = new ModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
         this.encodeHostedContactMapModal.setDatasource(new GenericMapDatasource(encodeContactMapDatasourceConfigurator('hg19')));
 
         this.encodeHostedContactMapModal.selectHandler = async selectionList => {

@@ -1,8 +1,7 @@
 import {Alert} from '../node_modules/igv-ui/src/index.js'
 import {StringUtils, TrackUtils} from '../node_modules/igv-utils/src/index.js'
-import HackedModalTable from "./hackedModalTable.js";
-import { EncodeTrackDatasource, encodeTrackDatasourceConfigurator } from '../node_modules/data-modal/js/index.js';
-import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
+import { ModalTable, EncodeTrackDatasource, encodeTrackDatasourceConfigurator } from '../node_modules/data-modal/js/index.js';
+import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import QRCode from "./qrcode.js";
 import SessionController, {sessionControllerConfigurator} from "./sessionController.js";
 import {googleEnabled} from './app.js';
@@ -17,7 +16,7 @@ let sessionController;
 let contactMapLoad;
 let trackLoad;
 
-const encodeModal = new HackedModalTable({ id: 'hic-encode-modal', title: 'ENCODE', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => loadTracks(selected) });
+const encodeModal = new ModalTable({ id: 'hic-encode-modal', title: 'ENCODE', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => loadTracks(selected) });
 
 async function initializationHelper(container, config) {
 
