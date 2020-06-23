@@ -32,10 +32,10 @@
     "rollup-plugin-terser": "^5.3.0"
   },
   "dependencies": {
-    "data-modal": "github:igvteam/data-modal#v0.2.1",
-    "igv-ui": "github:igvteam/igv-ui#v0.1.0",
+    "data-modal": "github:igvteam/data-modal#v0.2.2",
+    "igv-ui": "github:igvteam/igv-ui#v0.1.1",
     "igv-utils": "github:igvteam/igv-utils#v0.1.0",
-    "igv-widgets": "github:igvteam/igv-widgets#v1.0.0",
-    "juicebox.js": "^1.5.1"
+    "igv-widgets": "github:igvteam/igv-widgets#v0.1.1",
+    "juicebox.js": "github:igvteam/juicebox.js  "//"^1.5.2"
   }
 }
