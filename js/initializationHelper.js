@@ -1,7 +1,9 @@
 import {Alert} from '../node_modules/igv-ui/src/index.js'
 import {StringUtils, TrackUtils,} from '../node_modules/igv-utils/src/index.js'
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
-import EncodeDataSource from '../node_modules/data-modal/js/encodeDataSource.js';
+import EncodeTrackDatasource from "../node_modules/data-modal/js/encodeTrackDatasource.js"
+import { encodeTrackDatasourceSignalConfigurator } from "../node_modules/data-modal/js/encodeTrackDatasourceSignalConfig.js"
+import { encodeTrackDatasourceOtherConfigurator } from "../node_modules/data-modal/js/encodeTrackDatasourceOtherConfig.js"
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import QRCode from "./qrcode.js";
 import SessionController, {sessionControllerConfigurator} from "./sessionController.js";
@@ -17,11 +19,9 @@ let sessionController;
 let contactMapLoad;
 let trackLoad;
 
-const encodeModal = new ModalTable({
-    id: 'hic-encode-modal', title: 'ENCODE', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => {
-        loadTracks(selected)
-    }
-});
+const encodeModalTables = []
+encodeModalTables.push( new ModalTable({ id: 'hic-encode-signal-modal', title: 'ENCODE Signals', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => { loadTracks(selected) } }) );
+encodeModalTables.push( new ModalTable({ id: 'hic-encode-other-modal', title: 'ENCODE Others', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => { loadTracks(selected) } }) );
 
 async function initializationHelper(container, config) {
 
@@ -59,11 +59,17 @@ async function initializationHelper(container, config) {
                     await loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
                 }
 
-                if (EncodeDataSource.supportsGenome(genomeId)) {
-                    $('#hic-encode-modal-button').show();
-                    encodeModal.setDatasource(new EncodeDataSource(genomeId));
+                if (EncodeTrackDatasource.supportsGenome(genomeId)) {
+
+                    $('#hic-encode-signal-modal-button').show();
+                    $('#hic-encode-other-modal-button').show();
+
+                    encodeModalTables[ 0 ].setDatasource(new EncodeTrackDatasource( encodeTrackDatasourceSignalConfigurator( genomeId ) ));
+                    encodeModalTables[ 1 ].setDatasource(new EncodeTrackDatasource( encodeTrackDatasourceOtherConfigurator( genomeId ) ));
+
                 } else {
-                    $('#hic-encode-modal-button').hide();
+                    $('#hic-encode-signal-modal-button').hide();
+                    $('#hic-encode-other-modal-button').hide();
                 }
             }
         }
