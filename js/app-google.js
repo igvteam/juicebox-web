@@ -22,7 +22,7 @@
  */
 
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
-import { Alert } from '../node_modules/igv-ui/src/index.js'
+import { Alert } from '../node_modules/igv-ui/dist/igv-ui.js'
 
 // The igv object. TODO eliminate this dependency
 const igv = hic.igv;

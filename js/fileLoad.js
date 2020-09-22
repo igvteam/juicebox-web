@@ -1,5 +1,4 @@
-import {FileUtils} from "../node_modules/igv-utils/src/index.js"
-import { DOMUtils } from '../node_modules/igv-ui/src/index.js'
+import {FileUtils,DOMUtils} from "../node_modules/igv-utils/src/index.js"
 import { Utils} from '../node_modules/igv-widgets/dist/igv-widgets.js';
 import * as app_google from './app-google.js';
 class FileLoad {

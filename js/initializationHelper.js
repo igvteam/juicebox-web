@@ -1,4 +1,4 @@
-import {Alert} from '../node_modules/igv-ui/src/index.js'
+import {Alert} from '../node_modules/igv-ui/dist/igv-ui.js'
 import {StringUtils, TrackUtils,} from '../node_modules/igv-utils/src/index.js'
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import EncodeTrackDatasource from "../node_modules/data-modal/js/encodeTrackDatasource.js"
