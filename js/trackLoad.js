@@ -1,5 +1,6 @@
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
-import * as app_google from './app-google.js';
+import {GooglePicker} from '../node_modules/igv-utils/src/index.js';
+
 import { appendAndConfigureLoadURLModal, createAnnotationDatalistModals } from "./initializationHelper.js";
 
 const igv = hic.igv;
@@ -87,7 +88,7 @@ class TrackLoad {
         if (true === googleEnabled) {
             $googleDriveButtons.on('click', () => {
 
-                app_google.createDropdownButtonPicker(true, async responses => {
+                GooglePicker.createDropdownButtonPicker(true, async responses => {
 
 
                     const configurations = responses.map(({ name, url }) => {

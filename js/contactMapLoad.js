@@ -1,5 +1,5 @@
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
-import * as app_google from './app-google.js';
+import {GooglePicker} from '../node_modules/igv-utils/src/index.js';
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import ContactMapDatasource from "./contactMapDatasource.js";
 import EncodeContactMapDatasource from "./encodeContactMapDatasource.js";
@@ -62,7 +62,7 @@ class ContactMapLoad {
         if (true === googleEnabled) {
             $googleDriveButtons.on('click', () => {
 
-                app_google.createDropdownButtonPicker(true, async responses => {
+                GooglePicker.createDropdownButtonPicker(true, async responses => {
 
                     const paths = responses.map(({ name, url: google_url }) => {
                         return { filename: name, name, google_url };
