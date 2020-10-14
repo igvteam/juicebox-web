@@ -1,4 +1,4 @@
-import { Alert } from '../node_modules/igv-ui/dist/igv-ui.js'
+import { AlertSingleton } from '../node_modules/igv-widgets/dist/igv-widgets.js'
 
 let columnDictionary = {};
 
@@ -24,7 +24,7 @@ class ContactMapDatasource {
         try {
             response = await fetch(path);
         } catch (e) {
-            Alert.presentAlert(e.message);
+            AlertSingleton.present(e.message);
             return undefined;
         }
 

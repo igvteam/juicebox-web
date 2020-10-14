@@ -1,4 +1,4 @@
-import {Alert} from '../node_modules/igv-ui/dist/igv-ui.js'
+import { AlertSingleton } from '../node_modules/igv-widgets/dist/igv-widgets.js'
 
 let columnDictionary = {};
 
@@ -31,7 +31,7 @@ class EncodeContactMapDatasource {
             response = await fetch(this.path);
         } catch (e) {
             this.$encodeHostedModalPresentationButton.addClass('disabled');
-            Alert.presentAlert(`Unsupported assembly: ${this.genomeId}`);
+            AlertSingleton.present(`Unsupported assembly: ${this.genomeId}`);
             return undefined;
         }
 

@@ -21,9 +21,10 @@
  *
  */
 
-import {GoogleAuth} from '../node_modules/igv-utils/src/index.js';
-import initializationHelper from "./initializationHelper.js";
-import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
+import {GoogleAuth} from '../node_modules/igv-utils/src/index.js'
+import { AlertSingleton } from '../node_modules/igv-widgets/dist/igv-widgets.js'
+import initializationHelper from "./initializationHelper.js"
+import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js"
 
 document.addEventListener("DOMContentLoaded", async (event) => {
     await init(document.getElementById('app-container'));
@@ -33,6 +34,8 @@ let googleEnabled = false;
 
 async function init(container) {
 
+    AlertSingleton.init(container)
+
     const config = juiceboxConfig || {};   // From script include.  Optional.
 
     const enableGoogle = config.clientId && 'CLIENT_ID' !== config.clientId && (window.location.protocol === "https:" || window.location.host === "localhost")
@@ -41,12 +44,13 @@ async function init(container) {
         try {
             await GoogleAuth.init({
                 client_id: config.clientId,
+                apiKey: config.apiKey,
                 scope: 'https://www.googleapis.com/auth/userinfo.profile'
             })
             googleEnabled = true
         } catch (e) {
             console.error(e)
-            // AlertSingleton.present(e.message)
+            AlertSingleton.present(e.message)
         }
     }
 

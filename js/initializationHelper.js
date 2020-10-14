@@ -1,9 +1,10 @@
-import {Alert} from '../node_modules/igv-ui/dist/igv-ui.js'
-import {StringUtils, TrackUtils,} from '../node_modules/igv-utils/src/index.js'
+import { AlertSingleton } from '../node_modules/igv-widgets/dist/igv-widgets.js'
+import { StringUtils } from '../node_modules/igv-utils/src/index.js'
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import EncodeTrackDatasource from "../node_modules/data-modal/js/encodeTrackDatasource.js"
 import { encodeTrackDatasourceSignalConfigurator } from "../node_modules/data-modal/js/encodeTrackDatasourceSignalConfig.js"
 import { encodeTrackDatasourceOtherConfigurator } from "../node_modules/data-modal/js/encodeTrackDatasourceOtherConfig.js"
+import { createTrackWidgetsWithTrackRegistry } from '../node_modules/igv-widgets/dist/igv-widgets.js'
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import QRCode from "./qrcode.js";
 import SessionController, {sessionControllerConfigurator} from "./sessionController.js";
@@ -24,8 +25,6 @@ encodeModalTables.push( new ModalTable({ id: 'hic-encode-signal-modal', title: '
 encodeModalTables.push( new ModalTable({ id: 'hic-encode-other-modal', title: 'ENCODE Others', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => { loadTracks(selected) } }) );
 
 async function initializationHelper(container, config) {
-
-    Alert.init(container);
 
     $('.juicebox-app-clone-button').on('click', async () => {
 
@@ -85,14 +84,14 @@ async function initializationHelper(container, config) {
     $('#hic-track-dropdown-menu').parent().on('shown.bs.dropdown', function () {
         const browser = hic.HICBrowser.getCurrentBrowser();
         if (undefined === browser || undefined === browser.dataset) {
-            Alert.presentAlert('Contact map must be loaded and selected before loading tracks');
+            AlertSingleton.present('Contact map must be loaded and selected before loading tracks');
         }
     });
 
     $('#hic-control-map-dropdown-menu').parent().on('shown.bs.dropdown', function () {
         const browser = hic.HICBrowser.getCurrentBrowser();
         if (undefined === browser || undefined === browser.dataset) {
-            Alert.presentAlert('Contact map must be loaded and selected before loading "B" map"');
+            AlertSingleton.present('Contact map must be loaded and selected before loading "B" map"');
         }
     });
 
@@ -304,7 +303,7 @@ const createAnnotationDatalistModals = root => {
     $annotation_input.on('change', function (e) {
 
         if (undefined === hic.HICBrowser.getCurrentBrowser()) {
-            Alert.presentAlert('ERROR: you must select a map panel.');
+            AlertSingleton.present('ERROR: you must select a map panel.');
         } else {
 
             const name = $annotation_input.val();
@@ -337,7 +336,7 @@ const createAnnotationDatalistModals = root => {
     $annotation_2D_input.on('change', function (e) {
 
         if (undefined === hic.HICBrowser.getCurrentBrowser()) {
-            Alert.presentAlert('ERROR: you must select a map panel.');
+            AlertSingleton.present('ERROR: you must select a map panel.');
         } else {
             const name = $annotation_2D_input.val();
             const $option = $('#annotation-2D-datalist option').filter(function () {
@@ -400,7 +399,7 @@ const loadAnnotationDatalist = async ($datalist, url, type) => {
             console.log(`No track menu found ${url}`);
         } else {
             console.log(`Error loading track menu: ${url} ${e}`);
-            Alert.presentAlert(`Error loading track menu: ${url} ${e}`);
+            AlertSingleton.present(`Error loading track menu: ${url} ${e}`);
         }
     }
 
@@ -411,8 +410,7 @@ const loadAnnotationDatalist = async ($datalist, url, type) => {
 
             const tokens = line.split('\t');
 
-            if (tokens.length > 1 && ("2D" === type || igvSupports(tokens[1]))) {
-
+            if (tokens.length > 1) {
                 const [label, value] = tokens;
                 $datalist.append($(`<option data-url="${value}">${label}</option>`));
 
@@ -421,19 +419,6 @@ const loadAnnotationDatalist = async ($datalist, url, type) => {
     }
 
 };
-
-function igvSupports(path) {
-
-    // For now we will pretend that igv does not support bedpe, we want these loaded as 2D tracks
-    if (path.endsWith(".bedpe") || path.endsWith(".bedpe.gz")) {
-        return false;
-    }
-
-    let config = {url: path};
-    TrackUtils.inferTrackTypes(config);
-    return config.type !== undefined;
-
-}
 
 function loadTracks(tracks) {
     // Set some juicebox specific defaults
@@ -476,7 +461,7 @@ async function loadHicFile(url, name, mapType) {
             $('#hic-control-map-dropdown').removeClass('disabled');
         }
     } catch (e) {
-        Alert.presentAlert(`Error loading ${url}: ${e}`);
+        AlertSingleton.present(`Error loading ${url}: ${e}`);
     }
 };
 
