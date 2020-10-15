@@ -1,5 +1,5 @@
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
-import {GooglePicker} from '../node_modules/igv-utils/src/index.js';
+import {GooglePicker,TrackUtils,FileUtils} from '../node_modules/igv-utils/src/index.js';
 
 import { appendAndConfigureLoadURLModal, createAnnotationDatalistModals } from "./initializationHelper.js";
 
@@ -20,7 +20,7 @@ class TrackLoad {
                 {
                     name,
                     filename: name,
-                    format: igv.inferFileFormat(name),
+                    format: TrackUtils.inferFileFormat(name),
                     url: file
                 };
 
@@ -30,13 +30,13 @@ class TrackLoad {
 
         appendAndConfigureLoadURLModal(rootContainer, urlLoadModalId, path => {
 
-            const name = igv.getFilename(path);
+            const name = FileUtils.getFilename(path);
 
             const config =
                 {
                     name,
                     filename: name,
-                    format: igv.inferFileFormat(name),
+                    format: TrackUtils.inferFileFormat(name),
                     url: path
                 };
 
@@ -55,13 +55,13 @@ class TrackLoad {
                         const configurations = dbFiles.map(dbFile => {
 
                             const { link: path } = dbFile;
-                            const name = igv.getFilename(path);
+                            const name = FileUtils.getFilename(path);
 
                             const config =
                                 {
                                     name,
                                     filename: name,
-                                    format: igv.inferFileFormat(name),
+                                    format: TrackUtils.inferFileFormat(name),
                                     url: path
                                 };
 
@@ -97,7 +97,7 @@ class TrackLoad {
                             {
                                 name,
                                 filename: name,
-                                format: igv.inferFileFormat(name),
+                                format: TrackUtils.inferFileFormat(name),
                                 url
                             };
 

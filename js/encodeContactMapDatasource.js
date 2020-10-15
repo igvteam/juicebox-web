@@ -14,7 +14,6 @@ class EncodeContactMapDatasource {
 
         this.genomeId = genomeId;
 
-        // this.path = `https://s3.amazonaws.com/igv.org.app/encode/hic/${ genomeId }.txt`;
         this.path = 'https://s3.amazonaws.com/igv.org.app/encode/hic/hic.txt';
 
     }

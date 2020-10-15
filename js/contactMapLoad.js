@@ -1,5 +1,5 @@
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
-import {GooglePicker} from '../node_modules/igv-utils/src/index.js';
+import {GooglePicker,FileUtils} from '../node_modules/igv-utils/src/index.js';
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import ContactMapDatasource from "./contactMapDatasource.js";
 import EncodeContactMapDatasource from "./encodeContactMapDatasource.js";
@@ -42,7 +42,7 @@ class ContactMapLoad {
                     success: async dbFiles => {
                         const paths = dbFiles.map(dbFile => dbFile.link);
                         const path = paths[ 0 ];
-                        const name = igv.getFilename(path);
+                        const name = FileUtils.getFilename(path);
                         await loadHandler(path, name, mapType);
                     },
                     cancel: () => {},
@@ -77,7 +77,7 @@ class ContactMapLoad {
         }
 
         appendAndConfigureLoadURLModal(rootContainer, urlLoadModalId, path => {
-            const name = igv.getFilename(path);
+            const name = FileUtils.getFilename(path);
             loadHandler( path, name, mapType );
         });
 
