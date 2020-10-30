@@ -81,7 +81,7 @@ function configureSaveSessionModal(JSONProvider, sessionSaveModal) {
         const jsonString = JSON.stringify(json, null, '\t');
         const data = URL.createObjectURL(new Blob([jsonString], {type: "application/octet-stream"}));
 
-        igv.download(filename, data);
+        FileUtils.download(filename, data);
 
         $(sessionSaveModal).modal('hide');
     };
