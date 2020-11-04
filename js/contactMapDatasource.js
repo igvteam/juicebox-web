@@ -1,4 +1,4 @@
-import { AlertSingleton } from '../node_modules/igv-widgets/dist/igv-widgets.js'
+import {AlertSingleton} from '../node_modules/igv-ui/dist/igv-ui.js'
 
 let columnDictionary = {};
 

@@ -22,7 +22,7 @@
  */
 
 import {GoogleAuth} from '../node_modules/igv-utils/src/index.js'
-import { AlertSingleton } from '../node_modules/igv-widgets/dist/igv-widgets.js'
+import {AlertSingleton} from '../node_modules/igv-ui/dist/igv-ui.js'
 import initializationHelper from "./initializationHelper.js"
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js"
 

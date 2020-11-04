@@ -1,4 +1,4 @@
-import { AlertSingleton } from '../node_modules/igv-widgets/dist/igv-widgets.js'
+import {AlertSingleton} from '../node_modules/igv-ui/dist/igv-ui.js'
 import { StringUtils } from '../node_modules/igv-utils/src/index.js'
 import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import EncodeTrackDatasource from "../node_modules/data-modal/js/encodeTrackDatasource.js"
