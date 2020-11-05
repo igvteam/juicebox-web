@@ -1,9 +1,8 @@
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import {GooglePicker,FileUtils} from '../node_modules/igv-utils/src/index.js';
-import ModalTable from '../node_modules/data-modal/js/modalTable.js';
 import ContactMapDatasource from "./contactMapDatasource.js";
 import EncodeContactMapDatasource from "./encodeContactMapDatasource.js";
-import { currentGenomeId, appendAndConfigureLoadURLModal } from "./initializationHelper.js";
+import { appendAndConfigureLoadURLModal } from "./initializationHelper.js";
 import HackedModalTable from "./hackedModalTable.js";
 
 const igv = hic.igv;

@@ -1,13 +1,9 @@
 import {AlertSingleton} from '../node_modules/igv-ui/dist/igv-ui.js'
 import { StringUtils } from '../node_modules/igv-utils/src/index.js'
-import ModalTable from '../node_modules/data-modal/js/modalTable.js';
-import EncodeTrackDatasource from "../node_modules/data-modal/js/encodeTrackDatasource.js"
-import { encodeTrackDatasourceSignalConfigurator } from "../node_modules/data-modal/js/encodeTrackDatasourceSignalConfig.js"
-import { encodeTrackDatasourceOtherConfigurator } from "../node_modules/data-modal/js/encodeTrackDatasourceOtherConfig.js"
-import { createTrackWidgetsWithTrackRegistry } from '../node_modules/igv-widgets/dist/igv-widgets.js'
+import { ModalTable, EncodeTrackDatasource, encodeTrackDatasourceSignalConfigurator, encodeTrackDatasourceOtherConfigurator } from '../node_modules/data-modal/js/index.js'
+import { createSessionWidgets, dropboxDropdownItem, googleDriveDropdownItem } from '../node_modules/igv-widgets/dist/igv-widgets.js'
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import QRCode from "./qrcode.js";
-import SessionController, {sessionControllerConfigurator} from "./sessionController.js";
 import {googleEnabled} from './app.js';
 import ContactMapLoad from "./contactMapLoad.js";
 import TrackLoad from "./trackLoad.js";
@@ -16,7 +12,7 @@ import TrackLoad from "./trackLoad.js";
 const igv = hic.igv;
 
 let currentGenomeId;
-let sessionController;
+
 let contactMapLoad;
 let trackLoad;
 
@@ -79,7 +75,28 @@ async function initializationHelper(container, config) {
         updateBDropdown(browser);
     }
 
-    sessionController = new SessionController(sessionControllerConfigurator());
+    // Session - Dropbox and Google Drive buttons
+    $('div#igv-session-dropdown-menu > :nth-child(1)').after(dropboxDropdownItem('igv-app-dropdown-dropbox-session-file-button'));
+    $('div#igv-session-dropdown-menu > :nth-child(2)').after(googleDriveDropdownItem('igv-app-dropdown-google-drive-session-file-button'));
+
+
+    const $container = $(container)
+    createSessionWidgets(
+        $container,
+        igv.xhr,
+        'juicebox-webapp',
+        'igv-app-dropdown-local-session-file-input',
+        'igv-app-dropdown-dropbox-session-file-button',
+        'igv-app-dropdown-google-drive-session-file-button',
+        'igv-app-session-url-modal',
+        'igv-app-session-save-modal',
+        googleEnabled,
+        async config => { await hic.loadSession(config) },
+        () => hic.toJSON()
+    );
+
+
+
 
     $('#hic-track-dropdown-menu').parent().on('shown.bs.dropdown', function () {
         const browser = hic.HICBrowser.getCurrentBrowser();
