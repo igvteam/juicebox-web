@@ -1,11 +1,8 @@
-import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
+import { ModalTable } from '../node_modules/data-modal/js/index.js'
 import {GooglePicker,FileUtils} from '../node_modules/igv-utils/src/index.js';
 import ContactMapDatasource from "./contactMapDatasource.js";
 import EncodeContactMapDatasource from "./encodeContactMapDatasource.js";
 import { appendAndConfigureLoadURLModal } from "./initializationHelper.js";
-import HackedModalTable from "./hackedModalTable.js";
-
-const igv = hic.igv;
 
 let mapType = undefined;
 
@@ -82,40 +79,29 @@ class ContactMapLoad {
 
         if (mapMenu) {
 
-            this.contactMapModal = new HackedModalTable({ id: dataModalId, title: 'Contact Map', selectionStyle: 'single', pageLength: 10 });
+            this.contactMapModal = new ModalTable({ id: dataModalId, title: 'Contact Map', selectionStyle: 'single', pageLength: 10 });
 
             const { items: path } = mapMenu;
             this.contactMapModal.setDatasource( new ContactMapDatasource(path) );
 
-            this.contactMapModal.selectHandler = async selectionList => {
-                const { url, name } = this.contactMapModal.datasource.tableSelectionHandler(selectionList);
+            this.contactMapModal.selectHandler = async selection => {
+                const { url, name } = selection;
                 await loadHandler(url, name, mapType);
             };
         }
 
         this.$encodeHostedModalPresentationButton = $encodeHostedModalPresentationButton;
 
-        this.encodeHostedContactMapModal = new HackedModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
+        this.encodeHostedContactMapModal = new ModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
         this.encodeHostedContactMapModal.setDatasource(new EncodeContactMapDatasource(this.$encodeHostedModalPresentationButton, 'hg19'));
 
-        this.encodeHostedContactMapModal.selectHandler = async selectionList => {
-            const { url, name } = this.encodeHostedContactMapModal.datasource.tableSelectionHandler(selectionList);
+        this.encodeHostedContactMapModal.selectHandler = async selection => {
+            const { url, name } = selection;
             await loadHandler(url, name, mapType);
         };
 
-        // hic.EventBus.globalBus.subscribe('GenomeChange', this);
-
     }
 
-    // async receiveEvent(event) {
-    //
-    //     const { data:genomeId } = event;
-    //
-    //     if (currentGenomeId !== genomeId) {
-    //         this.encodeHostedContactMapModal.setDatasource(new EncodeContactMapDatasource(this.$encodeHostedModalPresentationButton, genomeId));
-    //     }
-    //
-    // }
 }
 
 export default ContactMapLoad

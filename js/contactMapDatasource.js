@@ -91,7 +91,8 @@ class ContactMapDatasource {
     };
 
     tableSelectionHandler(selectionList){
-        return selectionList[ 0 ];
+        const result = selectionList[ 0 ]
+        return result
     };
 
 }
