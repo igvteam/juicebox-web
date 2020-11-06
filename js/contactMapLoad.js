@@ -1,7 +1,7 @@
-import { ModalTable } from '../node_modules/data-modal/js/index.js'
+import { ModalTable, GenericMapDatasource } from '../node_modules/data-modal/js/index.js'
 import {GooglePicker,FileUtils} from '../node_modules/igv-utils/src/index.js';
-import ContactMapDatasource from "./contactMapDatasource.js";
-import EncodeContactMapDatasource from "./encodeContactMapDatasource.js";
+import { aidenLabContactMapDatasourceConfigurator } from './aidenLabContactMapDatasourceConfig.js'
+import { encodeContactMapDatasourceConfigurator } from "./encodeContactMapDatasourceConfig.js"
 import { appendAndConfigureLoadURLModal } from "./initializationHelper.js";
 
 let mapType = undefined;
@@ -82,7 +82,7 @@ class ContactMapLoad {
             this.contactMapModal = new ModalTable({ id: dataModalId, title: 'Contact Map', selectionStyle: 'single', pageLength: 10 });
 
             const { items: path } = mapMenu;
-            this.contactMapModal.setDatasource( new ContactMapDatasource(path) );
+            this.contactMapModal.setDatasource( new GenericMapDatasource( aidenLabContactMapDatasourceConfigurator()) );
 
             this.contactMapModal.selectHandler = async selection => {
                 const { url, name } = selection;
@@ -90,10 +90,11 @@ class ContactMapLoad {
             };
         }
 
-        this.$encodeHostedModalPresentationButton = $encodeHostedModalPresentationButton;
+        this.$encodeHostedModalPresentationButton = $encodeHostedModalPresentationButton
+        this.$encodeHostedModalPresentationButton.removeClass('disabled')
 
         this.encodeHostedContactMapModal = new ModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
-        this.encodeHostedContactMapModal.setDatasource(new EncodeContactMapDatasource(this.$encodeHostedModalPresentationButton, 'hg19'));
+        this.encodeHostedContactMapModal.setDatasource(new GenericMapDatasource( encodeContactMapDatasourceConfigurator()));
 
         this.encodeHostedContactMapModal.selectHandler = async selection => {
             const { url, name } = selection;
