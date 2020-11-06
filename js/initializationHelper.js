@@ -16,34 +16,91 @@ let currentGenomeId;
 let contactMapLoad;
 let trackLoad;
 
+async function initializationHelper(container, config) {
+
+    createAppCloneButton(container)
+
+    const genomeChangeListener = createGenomeChangeListener(config);
+
+    updateControlMapDropdownForAllBrowser(hic.allBrowsers)
+
+    configureSessionWidgets(container)
+
+    const trackLoadConfig =
+        {
+            rootContainer: document.querySelector('#hic-main'),
+            $localFileInput: $('#hic-local-track-file-input'),
+            urlLoadModalId: 'track-load-url-modal',
+            $dropboxButtons: $('#hic-track-dropdown-dropbox-button'),
+            $googleDriveButtons: $('#hic-track-dropdown-google-drive-button'),
+            googleEnabled,
+            loadHandler: (configurations) => loadTracks(configurations)
+        };
+
+    trackLoad = new TrackLoad(trackLoadConfig);
+
+    const $dropdowns = $('button[id$=-map-dropdown]').parent()
+
+    const contactMapLoadConfig =
+        {
+            rootContainer: document.querySelector('#hic-main'),
+            $dropdowns,
+            $localFileInputs: $dropdowns.find('input'),
+            urlLoadModalId: 'hic-load-url-modal',
+            dataModalId: 'hic-contact-map-modal',
+            $encodeHostedModalPresentationButton: $('#hic-encode-hosted-contact-map-presentation-button'),
+            encodeHostedModalId: 'hic-encode-hosted-contact-map-modal',
+            $dropboxButtons: $dropdowns.find('div[id$="-map-dropdown-dropbox-button"]'),
+            $googleDriveButtons: $dropdowns.find('div[id$="-map-dropdown-google-drive-button"]'),
+            googleEnabled,
+            mapMenu: config.mapMenu,
+            loadHandler: (path, name, mapType) => loadHicFile(path, name, mapType)
+        };
+
+    contactMapLoad = new ContactMapLoad(contactMapLoadConfig);
+
+    configureShareModal(container, config)
+
+    $('#hic-track-dropdown-menu').parent().on('shown.bs.dropdown', function () {
+        const browser = hic.HICBrowser.getCurrentBrowser();
+        if (undefined === browser || undefined === browser.dataset) {
+            AlertSingleton.present('Contact map must be loaded and selected before loading tracks');
+        }
+    });
+
+    $('#hic-control-map-dropdown-menu').parent().on('shown.bs.dropdown', function () {
+        const browser = hic.HICBrowser.getCurrentBrowser();
+        if (undefined === browser || undefined === browser.dataset) {
+            AlertSingleton.present('Contact map must be loaded and selected before loading "B" map"');
+        }
+    });
+
+    hic.EventBus.globalBus.subscribe("GenomeChange", genomeChangeListener);
+    hic.EventBus.globalBus.subscribe("BrowserSelect", event => updateControlMapDropdown(event.data))
+
+    // Must manually trigger the genome change event on initial load
+    if (hic.HICBrowser.currentBrowser && hic.HICBrowser.currentBrowser.genome) {
+        await genomeChangeListener.receiveEvent({data: hic.HICBrowser.currentBrowser.genome.id})
+    }
+
+}
+
 const encodeModalTables = []
 encodeModalTables.push( new ModalTable({ id: 'hic-encode-signal-modal', title: 'ENCODE Signals', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => { loadTracks(selected) } }) );
 encodeModalTables.push( new ModalTable({ id: 'hic-encode-other-modal', title: 'ENCODE Others', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => { loadTracks(selected) } }) );
 
-async function initializationHelper(container, config) {
+function createGenomeChangeListener (config) {
 
-    $('.juicebox-app-clone-button').on('click', async () => {
-
-        let browser = undefined;
-        try {
-            browser = await hic.createBrowser(container, {initFromUrl: false, updateHref: false});
-        } catch (e) {
-            console.error(e);
-        }
-
-        if (browser) {
-            hic.HICBrowser.setCurrentBrowser(browser);
-        }
-
-    });
-
-    const genomeChangeListener = {
+    return {
 
         receiveEvent: async event => {
+
             const {data: genomeId} = event;
 
             if (currentGenomeId !== genomeId) {
+
                 currentGenomeId = genomeId;
+
                 if (config.trackMenu) {
                     let tracksURL = config.trackMenu.items.replace("$GENOME_ID", genomeId);
                     await loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
@@ -68,21 +125,36 @@ async function initializationHelper(container, config) {
                 }
             }
         }
-    };
-
-    for (let browser of hic.allBrowsers) {
-        browser.eventBus.subscribe("MapLoad", checkBDropdown);
-        updateBDropdown(browser);
     }
 
-    // Session - Dropbox and Google Drive buttons
-    $('div#igv-session-dropdown-menu > :nth-child(1)').after(dropboxDropdownItem('igv-app-dropdown-dropbox-session-file-button'));
-    $('div#igv-session-dropdown-menu > :nth-child(2)').after(googleDriveDropdownItem('igv-app-dropdown-google-drive-session-file-button'));
+}
 
+function createAppCloneButton(container) {
 
-    const $container = $(container)
+    $('.juicebox-app-clone-button').on('click', async () => {
+
+        let browser = undefined;
+        try {
+            browser = await hic.createBrowser(container, {initFromUrl: false, updateHref: false});
+        } catch (e) {
+            console.error(e);
+        }
+
+        if (browser) {
+            hic.HICBrowser.setCurrentBrowser(browser);
+        }
+
+    });
+
+}
+
+function configureSessionWidgets(container) {
+
+    $('div#igv-session-dropdown-menu > :nth-child(1)').after(dropboxDropdownItem('igv-app-dropdown-dropbox-session-file-button'))
+    $('div#igv-session-dropdown-menu > :nth-child(2)').after(googleDriveDropdownItem('igv-app-dropdown-google-drive-session-file-button'))
+
     createSessionWidgets(
-        $container,
+        $(container),
         igv.xhr,
         'juicebox-webapp',
         'igv-app-dropdown-local-session-file-input',
@@ -93,171 +165,8 @@ async function initializationHelper(container, config) {
         googleEnabled,
         async config => { await hic.loadSession(config) },
         () => hic.toJSON()
-    );
+    )
 
-
-
-
-    $('#hic-track-dropdown-menu').parent().on('shown.bs.dropdown', function () {
-        const browser = hic.HICBrowser.getCurrentBrowser();
-        if (undefined === browser || undefined === browser.dataset) {
-            AlertSingleton.present('Contact map must be loaded and selected before loading tracks');
-        }
-    });
-
-    $('#hic-control-map-dropdown-menu').parent().on('shown.bs.dropdown', function () {
-        const browser = hic.HICBrowser.getCurrentBrowser();
-        if (undefined === browser || undefined === browser.dataset) {
-            AlertSingleton.present('Contact map must be loaded and selected before loading "B" map"');
-        }
-    });
-
-
-
-    const trackLoadConfig =
-        {
-            rootContainer: document.querySelector('#hic-main'),
-            $localFileInput: $('#hic-local-track-file-input'),
-            urlLoadModalId: 'track-load-url-modal',
-            $dropboxButtons: $('#hic-track-dropdown-dropbox-button'),
-            $googleDriveButtons: $('#hic-track-dropdown-google-drive-button'),
-            googleEnabled,
-            loadHandler: (configurations) => loadTracks(configurations)
-        };
-
-    trackLoad = new TrackLoad(trackLoadConfig);
-
-
-    const $dropdownButtons = $('button[id$=-map-dropdown]');
-    const $dropdowns = $dropdownButtons.parent();
-
-    const contactMapLoadConfig =
-        {
-            rootContainer: document.querySelector('#hic-main'),
-            $dropdowns,
-            $localFileInputs: $dropdowns.find('input'),
-            urlLoadModalId: 'hic-load-url-modal',
-            dataModalId: 'hic-contact-map-modal',
-            $encodeHostedModalPresentationButton: $('#hic-encode-hosted-contact-map-presentation-button'),
-            encodeHostedModalId: 'hic-encode-hosted-contact-map-modal',
-            $dropboxButtons: $dropdowns.find('div[id$="-map-dropdown-dropbox-button"]'),
-            $googleDriveButtons: $dropdowns.find('div[id$="-map-dropdown-google-drive-button"]'),
-            googleEnabled,
-            mapMenu: config.mapMenu,
-            loadHandler: (path, name, mapType) => loadHicFile(path, name, mapType)
-        };
-
-    contactMapLoad = new ContactMapLoad(contactMapLoadConfig);
-
-    configureShareModal();
-
-    hic.EventBus.globalBus.subscribe("GenomeChange", genomeChangeListener);
-
-    hic.EventBus.globalBus.subscribe("BrowserSelect", function (event) {
-        updateBDropdown(event.data);
-    });
-
-    // Must manually trigger the genome change event on initial load
-    if (hic.HICBrowser.currentBrowser && hic.HICBrowser.currentBrowser.genome) {
-        await genomeChangeListener.receiveEvent({data: hic.HICBrowser.currentBrowser.genome.id})
-    }
-
-
-    let qrcode = undefined;
-
-    function configureShareModal() {
-
-        const $hic_share_url_modal = $('#hic-share-url-modal');
-
-        $hic_share_url_modal.on('show.bs.modal', async function (e) {
-
-            let href = new String(window.location.href);
-
-            // This js file is specific to the aidenlab site, and we know we have only juicebox parameters.
-            // Strip href of current parameters, if any
-            let idx = href.indexOf("?");
-            if (idx > 0) href = href.substring(0, idx);
-
-            const jbUrl = await hic.shortJuiceboxURL(href);
-
-            const embedSnippet = await getEmbeddableSnippet($(container), config);
-            const $hic_embed_url = $('#hic-embed');
-            $hic_embed_url.val(embedSnippet);
-            $hic_embed_url.get(0).select();
-
-            let shareUrl = jbUrl;
-
-            // Shorten second time
-            // e.g. converts https://aidenlab.org/juicebox?juiceboxURL=https://goo.gl/WUb1mL  to https://goo.gl/ERHp5u
-
-            const $hic_share_url = $('#hic-share-url');
-            $hic_share_url.val(shareUrl);
-            $hic_share_url.get(0).select();
-
-            const tweetContainer = $('#tweetButtonContainer');
-            tweetContainer.empty();
-
-            $('#emailButton').attr('href', 'mailto:?body=' + shareUrl);
-
-            if (shareUrl.length < 100) {
-
-                await window.twttr.widgets.createShareButton(shareUrl, tweetContainer.get(0), {text: 'Contact map: '});
-                console.log("Tweet button updated");
-
-                // QR code generation
-                if (qrcode) {
-                    qrcode.clear();
-                    $('hic-qr-code-image').empty();
-                } else {
-                    qrcode = new QRCode(document.getElementById("hic-qr-code-image"), {
-                        width: 128,
-                        height: 128,
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                }
-
-                qrcode.makeCode(shareUrl);
-            }
-
-        });
-
-        $hic_share_url_modal.on('hidden.bs.modal', function (e) {
-            $('#hic-embed-container').hide();
-            $('#hic-qr-code-image').hide();
-        });
-
-        $('#hic-qr-code-button').on('click', function (e) {
-            $('#hic-embed-container').hide();
-            $('#hic-qr-code-image').toggle();
-        });
-
-        $('#hic-embed-button').on('click', function (e) {
-            $('#hic-qr-code-image').hide();
-            $('#hic-embed-container').toggle();
-        });
-
-        $('#hic-copy-link').on('click', function (e) {
-            var success;
-            $('#hic-share-url')[0].select();
-            success = document.execCommand('copy');
-            if (success) {
-                $('#hic-share-url-modal').modal('hide');
-            } else {
-                alert("Copy not successful");
-            }
-        });
-
-        $('#hic-embed-copy-link').on('click', function (e) {
-            var success;
-            $('#hic-embed')[0].select();
-            success = document.execCommand('copy');
-            if (success) {
-                $('#hic-share-url-modal').modal('hide');
-            } else {
-                alert("Copy not successful");
-            }
-        });
-    }
 }
 
 const appendAndConfigureLoadURLModal = (root, id, input_handler) => {
@@ -446,6 +355,98 @@ function loadTracks(tracks) {
     hic.HICBrowser.getCurrentBrowser().loadTracks(tracks);
 }
 
+let qrcode = undefined;
+
+function configureShareModal(container, config) {
+
+    const $hic_share_url_modal = $('#hic-share-url-modal');
+
+    $hic_share_url_modal.on('show.bs.modal', async function (e) {
+
+        let href = String(window.location.href);
+
+        // This js file is specific to the aidenlab site, and we know we have only juicebox parameters.
+        // Strip href of current parameters, if any
+        let idx = href.indexOf("?");
+        if (idx > 0) href = href.substring(0, idx);
+
+        const jbUrl = await hic.shortJuiceboxURL(href);
+
+        const embedSnippet = await getEmbeddableSnippet($(container), config);
+        const $hic_embed_url = $('#hic-embed');
+        $hic_embed_url.val(embedSnippet);
+        $hic_embed_url.get(0).select();
+
+        let shareUrl = jbUrl;
+
+        // Shorten second time
+        // e.g. converts https://aidenlab.org/juicebox?juiceboxURL=https://goo.gl/WUb1mL  to https://goo.gl/ERHp5u
+
+        const $hic_share_url = $('#hic-share-url');
+        $hic_share_url.val(shareUrl);
+        $hic_share_url.get(0).select();
+
+        const tweetContainer = $('#tweetButtonContainer');
+        tweetContainer.empty();
+
+        $('#emailButton').attr('href', 'mailto:?body=' + shareUrl);
+
+        if (shareUrl.length < 100) {
+
+            await window.twttr.widgets.createShareButton(shareUrl, tweetContainer.get(0), {text: 'Contact map: '});
+            console.log("Tweet button updated");
+
+            // QR code generation
+            if (qrcode) {
+                qrcode.clear();
+                $('hic-qr-code-image').empty();
+            } else {
+                qrcode = new QRCode(document.getElementById("hic-qr-code-image"), { width: 128, height: 128, correctLevel: QRCode.CorrectLevel.H });
+            }
+
+            qrcode.makeCode(shareUrl);
+        }
+
+    });
+
+    $hic_share_url_modal.on('hidden.bs.modal', function (e) {
+        $('#hic-embed-container').hide();
+        $('#hic-qr-code-image').hide();
+    });
+
+    $('#hic-qr-code-button').on('click', function (e) {
+        $('#hic-embed-container').hide();
+        $('#hic-qr-code-image').toggle();
+    });
+
+    $('#hic-embed-button').on('click', function (e) {
+        $('#hic-qr-code-image').hide();
+        $('#hic-embed-container').toggle();
+    });
+
+    $('#hic-copy-link').on('click', function (e) {
+        var success;
+        $('#hic-share-url')[0].select();
+        success = document.execCommand('copy');
+        if (success) {
+            $('#hic-share-url-modal').modal('hide');
+        } else {
+            alert("Copy not successful");
+        }
+    });
+
+    $('#hic-embed-copy-link').on('click', function (e) {
+        var success;
+        $('#hic-embed')[0].select();
+        success = document.execCommand('copy');
+        if (success) {
+            $('#hic-share-url-modal').modal('hide');
+        } else {
+            alert("Copy not successful");
+        }
+    });
+}
+
 async function loadHicFile(url, name, mapType) {
 
     try {
@@ -505,18 +506,22 @@ function getEmbedTarget() {
 
 }
 
-function checkBDropdown() {
-    updateBDropdown(hic.HICBrowser.getCurrentBrowser());
+function checkControlMapDropdown() {
+    updateControlMapDropdown(hic.HICBrowser.getCurrentBrowser());
 }
 
-function updateBDropdown(browser) {
-    if (browser) {
-        if (browser.dataset) {
-            $('#hic-control-map-dropdown').removeClass('disabled');
-        } else {
-      //      $('#hic-control-map-dropdown').addClass('disabled');
-        }
+function updateControlMapDropdown(browser) {
+    if (browser && browser.dataset) {
+        $('#hic-control-map-dropdown').removeClass('disabled')
     }
+}
+
+function updateControlMapDropdownForAllBrowser(browsers) {
+    for (let browser of browsers) {
+        browser.eventBus.subscribe("MapLoad", checkControlMapDropdown);
+        updateControlMapDropdown(browser);
+    }
+
 }
 
 export {appendAndConfigureLoadURLModal, createAnnotationDatalistModals, loadHicFile, currentGenomeId }
