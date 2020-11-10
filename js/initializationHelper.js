@@ -1,12 +1,10 @@
-import {AlertSingleton} from '../node_modules/igv-ui/dist/igv-ui.js'
+import { AlertSingleton} from '../node_modules/igv-ui/dist/igv-ui.js'
 import { StringUtils } from '../node_modules/igv-utils/src/index.js'
-import { ModalTable, EncodeTrackDatasource, encodeTrackDatasourceSignalConfigurator, encodeTrackDatasourceOtherConfigurator } from '../node_modules/data-modal/js/index.js'
 import { dropboxButtonImageBase64, googleDriveButtonImageBase64, createTrackWidgets, createSessionWidgets, dropboxDropdownItem, googleDriveDropdownItem } from '../node_modules/igv-widgets/dist/igv-widgets.js'
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import QRCode from "./qrcode.js";
 import {googleEnabled} from './app.js';
 import ContactMapLoad from "./contactMapLoad.js";
-import TrackLoad from "./trackLoad.js";
 
 // The igv object. TODO eliminate this dependency
 const igv = hic.igv;
@@ -20,65 +18,30 @@ async function initializationHelper(container, config) {
 
     createAppCloneButton(container)
 
-    const genomeChangeListener = createGenomeChangeListener(config);
-
     updateControlMapDropdownForAllBrowser(hic.allBrowsers)
 
     configureSessionWidgets(container)
 
+    const str = 'track'
+    let imgElement
 
+    imgElement = document.querySelector(`img#igv-app-${ str }-dropbox-button-image`)
+    imgElement.src = `data:image/svg+xml;base64,${ dropboxButtonImageBase64() }`
 
+    imgElement = document.querySelector(`img#igv-app-${ str }-google-drive-button-image`)
+    imgElement.src = `data:image/svg+xml;base64,${ googleDriveButtonImageBase64() }`
 
+    createTrackWidgets(
+        $(container),
+        $('#hic-local-track-file-input'),
+        $('#hic-track-dropdown-dropbox-button'),
+        googleEnabled,
+        $('#hic-track-dropdown-google-drive-button'),
+        ['hic-encode-signal-modal', 'hic-encode-other-modal'],
+        'track-load-url-modal',
+        configurations => loadTracks(configurations))
 
-
-    const trackLoadConfig =
-        {
-            rootContainer: document.querySelector('#hic-main'),
-            $localFileInput: $('#hic-local-track-file-input'),
-            urlLoadModalId: 'track-load-url-modal',
-            $dropboxButtons: $('#hic-track-dropdown-dropbox-button'),
-            $googleDriveButtons: $('#hic-track-dropdown-google-drive-button'),
-            googleEnabled,
-            loadHandler: (configurations) => loadTracks(configurations)
-        };
-
-    trackLoad = new TrackLoad(trackLoadConfig);
-
-
-
-
-
-
-    // const str = 'track'
-    // let imgElement
-    //
-    // imgElement = document.querySelector(`img#igv-app-${ str }-dropbox-button-image`)
-    // imgElement.src = `data:image/svg+xml;base64,${ dropboxButtonImageBase64() }`
-    //
-    // imgElement = document.querySelector(`img#igv-app-${ str }-google-drive-button-image`)
-    // imgElement.src = `data:image/svg+xml;base64,${ googleDriveButtonImageBase64() }`
-    //
-    // createTrackWidgets(
-    //     $(container),
-    //     $('#hic-local-track-file-input'),
-    //     $('#hic-track-dropdown-dropbox-button'),
-    //     googleEnabled,
-    //     $('#hic-track-dropdown-google-drive-button'),
-    //     ['hic-encode-signal-modal', 'hic-encode-other-modal'],
-    //     'track-load-url-modal',
-    //     configurations => loadTracks(configurations))
-
-
-
-
-
-
-
-
-
-
-
-
+    createAnnotationDatalistModals(container);
 
     const $dropdowns = $('button[id$=-map-dropdown]').parent()
 
@@ -116,26 +79,18 @@ async function initializationHelper(container, config) {
         }
     });
 
-    const listener =
-        {
-            receiveEvent: async event => {
-                hic.EventBus.globalBus.post({ type: 'DidChangeGenome', data: event.data })
-            }
-        }
+    const listener =createGenomeChangeListener(config)
 
-    hic.EventBus.globalBus.subscribe("GenomeChange", listener);
+    hic.EventBus.globalBus.subscribe("GenomeChange", listener)
+
     hic.EventBus.globalBus.subscribe("BrowserSelect", event => updateControlMapDropdown(event.data))
 
     // Must manually trigger the genome change event on initial load
-    if (hic.HICBrowser.currentBrowser && hic.HICBrowser.currentBrowser.genome) {
-        await listener.receiveEvent({ data: hic.HICBrowser.currentBrowser.genome.id })
-    }
+    // if (hic.HICBrowser.currentBrowser && hic.HICBrowser.currentBrowser.genome) {
+    //     await listener.receiveEvent({ data: hic.HICBrowser.currentBrowser.genome.id })
+    // }
 
 }
-
-// const encodeModalTables = []
-// encodeModalTables.push( new ModalTable({ id: 'hic-encode-signal-modal', title: 'ENCODE Signals', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => { loadTracks(selected) } }) );
-// encodeModalTables.push( new ModalTable({ id: 'hic-encode-other-modal', title: 'ENCODE Others', selectionStyle: 'multi', pageLength: 10, selectHandler: selected => { loadTracks(selected) } }) );
 
 function createGenomeChangeListener (config) {
 
@@ -143,7 +98,7 @@ function createGenomeChangeListener (config) {
 
         receiveEvent: async event => {
 
-            const {data: genomeId} = event;
+            const { data: genomeId } = event;
 
             if (currentGenomeId !== genomeId) {
 
@@ -159,18 +114,22 @@ function createGenomeChangeListener (config) {
                     await loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
                 }
 
-                if (EncodeTrackDatasource.supportsGenome(genomeId)) {
 
-                    $('#hic-encode-signal-modal-button').show();
-                    $('#hic-encode-other-modal-button').show();
+                // if (EncodeTrackDatasource.supportsGenome(genomeId)) {
+                //
+                //     $('#hic-encode-signal-modal-button').show();
+                //     $('#hic-encode-other-modal-button').show();
+                //
+                //     encodeModalTables[ 0 ].setDatasource(new EncodeTrackDatasource( encodeTrackDatasourceSignalConfigurator( genomeId ) ));
+                //     encodeModalTables[ 1 ].setDatasource(new EncodeTrackDatasource( encodeTrackDatasourceOtherConfigurator( genomeId ) ));
+                //
+                // } else {
+                //     $('#hic-encode-signal-modal-button').hide();
+                //     $('#hic-encode-other-modal-button').hide();
+                // }
 
-                    encodeModalTables[ 0 ].setDatasource(new EncodeTrackDatasource( encodeTrackDatasourceSignalConfigurator( genomeId ) ));
-                    encodeModalTables[ 1 ].setDatasource(new EncodeTrackDatasource( encodeTrackDatasourceOtherConfigurator( genomeId ) ));
+                hic.EventBus.globalBus.post({ type: 'DidChangeGenome', data: genomeId })
 
-                } else {
-                    $('#hic-encode-signal-modal-button').hide();
-                    $('#hic-encode-other-modal-button').hide();
-                }
             }
         }
     }
@@ -216,52 +175,6 @@ function configureSessionWidgets(container) {
     )
 
 }
-
-const appendAndConfigureLoadURLModal = (root, id, input_handler) => {
-
-    const html =
-        `<div id="${id}" class="modal fade">
-            <div class="modal-dialog  modal-lg">
-                <div class="modal-content">
-
-                <div class="modal-header">
-                    <div class="modal-title">Load URL</div>
-
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-
-                </div>
-
-                <div class="modal-body">
-
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Enter URL">
-                    </div>
-
-                </div>
-
-                </div>
-            </div>
-        </div>`;
-
-    $(root).append(html);
-
-    const $modal = $(root).find(`#${id}`);
-    $modal.find('input').on('change', function () {
-
-        const path = $(this).val();
-        $(this).val("");
-
-        $(`#${id}`).modal('hide');
-
-        input_handler(path);
-
-
-    });
-
-    return html;
-};
 
 const createAnnotationDatalistModals = root => {
 
@@ -572,6 +485,52 @@ function updateControlMapDropdownForAllBrowser(browsers) {
 
 }
 
-export {appendAndConfigureLoadURLModal, createAnnotationDatalistModals, loadHicFile, currentGenomeId }
+const appendAndConfigureLoadURLModal = (root, id, input_handler) => {
+
+    const html =
+        `<div id="${id}" class="modal fade">
+            <div class="modal-dialog  modal-lg">
+                <div class="modal-content">
+
+                <div class="modal-header">
+                    <div class="modal-title">Load URL</div>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Enter URL">
+                    </div>
+
+                </div>
+
+                </div>
+            </div>
+        </div>`;
+
+    $(root).append(html);
+
+    const $modal = $(root).find(`#${id}`);
+    $modal.find('input').on('change', function () {
+
+        const path = $(this).val();
+        $(this).val("");
+
+        $(`#${id}`).modal('hide');
+
+        input_handler(path);
+
+
+    });
+
+    return html;
+};
+
+export { appendAndConfigureLoadURLModal }
 
 export default initializationHelper
