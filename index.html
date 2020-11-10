@@ -193,31 +193,17 @@
 
             <div id="hic-track-dropdown-menu" class="dropdown-menu">
 
-                <!-- ENCODE Signals -->
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-encode-signal-modal" id="hic-encode-signal-modal-button">ENCODE Signals</a>
-
-                <!-- ENCODE Others -->
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-encode-other-modal" id="hic-encode-other-modal-button">ENCODE Others</a>
-
-                <!-- Genome Annotations (Frequently Used) -->
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-annotation-datalist-modal">Frequently Used</a>
-
-                <!-- 2D Annotations -->
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-annotation-2D-datalist-modal">2D Annotations</a>
-
-                <!-- Local Track -->
+                <!-- Local File -->
                 <label class="dropdown-item btn btn-default btn-file">
                     <div class="igv-app-dropdown-item-cloud-storage">
                         <div>
-                            Local File
+                            Local File ...
                         </div>
                         <div>
                             <input id="hic-local-track-file-input" name="local-track-file" type="file" style="display: none;">
                         </div>
                     </div>
                 </label>
-
-
 
                 <!-- Dropbox -->
                 <div class="dropdown-item">
@@ -228,8 +214,6 @@
                         <div>
                             <img src="./img/dropbox-dropdown-menu-item.png" width="18" height="18">
                         </div>
-<!--                        <div>...</div>-->
-
                     </div>
 
                 </div>
@@ -239,13 +223,31 @@
                     <div id="hic-track-dropdown-google-drive-button" class="igv-app-dropdown-item-cloud-storage">
                         <div>Google Drive File</div>
                         <div><img src="./img/googledrive-dropdown-menu-item.png" width="18" height="18"></div>
-<!--                        <div>...</div>-->
                     </div>
                 </div>
 
+                <!-- URL -->
+                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#track-load-url-modal">URL ...</a>
 
-                <!-- Track URL -->
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#track-load-url-modal">URL</a>
+
+
+                <!-- ENCODE Signals -->
+<!--                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-encode-signal-modal" id="hic-encode-signal-modal-button">ENCODE Signals</a>-->
+
+                <!-- ENCODE Others -->
+<!--                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-encode-other-modal" id="hic-encode-other-modal-button">ENCODE Others</a>-->
+
+
+
+
+
+
+
+                <!-- Genome Annotations (Frequently Used) -->
+<!--                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-annotation-datalist-modal">Frequently Used</a>-->
+
+                <!-- 2D Annotations -->
+                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-annotation-2D-datalist-modal">2D Annotations</a>
             </div>
 
         </div>
