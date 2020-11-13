@@ -2,7 +2,6 @@ import { ModalTable, GenericMapDatasource } from '../node_modules/data-modal/js/
 import {GooglePicker,FileUtils} from '../node_modules/igv-utils/src/index.js';
 import { aidenLabContactMapDatasourceConfigurator } from './aidenLabContactMapDatasourceConfig.js'
 import { encodeContactMapDatasourceConfigurator } from "./encodeContactMapDatasourceConfig.js"
-import { appendAndConfigureLoadURLModal } from "./initializationHelper.js";
 
 let mapType = undefined;
 
@@ -103,6 +102,52 @@ class ContactMapLoad {
 
     }
 
+}
+
+function appendAndConfigureLoadURLModal(root, id, input_handler) {
+
+    const html =
+        `<div id="${id}" class="modal fade">
+            <div class="modal-dialog  modal-lg">
+                <div class="modal-content">
+
+                <div class="modal-header">
+                    <div class="modal-title">Load URL</div>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Enter URL">
+                    </div>
+
+                </div>
+
+                </div>
+            </div>
+        </div>`;
+
+    $(root).append(html);
+
+    const $modal = $(root).find(`#${id}`);
+    $modal.find('input').on('change', function () {
+
+        const path = $(this).val();
+        $(this).val("");
+
+        $(`#${id}`).modal('hide');
+
+        input_handler(path);
+
+
+    });
+
+    return html;
 }
 
 export default ContactMapLoad

@@ -1,6 +1,5 @@
-import { AlertSingleton} from '../node_modules/igv-ui/dist/igv-ui.js'
 import { StringUtils } from '../node_modules/igv-utils/src/index.js'
-import { dropboxButtonImageBase64, googleDriveButtonImageBase64, createTrackWidgets, createSessionWidgets, dropboxDropdownItem, googleDriveDropdownItem } from '../node_modules/igv-widgets/dist/igv-widgets.js'
+import { AlertSingleton, dropboxButtonImageBase64, googleDriveButtonImageBase64, createTrackWidgets, createSessionWidgets, dropboxDropdownItem, googleDriveDropdownItem } from '../node_modules/igv-widgets/dist/igv-widgets.js'
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import QRCode from "./qrcode.js";
 import {googleEnabled} from './app.js';
@@ -92,91 +91,7 @@ async function initializationHelper(container, config) {
 
 }
 
-function createGenomeChangeListener (config) {
-
-    return {
-
-        receiveEvent: async event => {
-
-            const { data: genomeId } = event;
-
-            if (currentGenomeId !== genomeId) {
-
-                currentGenomeId = genomeId;
-
-                if (config.trackMenu) {
-                    let tracksURL = config.trackMenu.items.replace("$GENOME_ID", genomeId);
-                    await loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
-                }
-
-                if (config.trackMenu2D) {
-                    let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", genomeId);
-                    await loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
-                }
-
-
-                // if (EncodeTrackDatasource.supportsGenome(genomeId)) {
-                //
-                //     $('#hic-encode-signal-modal-button').show();
-                //     $('#hic-encode-other-modal-button').show();
-                //
-                //     encodeModalTables[ 0 ].setDatasource(new EncodeTrackDatasource( encodeTrackDatasourceSignalConfigurator( genomeId ) ));
-                //     encodeModalTables[ 1 ].setDatasource(new EncodeTrackDatasource( encodeTrackDatasourceOtherConfigurator( genomeId ) ));
-                //
-                // } else {
-                //     $('#hic-encode-signal-modal-button').hide();
-                //     $('#hic-encode-other-modal-button').hide();
-                // }
-
-                hic.EventBus.globalBus.post({ type: 'DidChangeGenome', data: genomeId })
-
-            }
-        }
-    }
-
-}
-
-function createAppCloneButton(container) {
-
-    $('.juicebox-app-clone-button').on('click', async () => {
-
-        let browser = undefined;
-        try {
-            browser = await hic.createBrowser(container, {initFromUrl: false, updateHref: false});
-        } catch (e) {
-            console.error(e);
-        }
-
-        if (browser) {
-            hic.HICBrowser.setCurrentBrowser(browser);
-        }
-
-    });
-
-}
-
-function configureSessionWidgets(container) {
-
-    $('div#igv-session-dropdown-menu > :nth-child(1)').after(dropboxDropdownItem('igv-app-dropdown-dropbox-session-file-button'))
-    $('div#igv-session-dropdown-menu > :nth-child(2)').after(googleDriveDropdownItem('igv-app-dropdown-google-drive-session-file-button'))
-
-    createSessionWidgets(
-        $(container),
-        igv.xhr,
-        'juicebox-webapp',
-        'igv-app-dropdown-local-session-file-input',
-        'igv-app-dropdown-dropbox-session-file-button',
-        'igv-app-dropdown-google-drive-session-file-button',
-        'igv-app-session-url-modal',
-        'igv-app-session-save-modal',
-        googleEnabled,
-        async config => { await hic.loadSession(config) },
-        () => hic.toJSON()
-    )
-
-}
-
-const createAnnotationDatalistModals = root => {
+function createAnnotationDatalistModals (root) {
 
     let modal;
 
@@ -238,9 +153,9 @@ const createAnnotationDatalistModals = root => {
         $annotation_2D_input.val('');
     });
 
-};
+}
 
-const createGenericDataListModal = (id, input_id, datalist_id, placeholder) => {
+function createGenericDataListModal (id, input_id, datalist_id, placeholder) {
 
     const generic_select_modal_string =
         `<div id="${id}" class="modal">
@@ -270,9 +185,98 @@ const createGenericDataListModal = (id, input_id, datalist_id, placeholder) => {
         </div>`;
 
     return generic_select_modal_string;
-};
+}
 
-const loadAnnotationDatalist = async ($datalist, url, type) => {
+function loadTracks(tracks) {
+    // Set some juicebox specific defaults
+    for (let t of tracks) {
+        t.autoscale = true;
+        t.displayMode = "COLLAPSED"
+    }
+    hic.HICBrowser.getCurrentBrowser().loadTracks(tracks);
+}
+
+async function loadHicFile(url, name, mapType) {
+
+    try {
+        let browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
+        const isControl = ('control-map' === mapType);
+        const browser = hic.HICBrowser.getCurrentBrowser();
+        const config = {url, name, isControl};
+
+        if (StringUtils.isString(url) && url.includes("?")) {
+            const query = hic.extractQuery(url);
+            const uriDecode = url.includes("%2C");
+            hic.decodeQuery(query, config, uriDecode);
+        }
+
+        if (isControl) {
+            await browser.loadHicControlFile(config)
+        } else {
+            browser.reset();
+            browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
+            if (browsersWithMaps.length > 0) {
+
+
+                config["synchState"] = browsersWithMaps[0].getSyncState();
+            }
+            await browser.loadHicFile(config);
+            if (!isControl) {
+                hic.syncBrowsers(hic.allBrowsers);
+            }
+
+            $('#hic-control-map-dropdown').removeClass('disabled');
+        }
+    } catch (e) {
+        AlertSingleton.present(`Error loading ${url}: ${e}`);
+    }
+}
+
+function createGenomeChangeListener (config) {
+
+    return {
+
+        receiveEvent: async event => {
+
+            const { data: genomeId } = event;
+
+            if (currentGenomeId !== genomeId) {
+
+                currentGenomeId = genomeId;
+
+                if (config.trackMenu) {
+                    let tracksURL = config.trackMenu.items.replace("$GENOME_ID", genomeId);
+                    await loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
+                }
+
+                if (config.trackMenu2D) {
+                    let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", genomeId);
+                    await loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
+                }
+
+
+                // if (EncodeTrackDatasource.supportsGenome(genomeId)) {
+                //
+                //     $('#hic-encode-signal-modal-button').show();
+                //     $('#hic-encode-other-modal-button').show();
+                //
+                //     encodeModalTables[ 0 ].setDatasource(new EncodeTrackDatasource( encodeTrackDatasourceSignalConfigurator( genomeId ) ));
+                //     encodeModalTables[ 1 ].setDatasource(new EncodeTrackDatasource( encodeTrackDatasourceOtherConfigurator( genomeId ) ));
+                //
+                // } else {
+                //     $('#hic-encode-signal-modal-button').hide();
+                //     $('#hic-encode-other-modal-button').hide();
+                // }
+
+                hic.EventBus.globalBus.post({ type: 'DidChangeGenome', data: genomeId })
+
+            }
+        }
+    }
+
+}
+
+async function loadAnnotationDatalist ($datalist, url, type) {
 
     $datalist.empty();
 
@@ -305,15 +309,46 @@ const loadAnnotationDatalist = async ($datalist, url, type) => {
         }
     }
 
-};
+}
 
-function loadTracks(tracks) {
-    // Set some juicebox specific defaults
-    for (let t of tracks) {
-        t.autoscale = true;
-        t.displayMode = "COLLAPSED"
-    }
-    hic.HICBrowser.getCurrentBrowser().loadTracks(tracks);
+function createAppCloneButton(container) {
+
+    $('.juicebox-app-clone-button').on('click', async () => {
+
+        let browser = undefined;
+        try {
+            browser = await hic.createBrowser(container, {initFromUrl: false, updateHref: false});
+        } catch (e) {
+            console.error(e);
+        }
+
+        if (browser) {
+            hic.HICBrowser.setCurrentBrowser(browser);
+        }
+
+    });
+
+}
+
+function configureSessionWidgets(container) {
+
+    $('div#igv-session-dropdown-menu > :nth-child(1)').after(dropboxDropdownItem('igv-app-dropdown-dropbox-session-file-button'))
+    $('div#igv-session-dropdown-menu > :nth-child(2)').after(googleDriveDropdownItem('igv-app-dropdown-google-drive-session-file-button'))
+
+    createSessionWidgets(
+        $(container),
+        igv.xhr,
+        'juicebox-webapp',
+        'igv-app-dropdown-local-session-file-input',
+        'igv-app-dropdown-dropbox-session-file-button',
+        'igv-app-dropdown-google-drive-session-file-button',
+        'igv-app-session-url-modal',
+        'igv-app-session-save-modal',
+        googleEnabled,
+        async config => { await hic.loadSession(config) },
+        () => hic.toJSON()
+    )
+
 }
 
 let qrcode = undefined;
@@ -408,42 +443,6 @@ function configureShareModal(container, config) {
     });
 }
 
-async function loadHicFile(url, name, mapType) {
-
-    try {
-        let browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
-        const isControl = ('control-map' === mapType);
-        const browser = hic.HICBrowser.getCurrentBrowser();
-        const config = {url, name, isControl};
-
-        if (StringUtils.isString(url) && url.includes("?")) {
-            const query = hic.extractQuery(url);
-            const uriDecode = url.includes("%2C");
-            hic.decodeQuery(query, config, uriDecode);
-        }
-
-        if (isControl) {
-            await browser.loadHicControlFile(config)
-        } else {
-            browser.reset();
-            browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
-            if (browsersWithMaps.length > 0) {
-
-
-                config["synchState"] = browsersWithMaps[0].getSyncState();
-            }
-            await browser.loadHicFile(config);
-            if (!isControl) {
-                hic.syncBrowsers(hic.allBrowsers);
-            }
-
-            $('#hic-control-map-dropdown').removeClass('disabled');
-        }
-    } catch (e) {
-        AlertSingleton.present(`Error loading ${url}: ${e}`);
-    }
-};
-
 async function getEmbeddableSnippet($container, config) {
     const base = (config.embedTarget || getEmbedTarget())
     const embedUrl = await hic.shortJuiceboxURL(base);
@@ -467,6 +466,14 @@ function getEmbedTarget() {
 
 }
 
+function updateControlMapDropdownForAllBrowser(browsers) {
+    for (let browser of browsers) {
+        browser.eventBus.subscribe("MapLoad", checkControlMapDropdown);
+        updateControlMapDropdown(browser);
+    }
+
+}
+
 function checkControlMapDropdown() {
     updateControlMapDropdown(hic.HICBrowser.getCurrentBrowser());
 }
@@ -476,61 +483,5 @@ function updateControlMapDropdown(browser) {
         $('#hic-control-map-dropdown').removeClass('disabled')
     }
 }
-
-function updateControlMapDropdownForAllBrowser(browsers) {
-    for (let browser of browsers) {
-        browser.eventBus.subscribe("MapLoad", checkControlMapDropdown);
-        updateControlMapDropdown(browser);
-    }
-
-}
-
-const appendAndConfigureLoadURLModal = (root, id, input_handler) => {
-
-    const html =
-        `<div id="${id}" class="modal fade">
-            <div class="modal-dialog  modal-lg">
-                <div class="modal-content">
-
-                <div class="modal-header">
-                    <div class="modal-title">Load URL</div>
-
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-
-                </div>
-
-                <div class="modal-body">
-
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Enter URL">
-                    </div>
-
-                </div>
-
-                </div>
-            </div>
-        </div>`;
-
-    $(root).append(html);
-
-    const $modal = $(root).find(`#${id}`);
-    $modal.find('input').on('change', function () {
-
-        const path = $(this).val();
-        $(this).val("");
-
-        $(`#${id}`).modal('hide');
-
-        input_handler(path);
-
-
-    });
-
-    return html;
-};
-
-export { appendAndConfigureLoadURLModal }
 
 export default initializationHelper
