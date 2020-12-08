@@ -1,6 +1,6 @@
 {
   "name": "juicebox-web",
-  "version": "1.5.1",
+  "version": "2.0.0",
   "license": "MIT",
   "author": {
     "name": "Douglass Turner"
@@ -11,7 +11,6 @@
     }
   ],
   "scripts": {
-    "start": "http-server -a localhost dist",
     "build": "npx rollup -c && node scripts/generateHtml.js ./navbars/aidenlab.html juicebox.html && node scripts/generateHtml.js ./navbars/generic.html index.html"
   },
   "devDependencies": {
@@ -21,7 +20,6 @@
     "@babel/preset-env": "^7.11.5",
     "core-js": "^3.6.5",
     "fs-extra": "^8.1.0",
-    "http-server": "^0.12.3",
     "regenerator-runtime": "^0.13.7",
     "rollup": "^1.32.1",
     "rollup-plugin-babel": "^4.4.0",
@@ -35,5 +33,6 @@
     "data-modal": "github:igvteam/data-modal#5e60b669",
     "igv-utils": "github:igvteam/igv-utils#7d4386ca",
     "igv-widgets": "github:igvteam/igv-widgets#4b0e011b"
+    "igv-ui": "github:igvteam/igv-ui#v0.1.1",
   }
 }

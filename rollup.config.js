@@ -7,17 +7,23 @@ import {terser} from "rollup-plugin-terser"
 
 export default [
     {
-        //input: 'test/testBabel.js',
         input: 'js/app.js',
         output: [
-            {file: 'dist/js/app-bundle.esm.js', format: 'es'},
+            {file: 'dist/js/hic-app.js', format: 'umd', name: "hic-app"},
+            {file: 'dist/js/hic-app.min.js', format: 'umd', name: "hic-app", plugins: [terser()]}
         ],
         plugins: [
+            strip({
+                debugger: true,
+                functions: ['console.log', 'assert.*', 'debug']
+            }),
+            commonjs(),
+            resolve(),
+            babel(),
             copy({
                 targets:
                     [
                         {src: 'node_modules/juicebox.js/dist/css/juicebox.css', dest: 'dist/css/'},
-                        {src: 'node_modules/juicebox.js/dist/js/juicebox.min.js', dest: 'dist/js/'},
                         {src: 'node_modules/juicebox.js/dist/css/img', dest: 'dist/css/'},
                         {src: 'node_modules/juicebox.js/dist/embed.html', dest: 'dist/'},
                         {src: 'css/app.css', dest: 'dist/css/'},
@@ -30,24 +36,7 @@ export default [
     {
         input: 'js/app.js',
         output: [
-            {file: 'dist/js/hic-app.js', format: 'umd', name: "hic-app"},
-            {file: 'dist/js/hic-app.min.js', format: 'umd', name: "hic-app", sourcemap: true}
-        ],
-        plugins: [
-            strip({
-                debugger: true,
-                functions: ['console.log', 'assert.*', 'debug']
-            }),
-            commonjs(),
-            resolve(),
-            babel(),
-            terser({
-                include: [/^.+\.min\.js$/],
-                sourcemap: {
-                    filename: "hic-app.min.js",
-                    url: "hic-app.min.js.map"
-                }}),
-
+            {file: 'dist/js/hic-app.esm.js', format: 'es'},
         ]
     }
-];
+]
