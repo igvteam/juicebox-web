@@ -24,6 +24,8 @@
 import {GoogleAuth} from '../node_modules/igv-utils/src/index.js'
 import {AlertSingleton} from '../node_modules/igv-widgets/dist/igv-widgets.js'
 import initializationHelper from "./initializationHelper.js"
+import {initApp} from "./initApp.js"
+
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js"
 
 document.addEventListener("DOMContentLoaded", async (event) => {
@@ -54,7 +56,7 @@ async function init(container) {
         }
     }
 
-    await hic.initApp(container, config)
+    await initApp(container, config)
 
     await initializationHelper(container, config)
 

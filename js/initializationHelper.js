@@ -5,8 +5,8 @@ import QRCode from "./qrcode.js";
 import {googleEnabled} from './app.js';
 import ContactMapLoad from "./contactMapLoad.js";
 
-// The igv object. TODO eliminate this dependency
-const igv = hic.igv;
+// The igv xhr object. TODO eliminate this dependency
+const igvxhr = hic.igvxhr;
 
 let currentGenomeId;
 
@@ -283,7 +283,7 @@ async function loadAnnotationDatalist ($datalist, url, type) {
     let data = undefined;
 
     try {
-        data = await igv.xhr.loadString(url);
+        data = await igvxhr.loadString(url);
     } catch (e) {
         if (e.message.includes("404")) {
             //  This is an expected condition, not all assemblies have track menus
@@ -337,7 +337,7 @@ function configureSessionWidgets(container) {
 
     createSessionWidgets(
         $(container),
-        igv.xhr,
+        igvxhr,
         'juicebox-webapp',
         'igv-app-dropdown-local-session-file-input',
         'igv-app-dropdown-dropbox-session-file-button',
@@ -353,6 +353,18 @@ function configureSessionWidgets(container) {
 
 let qrcode = undefined;
 
+
+// TODO -- this won't work as is, copied from juicebox.js
+async function shortJuiceboxURL(base) {
+    const url = `${base}?${getCompressedDataString()}`;
+    if (urlShorteners && urlShorteners.length > 0) {
+        return urlShorteners[0].shortenURL(url);
+    } else {
+        return Promise.resolve(url);
+    }
+}
+
+
 function configureShareModal(container, config) {
 
     const $hic_share_url_modal = $('#hic-share-url-modal');
@@ -361,12 +373,12 @@ function configureShareModal(container, config) {
 
         let href = String(window.location.href);
 
-        // This js file is specific to the aidenlab site, and we know we have only juicebox parameters.
+        // We assume we have only juicebox parameters.
         // Strip href of current parameters, if any
         let idx = href.indexOf("?");
         if (idx > 0) href = href.substring(0, idx);
 
-        const jbUrl = await hic.shortJuiceboxURL(href);
+        const jbUrl = await shortJuiceboxURL(href);
 
         const embedSnippet = await getEmbeddableSnippet($(container), config);
         const $hic_embed_url = $('#hic-embed');
