@@ -66,14 +66,14 @@ async function initializationHelper(container, config) {
     configureShareModal(container, config)
 
     $('#hic-track-dropdown-menu').parent().on('shown.bs.dropdown', function () {
-        const browser = hic.HICBrowser.getCurrentBrowser();
+        const browser = hic.getCurrentBrowser();
         if (undefined === browser || undefined === browser.dataset) {
             AlertSingleton.present('Contact map must be loaded and selected before loading tracks');
         }
     });
 
     $('#hic-control-map-dropdown-menu').parent().on('shown.bs.dropdown', function () {
-        const browser = hic.HICBrowser.getCurrentBrowser();
+        const browser = hic.getCurrentBrowser();
         if (undefined === browser || undefined === browser.dataset) {
             AlertSingleton.present('Contact map must be loaded and selected before loading "B" map"');
         }
@@ -105,7 +105,7 @@ function createAnnotationDatalistModals (root) {
     const $annotation_input = $('#annotation-input');
     $annotation_input.on('change', function (e) {
 
-        if (undefined === hic.HICBrowser.getCurrentBrowser()) {
+        if (undefined === hic.getCurrentBrowser()) {
             AlertSingleton.present('ERROR: you must select a map panel.');
         } else {
 
@@ -138,7 +138,7 @@ function createAnnotationDatalistModals (root) {
     const $annotation_2D_input = $('#annotation-2D-input');
     $annotation_2D_input.on('change', function (e) {
 
-        if (undefined === hic.HICBrowser.getCurrentBrowser()) {
+        if (undefined === hic.getCurrentBrowser()) {
             AlertSingleton.present('ERROR: you must select a map panel.');
         } else {
             const name = $annotation_2D_input.val();
@@ -194,7 +194,7 @@ function loadTracks(tracks) {
         t.autoscale = true;
         t.displayMode = "COLLAPSED"
     }
-    hic.HICBrowser.getCurrentBrowser().loadTracks(tracks);
+    hic.getCurrentBrowser().loadTracks(tracks);
 }
 
 async function loadHicFile(url, name, mapType) {
@@ -202,7 +202,7 @@ async function loadHicFile(url, name, mapType) {
     try {
         let browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
         const isControl = ('control-map' === mapType);
-        const browser = hic.HICBrowser.getCurrentBrowser();
+        const browser = hic.getCurrentBrowser();
         const config = {url, name, isControl};
 
         if (StringUtils.isString(url) && url.includes("?")) {
@@ -488,7 +488,7 @@ function updateControlMapDropdownForAllBrowser(browsers) {
 }
 
 function checkControlMapDropdown() {
-    updateControlMapDropdown(hic.HICBrowser.getCurrentBrowser());
+    updateControlMapDropdown(hic.getCurrentBrowser());
 }
 
 function updateControlMapDropdown(browser) {
