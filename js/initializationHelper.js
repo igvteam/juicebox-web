@@ -4,6 +4,7 @@ import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import QRCode from "./qrcode.js";
 import {googleEnabled} from './app.js';
 import ContactMapLoad from "./contactMapLoad.js";
+import {restoreSession, toJSON} from "./sessions.js"
 
 // The igv xhr object. TODO eliminate this dependency
 const igvxhr = hic.igvxhr;
@@ -345,8 +346,8 @@ function configureSessionWidgets(container) {
         'igv-app-session-url-modal',
         'igv-app-session-save-modal',
         googleEnabled,
-        async config => { await hic.loadSession(config) },
-        () => hic.toJSON()
+        async config => { await restoreSession(container, config) },
+        () => toJSON()
     )
 
 }

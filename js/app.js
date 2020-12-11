@@ -24,9 +24,7 @@
 import {GoogleAuth} from '../node_modules/igv-utils/src/index.js'
 import {AlertSingleton} from '../node_modules/igv-widgets/dist/igv-widgets.js'
 import initializationHelper from "./initializationHelper.js"
-import {initApp} from "./initApp.js"
-
-import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js"
+import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 
 document.addEventListener("DOMContentLoaded", async (event) => {
     await init(document.getElementById('app-container'));
@@ -38,7 +36,7 @@ async function init(container) {
 
     AlertSingleton.init(container)
 
-    const config = juiceboxConfig || {};   // From script include.  Optional.
+    const config = window.juiceboxConfig || {};   // From script include.  Optional.
 
     const enableGoogle = config.clientId && 'CLIENT_ID' !== config.clientId && (window.location.protocol === "https:" || window.location.host === "localhost")
 
@@ -56,7 +54,9 @@ async function init(container) {
         }
     }
 
-    await initApp(container, config)
+    // TODO -- expand old bitly URLs here?
+
+    await hic.initApp(container, config)
 
     await initializationHelper(container, config)
 
