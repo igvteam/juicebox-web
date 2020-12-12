@@ -36,7 +36,7 @@ async function init(container) {
 
     AlertSingleton.init(container)
 
-    const config = window.juiceboxConfig || {};   // From script include.  Optional.
+    const config = juiceboxConfig || {};   // From script include.  Optional.
 
     const enableGoogle = config.clientId && 'CLIENT_ID' !== config.clientId && (window.location.protocol === "https:" || window.location.host === "localhost")
 

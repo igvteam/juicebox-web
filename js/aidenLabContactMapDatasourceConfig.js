@@ -1,44 +1,50 @@
 
-const aidenLabContactMapDatasourceConfigurator = genomeId => {
-
-    return {
-        isJSON: true,
-        genomeId,
-        dataSetPathPrefix: undefined,
-        urlPrefix: undefined,
-        dataSetPath: 'https://aidenlab.org/juicebox/res/hicfiles.json',
-        addIndexColumn: true,
-        columns:
-            [
-                'index',
-                'url',
-                'NVI',
-                'name',
-                'author',
-                'journal',
-                'year',
-                'organism',
-                'reference genome',
-                'cell type',
-                'experiment type',
-                'protocol'
-            ],
-        hiddenColumns:
-            [
-                'index',
-                'NVI',
-                'url'
-            ],
-        parser,
-        selectionHandler: selectionList => selectionList[ 0 ]
-
+const configuration =
+    {
+    isJSON: true,
+    columns:
+        [
+            'url',
+            'NVI',
+            'name',
+            'author',
+            'journal',
+            'year',
+            'organism',
+            'reference genome',
+            'cell type',
+            'experiment type',
+            'protocol'
+        ],
+    filter
     }
+
+const aidenLabContactMapDatasourceConfigurator = url => {
+    return { url, ...configuration }
+}
+
+function filter( url, obj ) {
+
+    const cooked = {}
+
+    Object.assign(cooked, obj)
+
+    for (let key of configuration.columns) {
+        cooked[ key ] = cooked[ key ] || '-'
+    }
+
+    const output = {}
+    Object.assign(output, cooked)
+
+    output[ 'url' ] = '-' === cooked[ 'NVI' ] ? `${ url }` : `${ url }?nvi=${ cooked[ 'NVI' ] }`
+
+    return output
 
 }
 
-const parser = (obj, columnDictionary, addIndexColumn) => {
+const DEPRICATED_parser = (record, columnDictionary, addIndexColumn) => {
 
-    return Object.entries(obj).map(([ path, record ], i) => {
+    return Object.entries(record).map(([ path, record ], i) => {
 
         const cooked = {};
         Object.assign(cooked, record);

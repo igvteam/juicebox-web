@@ -1,18 +1,11 @@
 
-const encodeContactMapDatasourceConfigurator = genomeId => {
+const urlPrefix = 'https://www.encodeproject.org'
 
-    const urlPrefix = 'https://www.encodeproject.org';
-
-    return {
-        isJSON: false,
-        genomeId,
-        dataSetPathPrefix: undefined,
-        urlPrefix,
-        dataSetPath: 'https://s3.amazonaws.com/igv.org.app/encode/hic/hic.txt',
-        addIndexColumn: true,
+const encodeContactMapDatasourceConfiguration =
+    {
+        url: 'https://s3.amazonaws.com/igv.org.app/encode/hic/hic.txt',
         columns:
             [
-                'index',
                 'HREF',
                 'Assembly',
                 'Biosample',
@@ -23,45 +16,31 @@ const encodeContactMapDatasourceConfigurator = genomeId => {
                 'Accession',
                 'Experiment'
             ],
-        hiddenColumns:
-            [
-                'index',
-                'HREF'
-            ],
-        parser,
-        selectionHandler: selectionList => {
-            const list =  selectionList.map(({ HREF, Description }) => { return { url: `${ urlPrefix }${ HREF }`, name: Description } })
-            return list[ 0 ]
-        }
+        parser: { parse: encodeParser}
     }
 
-}
-
-const parser = (str, columnDictionary, addIndexColumn) => {
+function encodeParser(str) {
 
     const lines = str.split('\n').filter(line => "" !== line);
 
     // Discard first line. Column name descriptions.
-    lines.shift();
-
-    const keys = Object.keys(columnDictionary);
+    lines.shift()
 
     return lines.map((line, index) => {
 
-        const values = line.split('\t');
+        const values = line.split('\t')
 
-        if (true === addIndexColumn) {
-            values.unshift(index)
+        const obj = {}
+        const { columns } = encodeContactMapDatasourceConfiguration
+        for (let column of columns) {
+            obj[ column ] = values[ columns.indexOf(column) ]
         }
 
-        const obj = {};
-        for (let key of keys) {
-            obj[key] = values[ keys.indexOf(key) ]
-        }
+        obj[ 'HREF' ] = `${ urlPrefix }${ obj[ 'HREF' ] }`
 
-        return obj;
+        return obj
     });
 
-};
+}
 
-export { encodeContactMapDatasourceConfigurator }
+export { encodeContactMapDatasourceConfiguration }

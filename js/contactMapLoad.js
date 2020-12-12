@@ -1,7 +1,7 @@
 import { ModalTable, GenericDataSource } from '../node_modules/data-modal/js/index.js'
 import {GooglePicker,FileUtils} from '../node_modules/igv-utils/src/index.js';
 import { aidenLabContactMapDatasourceConfigurator } from './aidenLabContactMapDatasourceConfig.js'
-import { encodeContactMapDatasourceConfigurator } from "./encodeContactMapDatasourceConfig.js"
+import { encodeContactMapDatasourceConfiguration } from "./encodeContactMapDatasourceConfig.js"
 
 let mapType = undefined;
 
@@ -78,28 +78,44 @@ class ContactMapLoad {
 
         if (mapMenu) {
 
-            this.contactMapModal = new ModalTable({ id: dataModalId, title: 'Contact Map', selectionStyle: 'single', pageLength: 10 });
+            const modalTableConfig =
+                {
+                    id: dataModalId,
+                    title: 'Contact Map',
+                    selectionStyle: 'single',
+                    pageLength: 10,
+                    okHandler: async ([ selection ]) => {
+                        const { url, name } = selection
+                        await loadHandler(url, name, mapType)
+                    }
+                }
+            this.contactMapModal = new ModalTable(modalTableConfig)
 
-            const { items: path } = mapMenu;
-            this.contactMapModal.setDatasource( new GenericDataSource( aidenLabContactMapDatasourceConfigurator()) );
-
-            this.contactMapModal.selectHandler = async selection => {
-                const { url, name } = selection;
-                await loadHandler(url, name, mapType);
-            };
+            const { items: path } = mapMenu
+            const config = aidenLabContactMapDatasourceConfigurator(path)
+            const datasource = new GenericDataSource(config)
+            this.contactMapModal.setDatasource(datasource)
         }
 
         this.$encodeHostedModalPresentationButton = $encodeHostedModalPresentationButton
         this.$encodeHostedModalPresentationButton.removeClass('disabled')
 
-        this.encodeHostedContactMapModal = new ModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
-        this.encodeHostedContactMapModal.setDatasource(new GenericDataSource( encodeContactMapDatasourceConfigurator()));
+        const encodeModalTableConfig =
+            {
+                id: encodeHostedModalId,
+                title: 'ENCODE Hosted Contact Map',
+                selectionStyle: 'single',
+                pageLength: 10,
+                okHandler: async ([ { HREF, Description } ]) => {
+                    await loadHandler(HREF, Description, mapType)
+                }
+            }
 
-        this.encodeHostedContactMapModal.selectHandler = async selection => {
-            const { url, name } = selection;
-            await loadHandler(url, name, mapType);
-        };
+        this.encodeHostedContactMapModal = new ModalTable(encodeModalTableConfig)
 
+        const datasource = new GenericDataSource( encodeContactMapDatasourceConfiguration )
+        this.encodeHostedContactMapModal.setDatasource(datasource)
+        
     }
 
 }
