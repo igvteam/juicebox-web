@@ -1,4 +1,4 @@
-import {StringUtils} from '../node_modules/igv-utils/src/index.js'
+import {StringUtils, URLShortener} from '../node_modules/igv-utils/src/index.js'
 import {
     AlertSingleton,
     createSessionWidgets,
@@ -347,17 +347,6 @@ function configureSessionWidgets(container) {
 let qrcode = undefined;
 
 
-// TODO -- this won't work as is, copied from juicebox.js
-async function shortJuiceboxURL(base) {
-    const url = `${base}?${getCompressedDataString()}`;
-    if (urlShorteners && urlShorteners.length > 0) {
-        return urlShorteners[0].shortenURL(url);
-    } else {
-        return Promise.resolve(url);
-    }
-}
-
-
 function configureShareModal(container, config) {
 
     const $hic_share_url_modal = $('#hic-share-url-modal');
@@ -454,7 +443,7 @@ function configureShareModal(container, config) {
 
 async function getEmbeddableSnippet($container, config) {
     const base = (config.embedTarget || getEmbedTarget())
-    const embedUrl = await hic.shortJuiceboxURL(base);
+    const embedUrl = await shortJuiceboxURL(base);
     const height = $container.height();
     return '<iframe src="' + embedUrl + '" width="100%" height="' + height + '" frameborder="0" style="border:0" allowfullscreen></iframe>';
 }
@@ -492,6 +481,13 @@ function updateControlMapDropdown(browser) {
     if (browser && browser.dataset) {
         $('#hic-control-map-dropdown').removeClass('disabled')
     }
+}
+
+const urlShortener = URLShortener.getShortener({provider: "tinyURL"});
+
+async function shortJuiceboxURL(base) {
+    const url = `${base}?${hic.compressedSession()}`;
+    return urlShortener.shortenURL(url);
 }
 
 export default initializationHelper
