@@ -56,7 +56,7 @@ async function init(container) {
 
     // TODO -- expand old bitly URLs here?
 
-    await hic.initApp(container, config)
+    await hic.init(container, config)
 
     await initializationHelper(container, config)
 

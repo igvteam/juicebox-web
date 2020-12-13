@@ -1,10 +1,17 @@
-import { StringUtils } from '../node_modules/igv-utils/src/index.js'
-import { AlertSingleton, dropboxButtonImageBase64, googleDriveButtonImageBase64, createTrackWidgets, createSessionWidgets, dropboxDropdownItem, googleDriveDropdownItem } from '../node_modules/igv-widgets/dist/igv-widgets.js'
+import {StringUtils} from '../node_modules/igv-utils/src/index.js'
+import {
+    AlertSingleton,
+    createSessionWidgets,
+    createTrackWidgets,
+    dropboxButtonImageBase64,
+    dropboxDropdownItem,
+    googleDriveButtonImageBase64,
+    googleDriveDropdownItem
+} from '../node_modules/igv-widgets/dist/igv-widgets.js'
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import QRCode from "./qrcode.js";
 import {googleEnabled} from './app.js';
 import ContactMapLoad from "./contactMapLoad.js";
-import {restoreSession, toJSON} from "./sessions.js"
 
 // The igv xhr object. TODO eliminate this dependency
 const igvxhr = hic.igvxhr;
@@ -18,18 +25,18 @@ async function initializationHelper(container, config) {
 
     createAppCloneButton(container)
 
-    updateControlMapDropdownForAllBrowser(hic.allBrowsers)
+    updateControlMapDropdownForAllBrowser()
 
     configureSessionWidgets(container)
 
     const str = 'track'
     let imgElement
 
-    imgElement = document.querySelector(`img#igv-app-${ str }-dropbox-button-image`)
-    imgElement.src = `data:image/svg+xml;base64,${ dropboxButtonImageBase64() }`
+    imgElement = document.querySelector(`img#igv-app-${str}-dropbox-button-image`)
+    imgElement.src = `data:image/svg+xml;base64,${dropboxButtonImageBase64()}`
 
-    imgElement = document.querySelector(`img#igv-app-${ str }-google-drive-button-image`)
-    imgElement.src = `data:image/svg+xml;base64,${ googleDriveButtonImageBase64() }`
+    imgElement = document.querySelector(`img#igv-app-${str}-google-drive-button-image`)
+    imgElement.src = `data:image/svg+xml;base64,${googleDriveButtonImageBase64()}`
 
     createTrackWidgets(
         $(container),
@@ -79,7 +86,7 @@ async function initializationHelper(container, config) {
         }
     });
 
-    const listener =createGenomeChangeListener(config)
+    const listener = createGenomeChangeListener(config)
 
     hic.EventBus.globalBus.subscribe("GenomeChange", listener)
 
@@ -92,7 +99,7 @@ async function initializationHelper(container, config) {
 
 }
 
-function createAnnotationDatalistModals (root) {
+function createAnnotationDatalistModals(root) {
 
     let modal;
 
@@ -156,7 +163,7 @@ function createAnnotationDatalistModals (root) {
 
 }
 
-function createGenericDataListModal (id, input_id, datalist_id, placeholder) {
+function createGenericDataListModal(id, input_id, datalist_id, placeholder) {
 
     const generic_select_modal_string =
         `<div id="${id}" class="modal">
@@ -200,32 +207,15 @@ function loadTracks(tracks) {
 async function loadHicFile(url, name, mapType) {
 
     try {
-        let browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
         const isControl = ('control-map' === mapType);
         const browser = hic.getCurrentBrowser();
         const config = {url, name, isControl};
-
-        if (StringUtils.isString(url) && url.includes("?")) {
-            const query = hic.extractQuery(url);
-            const uriDecode = url.includes("%2C");
-            hic.decodeQuery(query, config, uriDecode);
-        }
 
         if (isControl) {
             await browser.loadHicControlFile(config)
         } else {
             browser.reset();
-            browsersWithMaps = hic.allBrowsers.filter(browser => browser.dataset !== undefined);
-            if (browsersWithMaps.length > 0) {
-
-
-                config["synchState"] = browsersWithMaps[0].getSyncState();
-            }
             await browser.loadHicFile(config);
-            if (!isControl) {
-                hic.syncBrowsers(hic.allBrowsers);
-            }
-
             $('#hic-control-map-dropdown').removeClass('disabled');
         }
     } catch (e) {
@@ -233,13 +223,13 @@ async function loadHicFile(url, name, mapType) {
     }
 }
 
-function createGenomeChangeListener (config) {
+function createGenomeChangeListener(config) {
 
     return {
 
         receiveEvent: async event => {
 
-            const { data: genomeId } = event;
+            const {data: genomeId} = event;
 
             if (currentGenomeId !== genomeId) {
 
@@ -269,7 +259,7 @@ function createGenomeChangeListener (config) {
                 //     $('#hic-encode-other-modal-button').hide();
                 // }
 
-                hic.EventBus.globalBus.post({ type: 'DidChangeGenome', data: genomeId })
+                hic.EventBus.globalBus.post({type: 'DidChangeGenome', data: genomeId})
 
             }
         }
@@ -277,7 +267,7 @@ function createGenomeChangeListener (config) {
 
 }
 
-async function loadAnnotationDatalist ($datalist, url, type) {
+async function loadAnnotationDatalist($datalist, url, type) {
 
     $datalist.empty();
 
@@ -318,7 +308,7 @@ function createAppCloneButton(container) {
 
         let browser = undefined;
         try {
-            browser = await hic.createBrowser(container, {initFromUrl: false, updateHref: false});
+            browser = await hic.createBrowser(container, {});
         } catch (e) {
             console.error(e);
         }
@@ -346,8 +336,10 @@ function configureSessionWidgets(container) {
         'igv-app-session-url-modal',
         'igv-app-session-save-modal',
         googleEnabled,
-        async config => { await restoreSession(container, config) },
-        () => toJSON()
+        async config => {
+            await hic.restoreSession(container, config)
+        },
+        () => hic.toJSON()
     )
 
 }
@@ -410,7 +402,11 @@ function configureShareModal(container, config) {
                 qrcode.clear();
                 $('hic-qr-code-image').empty();
             } else {
-                qrcode = new QRCode(document.getElementById("hic-qr-code-image"), { width: 128, height: 128, correctLevel: QRCode.CorrectLevel.H });
+                qrcode = new QRCode(document.getElementById("hic-qr-code-image"), {
+                    width: 128,
+                    height: 128,
+                    correctLevel: QRCode.CorrectLevel.H
+                });
             }
 
             qrcode.makeCode(shareUrl);
@@ -479,7 +475,8 @@ function getEmbedTarget() {
 
 }
 
-function updateControlMapDropdownForAllBrowser(browsers) {
+function updateControlMapDropdownForAllBrowser() {
+    const browsers = hic.getAllBrowsers();
     for (let browser of browsers) {
         browser.eventBus.subscribe("MapLoad", checkControlMapDropdown);
         updateControlMapDropdown(browser);
