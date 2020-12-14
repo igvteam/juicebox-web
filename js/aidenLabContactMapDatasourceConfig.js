@@ -4,8 +4,8 @@ const configuration =
     isJSON: true,
     columns:
         [
-            'url',
-            'NVI',
+            // 'url',
+            // 'NVI',
             'name',
             'author',
             'journal',
@@ -16,29 +16,35 @@ const configuration =
             'experiment type',
             'protocol'
         ],
-    filter
+        parser: { parse: aidenLabParser}
     }
 
 const aidenLabContactMapDatasourceConfigurator = url => {
     return { url, ...configuration }
 }
 
-function filter( url, obj ) {
+function aidenLabParser( str ) {
 
-    const cooked = {}
+    const results = Object.entries( JSON.parse(str) ).map(([ url, obj ]) => {
 
-    Object.assign(cooked, obj)
+        const cooked = {}
 
-    for (let key of configuration.columns) {
-        cooked[ key ] = cooked[ key ] || '-'
-    }
+        Object.assign(cooked, obj)
 
-    const output = {}
-    Object.assign(output, cooked)
+        for (let key of configuration.columns) {
+            cooked[ key ] = cooked[ key ] || '-'
+        }
 
-    output[ 'url' ] = '-' === cooked[ 'NVI' ] ? `${ url }` : `${ url }?nvi=${ cooked[ 'NVI' ] }`
+        const output = {}
+        Object.assign(output, cooked)
 
-    return output
+        output[ 'url' ] = '-' === cooked[ 'NVI' ] ? `${ url }` : `${ url }?nvi=${ cooked[ 'NVI' ] }`
+
+        return output
+
+    })
+
+    return results
 
 }
 

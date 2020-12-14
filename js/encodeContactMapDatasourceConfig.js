@@ -6,7 +6,7 @@ const encodeContactMapDatasourceConfiguration =
         url: 'https://s3.amazonaws.com/igv.org.app/encode/hic/hic.txt',
         columns:
             [
-                'HREF',
+                // 'HREF',
                 'Assembly',
                 'Biosample',
                 'Description',
