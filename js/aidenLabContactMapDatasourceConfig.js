@@ -1,51 +1,43 @@
-
 const configuration =
     {
-    isJSON: true,
-    columns:
-        [
-            // 'url',
-            // 'NVI',
-            'name',
-            'author',
-            'journal',
-            'year',
-            'organism',
-            'reference genome',
-            'cell type',
-            'experiment type',
-            'protocol'
-        ],
-        parser: { parse: aidenLabParser}
+        isJSON: true,
+        columns:
+            [
+                // 'url',
+                // 'NVI',
+                'name',
+                'author',
+                'journal',
+                'year',
+                'organism',
+                'reference genome',
+                'cell type',
+                'experiment type',
+                'protocol'
+            ],
+        parser: {parse: aidenLabParser} //(str) => Object.entries(JSON.parse(str))}
     }
 
 const aidenLabContactMapDatasourceConfigurator = url => {
-    return { url, ...configuration }
+    return {url, ...configuration}
 }
 
-function aidenLabParser( str ) {
+function aidenLabParser(str) {
 
-    const results = Object.entries( JSON.parse(str) ).map(([ url, obj ]) => {
+    const results = Object.entries(JSON.parse(str)).map(([url, obj]) => {
 
-        const cooked = {}
+        obj['url'] = obj['NVI'] ? `${url}?nvi=${obj['NVI']}` : url;
 
-        Object.assign(cooked, obj)
-
+        // Insure that all visible columns have a value
         for (let key of configuration.columns) {
-            cooked[ key ] = cooked[ key ] || '-'
+            obj[key] = obj[key] || '-'
         }
 
-        const output = {}
-        Object.assign(output, cooked)
-
-        output[ 'url' ] = '-' === cooked[ 'NVI' ] ? `${ url }` : `${ url }?nvi=${ cooked[ 'NVI' ] }`
-
-        return output
-
+        return obj
     })
 
     return results
 
 }
 
-export { aidenLabContactMapDatasourceConfigurator }
+export {aidenLabContactMapDatasourceConfigurator}
