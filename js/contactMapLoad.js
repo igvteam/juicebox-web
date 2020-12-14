@@ -107,7 +107,9 @@ class ContactMapLoad {
                 selectionStyle: 'single',
                 pageLength: 10,
                 okHandler: async ([ { HREF, Description } ]) => {
-                    await loadHandler(HREF, Description, mapType)
+                    const urlPrefix = 'https://www.encodeproject.org'
+                    const path = `${ urlPrefix }${ HREF }`
+                    await loadHandler(path, Description, mapType)
                 }
             }
 
@@ -115,7 +117,7 @@ class ContactMapLoad {
 
         const datasource = new GenericDataSource( encodeContactMapDatasourceConfiguration )
         this.encodeHostedContactMapModal.setDatasource(datasource)
-        
+
     }
 
 }
