@@ -32,7 +32,7 @@
     "rollup-plugin-terser": "^5.3.1"
   },
   "dependencies": {
-    "data-modal": "github:igvteam/data-modal#5ddcae8d",
+    "data-modal": "github:igvteam/data-modal#5e60b669",
     "igv-utils": "github:igvteam/igv-utils#7d4386ca",
     "igv-widgets": "github:igvteam/igv-widgets#4b0e011b"
   }
