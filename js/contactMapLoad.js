@@ -1,12 +1,7 @@
-import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
-import * as app_google from './app-google.js';
-import ModalTable from '../node_modules/data-modal/js/modalTable.js';
-import ContactMapDatasource from "./contactMapDatasource.js";
-import EncodeContactMapDatasource from "./encodeContactMapDatasource.js";
-import { currentGenomeId, appendAndConfigureLoadURLModal } from "./initializationHelper.js";
-import HackedModalTable from "./hackedModalTable.js";
-
-const igv = hic.igv;
+import { ModalTable, GenericDataSource } from '../node_modules/data-modal/js/index.js'
+import {GooglePicker,FileUtils} from '../node_modules/igv-utils/src/index.js';
+import { aidenLabContactMapDatasourceConfigurator } from './aidenLabContactMapDatasourceConfig.js'
+import { encodeContactMapDatasourceConfiguration } from "./encodeContactMapDatasourceConfig.js"
 
 let mapType = undefined;
 
@@ -42,7 +37,7 @@ class ContactMapLoad {
                     success: async dbFiles => {
                         const paths = dbFiles.map(dbFile => dbFile.link);
                         const path = paths[ 0 ];
-                        const name = igv.getFilename(path);
+                        const name = FileUtils.getFilename(path);
                         await loadHandler(path, name, mapType);
                     },
                     cancel: () => {},
@@ -62,7 +57,7 @@ class ContactMapLoad {
         if (true === googleEnabled) {
             $googleDriveButtons.on('click', () => {
 
-                app_google.createDropdownButtonPicker(true, async responses => {
+                GooglePicker.createDropdownButtonPicker(true, async responses => {
 
                     const paths = responses.map(({ name, url: google_url }) => {
                         return { filename: name, name, google_url };
@@ -77,46 +72,100 @@ class ContactMapLoad {
         }
 
         appendAndConfigureLoadURLModal(rootContainer, urlLoadModalId, path => {
-            const name = igv.getFilename(path);
+            const name = FileUtils.getFilename(path);
             loadHandler( path, name, mapType );
         });
 
         if (mapMenu) {
 
-            this.contactMapModal = new HackedModalTable({ id: dataModalId, title: 'Contact Map', selectionStyle: 'single', pageLength: 10 });
+            const modalTableConfig =
+                {
+                    id: dataModalId,
+                    title: 'Contact Map',
+                    selectionStyle: 'single',
+                    pageLength: 10,
+                    okHandler: async ([ selection ]) => {
+                        const { url, name } = selection
+                        await loadHandler(url, name, mapType)
+                    }
+                }
+            this.contactMapModal = new ModalTable(modalTableConfig)
 
-            const { items: path } = mapMenu;
-            this.contactMapModal.setDatasource( new ContactMapDatasource(path) );
-
-            this.contactMapModal.selectHandler = async selectionList => {
-                const { url, name } = this.contactMapModal.datasource.tableSelectionHandler(selectionList);
-                await loadHandler(url, name, mapType);
-            };
+            const { items: path } = mapMenu
+            const config = aidenLabContactMapDatasourceConfigurator(path)
+            const datasource = new GenericDataSource(config)
+            this.contactMapModal.setDatasource(datasource)
         }
 
-        this.$encodeHostedModalPresentationButton = $encodeHostedModalPresentationButton;
+        this.$encodeHostedModalPresentationButton = $encodeHostedModalPresentationButton
+        this.$encodeHostedModalPresentationButton.removeClass('disabled')
 
-        this.encodeHostedContactMapModal = new HackedModalTable({ id: encodeHostedModalId, title: 'ENCODE Hosted Contact Map', selectionStyle: 'single', pageLength: 10 });
-        this.encodeHostedContactMapModal.setDatasource(new EncodeContactMapDatasource(this.$encodeHostedModalPresentationButton, 'hg19'));
+        const encodeModalTableConfig =
+            {
+                id: encodeHostedModalId,
+                title: 'ENCODE Hosted Contact Map',
+                selectionStyle: 'single',
+                pageLength: 10,
+                okHandler: async ([ { HREF, Description } ]) => {
+                    const urlPrefix = 'https://www.encodeproject.org'
+                    const path = `${ urlPrefix }${ HREF }`
+                    await loadHandler(path, Description, mapType)
+                }
+            }
 
-        this.encodeHostedContactMapModal.selectHandler = async selectionList => {
-            const { url, name } = this.encodeHostedContactMapModal.datasource.tableSelectionHandler(selectionList);
-            await loadHandler(url, name, mapType);
-        };
+        this.encodeHostedContactMapModal = new ModalTable(encodeModalTableConfig)
 
-        // hic.EventBus.globalBus.subscribe('GenomeChange', this);
+        const datasource = new GenericDataSource( encodeContactMapDatasourceConfiguration )
+        this.encodeHostedContactMapModal.setDatasource(datasource)
 
     }
 
-    // async receiveEvent(event) {
-    //
-    //     const { data:genomeId } = event;
-    //
-    //     if (currentGenomeId !== genomeId) {
-    //         this.encodeHostedContactMapModal.setDatasource(new EncodeContactMapDatasource(this.$encodeHostedModalPresentationButton, genomeId));
-    //     }
-    //
-    // }
+}
+
+function appendAndConfigureLoadURLModal(root, id, input_handler) {
+
+    const html =
+        `<div id="${id}" class="modal fade">
+            <div class="modal-dialog  modal-lg">
+                <div class="modal-content">
+
+                <div class="modal-header">
+                    <div class="modal-title">Load URL</div>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Enter URL">
+                    </div>
+
+                </div>
+
+                </div>
+            </div>
+        </div>`;
+
+    $(root).append(html);
+
+    const $modal = $(root).find(`#${id}`);
+    $modal.find('input').on('change', function () {
+
+        const path = $(this).val();
+        $(this).val("");
+
+        $(`#${id}`).modal('hide');
+
+        input_handler(path);
+
+
+    });
+
+    return html;
 }
 
 export default ContactMapLoad

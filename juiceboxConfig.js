@@ -19,20 +19,6 @@ var juiceboxConfig = {
         items: 'https://hicfiles.s3.amazonaws.com/internal/tracksMenu_2D.$GENOME_ID.txt'
     },
 
-    // List of URL shorteners.  First in the list is the default and will be used for shortening URLs
-    // Others potentiall used for expanding short URLs.  At least 1 shortener is required for the
-    // "Share" button.
-    urlShortener: [
-        {
-            provider: 'tinyURL'
-        },
-        // {
-        //     provider: "bitly",
-        //     apiKey: "BITLY ACCESS TOKEN HERE",
-        //     hostname: 'bit.ly'
-        // }
-    ],
-
     // Supply a Google client id to enable loading of private Google files.  Supply an API key to
     // enable loading of public Google files without login.
     // google: {

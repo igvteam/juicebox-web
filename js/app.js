@@ -21,8 +21,9 @@
  *
  */
 
-import * as app_google from './app-google.js';
-import initializationHelper from "./initializationHelper.js";
+import {GoogleAuth} from '../node_modules/igv-utils/src/index.js'
+import {AlertSingleton} from '../node_modules/igv-widgets/dist/igv-widgets.js'
+import initializationHelper from "./initializationHelper.js"
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 
 document.addEventListener("DOMContentLoaded", async (event) => {
@@ -33,37 +34,32 @@ let googleEnabled = false;
 
 async function init(container) {
 
-    const config = juiceboxConfig || {};   // From script include.  Optional.
-    const google = config.google;
-    const clientId = google ? google.clientId : undefined;
+    AlertSingleton.init(container)
 
-    if (clientId && 'GOOGLE_CLIENT_ID' !== clientId && (window.location.protocol !== "https:" && window.location.host !== "localhost")) {
-        console.warn("To enable Google Drive use https://")
+    const config = window.juiceboxConfig || {};   // From script include.  Optional.
+
+    const enableGoogle = config.clientId && 'CLIENT_ID' !== config.clientId && (window.location.protocol === "https:" || window.location.host === "localhost")
+
+    if (enableGoogle) {
+        try {
+            await GoogleAuth.init({
+                client_id: config.clientId,
+                apiKey: config.apiKey,
+                scope: 'https://www.googleapis.com/auth/userinfo.profile'
+            })
+            googleEnabled = true
+        } catch (e) {
+            console.error(e)
+            AlertSingleton.present(e.message)
+        }
     }
 
-    if (clientId && 'GOOGLE_CLIENT_ID' !== clientId && (window.location.protocol === "https:" || window.location.host === "localhost")) {
-        const gapiConfig =
-            {
-                callback: async () => {
-                    let ignore = await app_google.init(clientId);
-                    await hic.initApp(container, config);
-                    googleEnabled = true;
-                    app_google.postInit();
-                    await initializationHelper(container, config);
+    // TODO -- expand old bitly URLs here?
 
-                },
-                onerror: async error => {
-                    console.log('gapi.client:auth2 - failed to load!');
-                    console.error(error);
-                    await initializationHelper(container, config);
-                }
-            };
+    await hic.init(container, config)
 
-        gapi.load('client:auth2', gapiConfig);
-    } else {
-        await hic.initApp(container, config);
-        await initializationHelper(container, config);
-    }
+    await initializationHelper(container, config)
+
 }
 
 export {googleEnabled}
