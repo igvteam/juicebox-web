@@ -18,9 +18,6 @@ const igvxhr = hic.igvxhr;
 
 let currentGenomeId;
 
-let contactMapLoad;
-let trackLoad;
-
 async function initializationHelper(container, config) {
 
     createAppCloneButton(container)
@@ -68,7 +65,7 @@ async function initializationHelper(container, config) {
             loadHandler: (path, name, mapType) => loadHicFile(path, name, mapType)
         };
 
-    contactMapLoad = new ContactMapLoad(contactMapLoadConfig);
+    new ContactMapLoad(contactMapLoadConfig);
 
     configureShareModal(container, config)
 
