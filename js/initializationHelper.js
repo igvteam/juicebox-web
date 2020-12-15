@@ -11,7 +11,7 @@ import {
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import QRCode from "./qrcode.js";
 import {googleEnabled} from './app.js';
-import ContactMapLoad from "./contactMapLoad.js";
+import configureContactMapLoaders from "./contactMapLoad.js";
 
 // The igv xhr object. TODO eliminate this dependency
 const igvxhr = hic.igvxhr;
@@ -56,7 +56,6 @@ async function initializationHelper(container, config) {
             $localFileInputs: $dropdowns.find('input'),
             urlLoadModalId: 'hic-load-url-modal',
             dataModalId: 'hic-contact-map-modal',
-            $encodeHostedModalPresentationButton: $('#hic-encode-hosted-contact-map-presentation-button'),
             encodeHostedModalId: 'hic-encode-hosted-contact-map-modal',
             $dropboxButtons: $dropdowns.find('div[id$="-map-dropdown-dropbox-button"]'),
             $googleDriveButtons: $dropdowns.find('div[id$="-map-dropdown-google-drive-button"]'),
@@ -65,7 +64,8 @@ async function initializationHelper(container, config) {
             loadHandler: (path, name, mapType) => loadHicFile(path, name, mapType)
         };
 
-    new ContactMapLoad(contactMapLoadConfig);
+    configureContactMapLoaders(contactMapLoadConfig);
+    $('#hic-encode-hosted-contact-map-presentation-button').removeClass('disabled')
 
     configureShareModal(container, config)
 
