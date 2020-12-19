@@ -67,11 +67,7 @@ function configureContactMapLoaders({
 
     });
 
-    if (false === googleEnabled) {
-        $googleDriveButtons.parent().hide();
-    }
-
-    if (true === googleEnabled) {
+    if (googleEnabled) {
         $googleDriveButtons.on('click', () => {
 
             GooglePicker.createDropdownButtonPicker(true, async responses => {
@@ -83,9 +79,10 @@ function configureContactMapLoaders({
                 let {name, google_url: path} = paths[0];
                 await loadHandler(path, name, mapType);
 
-            });
-
-        });
+            })
+        })
+    } else {
+        $googleDriveButtons.parent().hide();
     }
 
     appendAndConfigureLoadURLModal(rootContainer, urlLoadModalId, path => {

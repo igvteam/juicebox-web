@@ -30,31 +30,27 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     await init(document.getElementById('app-container'));
 });
 
-let googleEnabled = false;
-
 async function init(container) {
 
     AlertSingleton.init(container)
 
     const config = window.juiceboxConfig || {};   // From script include.  Optional.
 
-    const enableGoogle = config.clientId && 'CLIENT_ID' !== config.clientId && (window.location.protocol === "https:" || window.location.host === "localhost")
+    const google = config.google;
+    config.googleEnabled = google && (window.location.protocol === "https:" || window.location.host === "localhost")
 
-    if (enableGoogle) {
+    if (config.googleEnabled) {
         try {
             await GoogleAuth.init({
-                client_id: config.clientId,
-                apiKey: config.apiKey,
+                client_id: google.clientId,
+                apiKey: google.apiKey,
                 scope: 'https://www.googleapis.com/auth/userinfo.profile'
             })
-            googleEnabled = true
         } catch (e) {
             console.error(e)
             AlertSingleton.present(e.message)
         }
     }
-
-    // TODO -- expand old bitly URLs here?
 
     await hic.init(container, config)
 
@@ -62,7 +58,9 @@ async function init(container) {
 
 }
 
-export {googleEnabled}
+// This export of juicebox.js ('hic') is odd, but its needed for embed.html
+export default hic
+
 
 
 

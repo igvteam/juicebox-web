@@ -9,7 +9,6 @@ export default [
     {
         input: 'js/app.js',
         output: [
-            {file: 'dist/js/hic-app.js', format: 'umd', name: "hic-app"},
             {file: 'dist/js/hic-app.min.js', format: 'umd', name: "hic-app", plugins: [terser()]}
         ],
         plugins: [
@@ -25,18 +24,19 @@ export default [
                     [
                         {src: 'node_modules/juicebox.js/dist/css/juicebox.css', dest: 'dist/css/'},
                         {src: 'node_modules/juicebox.js/dist/css/img', dest: 'dist/css/'},
-                        {src: 'node_modules/juicebox.js/dist/embed.html', dest: 'dist/'},
+                        {src: 'scripts/embed.html', dest: 'dist/'},
                         {src: 'css/app.css', dest: 'dist/css/'},
                         {src: 'img', dest: 'dist/'},
                         {src: 'juiceboxConfig.js', dest: 'dist/'}
                     ]
             })
         ]
-    },
-    {
-        input: 'js/app.js',
-        output: [
-            {file: 'dist/js/hic-app.esm.js', format: 'es'},
-        ]
     }
+    // ,
+    // {
+    //     input: 'js/app.js',
+    //     output: [
+    //         {file: 'dist/js/hic-app.esm.js', format: 'es'},
+    //     ]
+    // }
 ]
