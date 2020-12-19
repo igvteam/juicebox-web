@@ -13,7 +13,11 @@
 
 * http://localhost/juicebox-web/dist/embed.html?hicUrl=https://dnazoo.s3.amazonaws.com/Sciurus_vulgaris/mSciVul1.PB.asm1.purge2.scaff2.hic&name=Draft%20assembly&colorScale=3164,255,0,0&nvi=988102227,834
 
-# Embedded googl drive track (requires google config) 
+# embed.html with Google drive track (requires google config)
+
+* http://localhost/juicebox-web/dist/embed.html?juiceboxURL=http://bit.ly/2srvPJK
+
+# Embedded google drive track (requires google config) 
 
 * http://localhost/juicebox-web/dist/index.html?juiceboxURL=http://bit.ly/2srvPJK
 

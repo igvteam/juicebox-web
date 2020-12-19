@@ -31,12 +31,20 @@ export default [
                     ]
             })
         ]
+    },
+    {
+        input: 'js/embed.js',
+        output: [
+            {file: 'dist/js/juicebox-embed.min.js', format: 'umd', name: "hic", plugins: [terser()]}
+        ],
+        plugins: [
+            strip({
+                debugger: true,
+                functions: ['console.log', 'assert.*', 'debug']
+            }),
+            commonjs(),
+            resolve(),
+            babel()
+        ]
     }
-    // ,
-    // {
-    //     input: 'js/app.js',
-    //     output: [
-    //         {file: 'dist/js/hic-app.esm.js', format: 'es'},
-    //     ]
-    // }
 ]

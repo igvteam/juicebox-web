@@ -30,6 +30,13 @@ document.addEventListener("DOMContentLoaded", async (event) => {
     await init(document.getElementById('app-container'));
 });
 
+/**
+ * Initialize the app in the given container (dom element).
+ *
+ * @param container
+ * @param embedded -- optional, if true initialize for embedding, essentially juicebox.js only with no "app" buttons
+ * @returns {Promise<void>}
+ */
 async function init(container) {
 
     AlertSingleton.init(container)
@@ -38,7 +45,6 @@ async function init(container) {
 
     const google = config.google;
     config.googleEnabled = google && (window.location.protocol === "https:" || window.location.host === "localhost")
-
     if (config.googleEnabled) {
         try {
             await GoogleAuth.init({
@@ -55,12 +61,7 @@ async function init(container) {
     await hic.init(container, config)
 
     await initializationHelper(container, config)
-
 }
-
-// This export of juicebox.js ('hic') is odd, but its needed for embed.html
-export default hic
-
 
 
 
