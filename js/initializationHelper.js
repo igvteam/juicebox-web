@@ -6,7 +6,8 @@ import {
     dropboxButtonImageBase64,
     dropboxDropdownItem,
     googleDriveButtonImageBase64,
-    googleDriveDropdownItem
+    googleDriveDropdownItem,
+    EventBus
 } from '../node_modules/igv-widgets/dist/igv-widgets.js'
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import QRCode from "./qrcode.js";
@@ -255,7 +256,7 @@ function createGenomeChangeListener(config) {
                 //     $('#hic-encode-other-modal-button').hide();
                 // }
 
-                hic.EventBus.globalBus.post({type: 'DidChangeGenome', data: genomeId})
+                EventBus.globalBus.post({type: 'DidChangeGenome', data: {genomeID: genomeId}})
 
             }
         }
