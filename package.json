@@ -32,7 +32,7 @@
   "dependencies": {
     "data-modal": "github:igvteam/data-modal#v1.1.0",
     "igv-utils": "github:igvteam/igv-utils#v1.2.1",
-    "igv-widgets": "github:igvteam/igv-widgets#v1.1.1",
+    "igv-widgets": "github:igvteam/igv-widgets#7b9b453b",
     "juicebox.js": "^2.1.2"
   }
 }
