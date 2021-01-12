@@ -19,7 +19,7 @@ var juiceboxConfig = {
         items: 'https://hicfiles.s3.amazonaws.com/internal/tracksMenu_2D.$GENOME_ID.txt'
     },
 
-    trackRegistryFile: "res/tracks/trackRegistry.json",
+    trackRegistryFile: "res/tracks/encodeRegistry.json",
 
     // Supply a Google client id to enable loading of private Google files.  Supply an API key to
     // enable loading of public Google files without login.
