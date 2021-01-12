@@ -2,7 +2,7 @@ import {StringUtils, URLShortener} from '../node_modules/igv-utils/src/index.js'
 import {
     AlertSingleton,
     createSessionWidgets,
-    createTrackWidgets,
+    createTrackWidgetsWithTrackRegistry,
     dropboxButtonImageBase64,
     dropboxDropdownItem,
     googleDriveButtonImageBase64,
@@ -20,6 +20,8 @@ let currentGenomeId;
 
 async function initializationHelper(container, config) {
 
+    const $trackDropdownMenu = $('#hic-track-dropdown-menu')
+
     createAppCloneButton(container)
 
     updateControlMapDropdownForAllBrowser()
@@ -35,14 +37,17 @@ async function initializationHelper(container, config) {
     imgElement = document.querySelector(`img#igv-app-${str}-google-drive-button-image`)
     imgElement.src = `data:image/svg+xml;base64,${googleDriveButtonImageBase64()}`
 
-    createTrackWidgets(
-        $(container),
+    createTrackWidgetsWithTrackRegistry($(container),
+        $trackDropdownMenu,
         $('#hic-local-track-file-input'),
         $('#hic-track-dropdown-dropbox-button'),
         config.googleEnabled,
         $('#hic-track-dropdown-google-drive-button'),
         ['hic-encode-signal-modal', 'hic-encode-other-modal'],
         'track-load-url-modal',
+        undefined,
+        undefined,
+        config.trackRegistryFile,
         configurations => loadTracks(configurations))
 
     createAnnotationDatalistModals(container);
@@ -69,7 +74,7 @@ async function initializationHelper(container, config) {
 
     configureShareModal(container, config)
 
-    $('#hic-track-dropdown-menu').parent().on('shown.bs.dropdown', function () {
+    $trackDropdownMenu.parent().on('shown.bs.dropdown', function () {
         const browser = hic.getCurrentBrowser();
         if (undefined === browser || undefined === browser.dataset) {
             AlertSingleton.present('Contact map must be loaded and selected before loading tracks');
@@ -88,11 +93,6 @@ async function initializationHelper(container, config) {
     hic.EventBus.globalBus.subscribe("GenomeChange", listener)
 
     hic.EventBus.globalBus.subscribe("BrowserSelect", event => updateControlMapDropdown(event.data))
-
-    // Must manually trigger the genome change event on initial load
-    // if (hic.HICBrowser.currentBrowser && hic.HICBrowser.currentBrowser.genome) {
-    //     await listener.receiveEvent({ data: hic.HICBrowser.currentBrowser.genome.id })
-    // }
 
 }
 
@@ -241,20 +241,6 @@ function createGenomeChangeListener(config) {
                     let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", genomeId);
                     await loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
                 }
-
-
-                // if (EncodeTrackDatasource.supportsGenome(genomeId)) {
-                //
-                //     $('#hic-encode-signal-modal-button').show();
-                //     $('#hic-encode-other-modal-button').show();
-                //
-                //     encodeModalTables[ 0 ].setDatasource(new EncodeTrackDatasource( encodeTrackDatasourceSignalConfigurator( genomeId ) ));
-                //     encodeModalTables[ 1 ].setDatasource(new EncodeTrackDatasource( encodeTrackDatasourceOtherConfigurator( genomeId ) ));
-                //
-                // } else {
-                //     $('#hic-encode-signal-modal-button').hide();
-                //     $('#hic-encode-other-modal-button').hide();
-                // }
 
                 EventBus.globalBus.post({type: 'DidChangeGenome', data: {genomeID: genomeId}})
 
