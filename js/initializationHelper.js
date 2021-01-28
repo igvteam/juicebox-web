@@ -291,13 +291,13 @@ function createAppCloneButton(container) {
 
         let browser = undefined;
         try {
-            browser = await hic.createBrowser(container, {});
+            browser = await hic.createBrowser(container, hic.getCurrentBrowser().config);
         } catch (e) {
             console.error(e);
         }
 
         if (browser) {
-            hic.HICBrowser.setCurrentBrowser(browser);
+            hic.setCurrentBrowser(browser)
         }
 
     });
