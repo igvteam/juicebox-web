@@ -291,7 +291,8 @@ function createAppCloneButton(container) {
 
         let browser = undefined;
         try {
-            browser = await hic.createBrowser(container, hic.getCurrentBrowser().config);
+            const { width, height } = hic.getCurrentBrowser().config
+            browser = await hic.createBrowser(container, { width, height });
         } catch (e) {
             console.error(e);
         }
