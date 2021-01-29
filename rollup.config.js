@@ -22,12 +22,14 @@ export default [
             copy({
                 targets:
                     [
+                        {src: 'res', dest: 'dist/'},
                         {src: 'node_modules/juicebox.js/dist/css/juicebox.css', dest: 'dist/css/'},
                         {src: 'node_modules/juicebox.js/dist/css/img', dest: 'dist/css/'},
                         {src: 'scripts/embed.html', dest: 'dist/'},
                         {src: 'css/app.css', dest: 'dist/css/'},
                         {src: 'img', dest: 'dist/'},
-                        {src: 'juiceboxConfig.js', dest: 'dist/'}
+                        {src: 'juiceboxConfig.js', dest: 'dist/'},
+
                     ]
             })
         ]
