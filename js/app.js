@@ -52,6 +52,7 @@ async function init(container) {
                 apiKey: google.apiKey,
                 scope: 'https://www.googleapis.com/auth/userinfo.profile'
             })
+            await GoogleAuth.signOut();   // The await is important !!!
         } catch (e) {
             console.error(e)
             AlertSingleton.present(e.message)
