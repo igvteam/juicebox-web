@@ -1,6 +1,6 @@
 {
   "name": "juicebox-web",
-  "version": "2.1.2",
+  "version": "2.1.5",
   "license": "MIT",
   "author": {
     "name": "Douglass Turner"
@@ -33,6 +33,6 @@
     "data-modal": "github:igvteam/data-modal#v1.1.0",
     "igv-utils": "github:igvteam/igv-utils#v1.2.3",
     "igv-widgets": "github:igvteam/igv-widgets#v1.1.2",
-    "juicebox.js": "^2.1.7"
+    "juicebox.js": "^2.1.9"
   }
 }
