@@ -21,10 +21,10 @@
  *
  */
 
+import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import {GoogleAuth} from '../node_modules/igv-utils/src/index.js'
 import {AlertSingleton} from '../node_modules/igv-widgets/dist/igv-widgets.js'
-import initializationHelper from "./initializationHelper.js"
-import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
+import { initializationHelper}  from "./initializationHelper.js"
 
 document.addEventListener("DOMContentLoaded", async (event) => {
     await init(document.getElementById('app-container'));
@@ -59,10 +59,8 @@ async function init(container) {
         }
     }
 
+    initializationHelper(container, config)
+
     await hic.init(container, config)
 
-    await initializationHelper(container, config)
 }
-
-
-
