@@ -21,10 +21,10 @@
  *
  */
 
-import {GoogleAuth} from '../node_modules/igv-utils/src/index.js'
-import {AlertSingleton} from '../node_modules/igv-widgets/dist/igv-widgets.js'
-import initializationHelper from "./initializationHelper.js"
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
+import {GoogleAuth} from '../node_modules/igv-utils/src/index.js'
+import {AlertSingleton, updateTrackMenus} from '../node_modules/igv-widgets/dist/igv-widgets.js'
+import { initializationHelper, loadAnnotationDatalist }  from "./initializationHelper.js"
 
 document.addEventListener("DOMContentLoaded", async (event) => {
     await init(document.getElementById('app-container'));
@@ -59,10 +59,35 @@ async function init(container) {
         }
     }
 
+    const genomeChangeListener = event => {
+
+        const { data:genomeId } = event;
+
+        if (currentGenomeId !== genomeId) {
+
+            currentGenomeId = genomeId;
+
+            if (config.trackMenu) {
+
+                let tracksURL = config.trackMenu.items.replace("$GENOME_ID", genomeId);
+                loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
+            }
+
+            if (config.trackMenu2D) {
+                let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", genomeId);
+                loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
+            }
+
+            updateTrackMenus(genomeId, undefined, config.trackRegistryFile, $('#hic-track-dropdown-menu'))
+
+        }
+    }
+
+    hic.EventBus.globalBus.subscribe("GenomeChange", genomeChangeListener)
+
     await hic.init(container, config)
 
     await initializationHelper(container, config)
 }
 
-
-
+let currentGenomeId;

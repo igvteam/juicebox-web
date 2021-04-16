@@ -1,4 +1,4 @@
-import {StringUtils, URLShortener} from '../node_modules/igv-utils/src/index.js'
+import {StringUtils, URLShortener, igvxhr} from '../node_modules/igv-utils/src/index.js'
 import {
     AlertSingleton,
     createSessionWidgets,
@@ -6,17 +6,11 @@ import {
     dropboxButtonImageBase64,
     dropboxDropdownItem,
     googleDriveButtonImageBase64,
-    googleDriveDropdownItem,
-    EventBus
+    googleDriveDropdownItem
 } from '../node_modules/igv-widgets/dist/igv-widgets.js'
 import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import QRCode from "./qrcode.js";
 import configureContactMapLoaders from "./contactMapLoad.js";
-
-// The igv xhr object. TODO eliminate this dependency
-const igvxhr = hic.igvxhr;
-
-let currentGenomeId;
 
 async function initializationHelper(container, config) {
 
@@ -87,10 +81,6 @@ async function initializationHelper(container, config) {
             AlertSingleton.present('Contact map must be loaded and selected before loading "B" map"');
         }
     });
-
-    const listener = createGenomeChangeListener(config)
-
-    hic.EventBus.globalBus.subscribe("GenomeChange", listener)
 
     hic.EventBus.globalBus.subscribe("BrowserSelect", event => updateControlMapDropdown(event.data))
 
@@ -220,36 +210,6 @@ async function loadHicFile(url, name, mapType) {
     }
 }
 
-function createGenomeChangeListener(config) {
-
-    return {
-
-        receiveEvent: async event => {
-
-            const {data: genomeId} = event;
-
-            if (currentGenomeId !== genomeId) {
-
-                currentGenomeId = genomeId;
-
-                if (config.trackMenu) {
-                    let tracksURL = config.trackMenu.items.replace("$GENOME_ID", genomeId);
-                    await loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
-                }
-
-                if (config.trackMenu2D) {
-                    let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", genomeId);
-                    await loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
-                }
-
-                EventBus.globalBus.post({type: 'DidChangeGenome', data: {genomeID: genomeId}})
-
-            }
-        }
-    }
-
-}
-
 async function loadAnnotationDatalist($datalist, url, type) {
 
     $datalist.empty();
@@ -312,7 +272,6 @@ function configureSessionWidgets(container, googleEnabled) {
 
     createSessionWidgets(
         $(container),
-        igvxhr,
         'juicebox-webapp',
         'igv-app-dropdown-local-session-file-input',
         'igv-app-dropdown-dropbox-session-file-button',
@@ -474,4 +433,4 @@ async function shortJuiceboxURL(base) {
     return urlShortener.shortenURL(url);
 }
 
-export default initializationHelper
+export { initializationHelper, loadAnnotationDatalist }
