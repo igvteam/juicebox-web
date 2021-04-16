@@ -3,6 +3,7 @@ import {
     AlertSingleton,
     createSessionWidgets,
     createTrackWidgetsWithTrackRegistry,
+    updateTrackMenus,
     dropboxButtonImageBase64,
     dropboxDropdownItem,
     googleDriveButtonImageBase64,
@@ -12,7 +13,9 @@ import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
 import QRCode from "./qrcode.js";
 import configureContactMapLoaders from "./contactMapLoad.js";
 
-async function initializationHelper(container, config) {
+let currentGenomeId;
+
+function initializationHelper(container, config) {
 
     const $trackDropdownMenu = $('#hic-track-dropdown-menu')
 
@@ -81,6 +84,32 @@ async function initializationHelper(container, config) {
             AlertSingleton.present('Contact map must be loaded and selected before loading "B" map"');
         }
     });
+
+    const genomeChangeListener = event => {
+
+        const { data:genomeId } = event;
+
+        if (currentGenomeId !== genomeId) {
+
+            currentGenomeId = genomeId;
+
+            if (config.trackMenu) {
+
+                let tracksURL = config.trackMenu.items.replace("$GENOME_ID", genomeId);
+                loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
+            }
+
+            if (config.trackMenu2D) {
+                let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", genomeId);
+                loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
+            }
+
+            updateTrackMenus(genomeId, undefined, config.trackRegistryFile, $('#hic-track-dropdown-menu'))
+
+        }
+    }
+
+    hic.EventBus.globalBus.subscribe("GenomeChange", genomeChangeListener)
 
     hic.EventBus.globalBus.subscribe("BrowserSelect", event => updateControlMapDropdown(event.data))
 
@@ -433,4 +462,4 @@ async function shortJuiceboxURL(base) {
     return urlShortener.shortenURL(url);
 }
 
-export { initializationHelper, loadAnnotationDatalist }
+export { initializationHelper }
