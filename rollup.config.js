@@ -1,6 +1,6 @@
-import commonjs from 'rollup-plugin-commonjs';
-import resolve from 'rollup-plugin-node-resolve';
-import babel from 'rollup-plugin-babel';
+import commonjs from "@rollup/plugin-commonjs";
+import nodeResolve from "@rollup/plugin-node-resolve";
+import babel from "@rollup/plugin-babel";
 import strip from 'rollup-plugin-strip';
 import copy from 'rollup-plugin-copy'
 import {terser} from "rollup-plugin-terser"
@@ -17,7 +17,7 @@ export default [
                 functions: ['console.log', 'assert.*', 'debug']
             }),
             commonjs(),
-            resolve(),
+            nodeResolve(),
             babel(),
             copy({
                 targets:
@@ -45,7 +45,7 @@ export default [
                 functions: ['console.log', 'assert.*', 'debug']
             }),
             commonjs(),
-            resolve(),
+            nodeResolve(),
             babel()
         ]
     }
