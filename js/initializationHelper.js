@@ -17,6 +17,20 @@ let currentGenomeId;
 
 function initializationHelper(container, config) {
 
+    // sync/un-sync maps
+    const mapSyncButton = document.getElementById('juicebox-app-sync-maps-button')
+    mapSyncButton.addEventListener('click', () => {
+
+        for (let browser of hic.getAllBrowsers()) {
+            browser.synchable = mapSyncButton.checked
+        }
+
+        if (true === hic.getCurrentBrowser().synchable) {
+            console.log(`sync ${ hic.getAllBrowsers().length } browsers.`)
+            // hic.syncBrowsers(hic.getAllBrowsers())
+        }
+    })
+
     const $trackDropdownMenu = $('#hic-track-dropdown-menu')
 
     createAppCloneButton(container)
@@ -281,7 +295,7 @@ function createAppCloneButton(container) {
         let browser = undefined;
         try {
             const { width, height } = hic.getCurrentBrowser().config
-            browser = await hic.createBrowser(container, { width, height });
+            browser = await hic.createBrowser(container, { width, height, synchable: hic.getCurrentBrowser().synchable });
         } catch (e) {
             console.error(e);
         }
