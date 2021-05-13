@@ -66,4 +66,5 @@ async function init(container) {
     const { synchable } = hic.getCurrentBrowser()
     document.getElementById('juicebox-app-sync-maps-button').checked = synchable
 
+
 }

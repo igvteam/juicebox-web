@@ -17,21 +17,9 @@ let currentGenomeId;
 
 function initializationHelper(container, config) {
 
-    // sync/un-sync maps
-    const mapSyncButton = document.getElementById('juicebox-app-sync-maps-button')
-    mapSyncButton.addEventListener('click', () => {
-
-        for (let browser of hic.getAllBrowsers()) {
-            browser.synchable = mapSyncButton.checked
-        }
-
-        if (true === hic.getCurrentBrowser().synchable) {
-            console.log(`sync ${ hic.getAllBrowsers().length } browsers.`)
-            // hic.syncBrowsers(hic.getAllBrowsers())
-        }
-    })
-
     const $trackDropdownMenu = $('#hic-track-dropdown-menu')
+
+    createMapSyncButton(document.getElementById('juicebox-app-sync-maps-button-container'))
 
     createAppCloneButton(container)
 
@@ -126,6 +114,38 @@ function initializationHelper(container, config) {
     hic.EventBus.globalBus.subscribe("GenomeChange", genomeChangeListener)
 
     hic.EventBus.globalBus.subscribe("BrowserSelect", event => updateControlMapDropdown(event.data))
+
+}
+
+function createMapSyncButton(buttonContainer) {
+
+    const mapSyncButton = buttonContainer.querySelector('#juicebox-app-sync-maps-button')
+
+    mapSyncButton.addEventListener('click', () => {
+
+        console.log(`browsers ${ mapSyncButton.checked ? 'are' : 'are not' } synchronized.`)
+
+        for (let browser of hic.getAllBrowsers()) {
+            browser.synchable = mapSyncButton.checked
+        }
+
+        // if (true === hic.getCurrentBrowser().synchable) {
+        //     console.log(`sync ${ hic.getAllBrowsers().length } browsers.`)
+        //     // hic.syncBrowsers(hic.getAllBrowsers())
+        // }
+    })
+
+    hic.EventBus.globalBus.subscribe('DidCreateBrowser', () => {
+        if (hic.getAllBrowsers().length > 1) {
+            buttonContainer.style.display = 'block'
+        }
+    })
+
+    hic.EventBus.globalBus.subscribe("DidDeleteBrowser", () => {
+        if (1 === hic.getAllBrowsers().length) {
+            buttonContainer.style.display = 'none'
+        }
+    })
 
 }
 
