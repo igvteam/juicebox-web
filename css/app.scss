@@ -2,6 +2,16 @@ $default-font-family: 'Open Sans', sans-serif;
 $default-dark-color: #5f5f5f;
 $default-hover-color: #0f0f0f;
 
+.btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.custom-control-input:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 #hic-share-url-modal {
 
     color: $default-dark-color;

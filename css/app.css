@@ -1,3 +1,11 @@
+.btn:focus {
+  outline: none !important;
+  box-shadow: none !important; }
+
+.custom-control-input:focus {
+  outline: none !important;
+  box-shadow: none !important; }
+
 #hic-share-url-modal {
   color: #5f5f5f; }
   #hic-share-url-modal .modal-body {
