@@ -21,7 +21,7 @@
  *
  */
 
-import hic from "../node_modules/juicebox.js/dist/js/juicebox.esm.js";
+import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 import {GoogleAuth} from '../node_modules/igv-utils/src/index.js'
 import {AlertSingleton} from '../node_modules/igv-widgets/dist/igv-widgets.js'
 import { initializationHelper}  from "./initializationHelper.js"
