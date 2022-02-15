@@ -24,7 +24,7 @@
     "core-js": "^3.11.0",
     "data-modal": "github:igvteam/data-modal#v1.1.0",
     "igv-utils": "github:igvteam/igv-utils#v1.2.3",
-    "igv-widgets": "github:igvteam/igv-widgets#v1.2.1",
+    "igv-widgets": "github:igvteam/igv-widgets#v1.3.1",
     "juicebox.js": "^2.2.0",
     "rollup": "^2.45.2",
     "rollup-plugin-copy": "^3.4.0",
