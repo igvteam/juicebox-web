@@ -115,6 +115,7 @@ a#emailButton:active {
     flex-wrap: wrap;
     justify-content: flex-start; }
   .juicebox-app-caption-container .hic-caption-container {
+    overflow-y: auto;
     height: 64px;
     width: 100%;
     margin-top: 16px;
