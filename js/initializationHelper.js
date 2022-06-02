@@ -34,9 +34,12 @@ function initializationHelper(container, config) {
     imgElement = document.querySelector(`img#igv-app-${str}-google-drive-button-image`)
     imgElement.src = `data:image/svg+xml;base64,${googleDriveButtonImageBase64()}`
 
+    const initializeDropbox = async () => Promise.resolve(true)
+
     createTrackWidgetsWithTrackRegistry($(container),
         $trackDropdownMenu,
         $('#hic-local-track-file-input'),
+        initializeDropbox,
         $('#hic-track-dropdown-dropbox-button'),
         config.googleEnabled,
         $('#hic-track-dropdown-google-drive-button'),
