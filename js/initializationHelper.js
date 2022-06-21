@@ -1,4 +1,5 @@
 import {StringUtils, URLShortener, igvxhr} from '../node_modules/igv-utils/src/index.js'
+
 import {
     AlertSingleton,
     createSessionWidgets,
@@ -9,6 +10,7 @@ import {
     googleDriveButtonImageBase64,
     googleDriveDropdownItem
 } from '../node_modules/igv-widgets/dist/igv-widgets.js'
+
 import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 import QRCode from "./qrcode.js";
 import configureContactMapLoaders from "./contactMapLoad.js";
@@ -302,18 +304,16 @@ function configureSessionWidgets(container, googleEnabled) {
     $('div#igv-session-dropdown-menu > :nth-child(1)').after(dropboxDropdownItem('igv-app-dropdown-dropbox-session-file-button'))
     $('div#igv-session-dropdown-menu > :nth-child(2)').after(googleDriveDropdownItem('igv-app-dropdown-google-drive-session-file-button'))
 
-    createSessionWidgets(
-        $(container),
+    createSessionWidgets($(container),
         'juicebox-webapp',
         'igv-app-dropdown-local-session-file-input',
+        () => Promise.resolve(true),
         'igv-app-dropdown-dropbox-session-file-button',
         'igv-app-dropdown-google-drive-session-file-button',
         'igv-app-session-url-modal',
         'igv-app-session-save-modal',
         googleEnabled,
-        async config => {
-            await hic.restoreSession(container, config)
-        },
+        async config => await hic.restoreSession(container, config),
         () => hic.toJSON()
     )
 
