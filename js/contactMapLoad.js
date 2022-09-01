@@ -105,7 +105,7 @@ function configureContactMapLoaders({
             }
         contactMapModal = new ModalTable(modalTableConfig)
 
-        const {items: path} = mapMenu
+        const path =  mapMenu.items
         const config = aidenLabContactMapDatasourceConfigurator(path)
         const datasource = new GenericDataSource(config)
         contactMapModal.setDatasource(datasource)
