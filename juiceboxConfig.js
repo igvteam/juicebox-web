@@ -6,8 +6,8 @@
  */
 
 var juiceboxConfig = {
-    width: 960,
-    height: 960,
+    width: 800,
+    height: 800,
     mapMenu: {
         id: 'contact-map-datalist',
         items: 'https://aidenlab.org/juicebox/res/hicfiles.json'
