@@ -48,6 +48,16 @@ a#emailButton:active  {
     font-weight: 700;
 }
 
+.btn-circle {
+    width: 28px;
+    height: 28px;
+    padding: 6px 0;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1;
+}
+
 .hic-social-button-container {
     display: flex;
     flex-direction: row;

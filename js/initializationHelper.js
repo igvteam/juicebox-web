@@ -54,7 +54,7 @@ function initializationHelper(container, config) {
 
     createAnnotationDatalistModals(container);
 
-    const $dropdowns = $('button[id$=-map-dropdown]').parent()
+    const $dropdowns = $('a[id$=-map-dropdown]').parent()
 
     const contactMapLoadConfig =
         {
@@ -281,9 +281,9 @@ async function loadAnnotationDatalist($datalist, url, type) {
 
 function createAppCloneButton(container) {
 
-    $('.juicebox-app-clone-button').on('click', async () => {
+    document.querySelector('#juicebox-app-clone-button').addEventListener('click', async () => {
 
-        let browser = undefined;
+        let browser
         try {
             const { width, height } = hic.getCurrentBrowser().config
             browser = await hic.createBrowser(container, { width, height });
@@ -294,8 +294,7 @@ function createAppCloneButton(container) {
         if (browser) {
             hic.setCurrentBrowser(browser)
         }
-
-    });
+    })
 
 }
 
