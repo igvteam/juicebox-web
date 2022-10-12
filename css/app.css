@@ -124,6 +124,7 @@ a#emailButton:active {
 }
 
 .juicebox-app-caption-container {
+  margin-top: 64px;
   display: flex;
   flex-flow: column;
   flex-wrap: wrap;
