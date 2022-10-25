@@ -29,18 +29,18 @@ for (let line of lines) {
         fs.writeSync(fd, line + '\n', null, 'utf-8');
     }
 
-    else if (line.includes("<!--NAVBAR-->") && process.argv.length > 2) {
-        const navbarFile = require.resolve(process.argv[2]);
-        const navbar = fs.readFileSync(navbarFile, 'utf-8');
-        fs.writeSync(fd, navbar, null, 'utf-8');
-        skipNavbar = true;
-    }
-
-    else if(skipNavbar) {
-        if(line.includes("<!--NAVBAR")) {
-            skipNavbar = false;
-        }
-    }
+    // else if (line.includes("<!--NAVBAR-->") && process.argv.length > 2) {
+    //     const navbarFile = require.resolve(process.argv[2]);
+    //     const navbar = fs.readFileSync(navbarFile, 'utf-8');
+    //     fs.writeSync(fd, navbar, null, 'utf-8');
+    //     skipNavbar = true;
+    // }
+    //
+    // else if(skipNavbar) {
+    //     if(line.includes("<!--NAVBAR")) {
+    //         skipNavbar = false;
+    //     }
+    // }
 
     else {
         fs.writeSync(fd, line + '\n', null, 'utf-8')
