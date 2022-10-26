@@ -19,6 +19,8 @@ let currentGenomeId;
 
 function initializationHelper(container, config) {
 
+    configureSequenceAndRefSeqGeneTrackToggle()
+
     const $trackDropdownMenu = $('#hic-track-dropdown-menu')
 
     createAppCloneButton(container)
@@ -118,6 +120,68 @@ function initializationHelper(container, config) {
 
     hic.EventBus.globalBus.subscribe("BrowserSelect", event => updateControlMapDropdown(event.data))
 
+    hic.EventBus.globalBus.subscribe('TrackXYPairLoad', ({ data }) => {
+
+        if (data.track.format && 'refgene' === data.track.format) {
+            console.log(`TrackXYPairLoad with format(refgene) did load`)
+            document.querySelector('#hic-toggle-ref-seq-genes-track').checked = true
+        } else if (data.track.format && 'sequence' === data.track.format) {
+            console.log(`TrackXYPairLoad with format(sequence) did load`)
+            document.querySelector('#hic-toggle-sequence-track').checked = true
+        }
+
+    })
+}
+
+function configureSequenceAndRefSeqGeneTrackToggle() {
+
+    // sequence track
+    const sequenceTrackToggle = document.querySelector('#hic-toggle-sequence-track')
+    sequenceTrackToggle.addEventListener('click', async () => {
+
+        const browser = hic.getCurrentBrowser()
+        const sequenceTrackPair = findTrackPairWithFormat(browser.trackPairs, 'sequence')
+
+        if (!sequenceTrackToggle.checked && sequenceTrackPair) {
+            browser.layoutController.removeTrackXYPair(sequenceTrackPair)
+        } else if (undefined === sequenceTrackPair) {
+            await browser.loadTracks([ { type: 'sequence', format: 'sequence' } ])
+        }
+
+    })
+
+    // ref seq gene track
+    const refSeqGenesTrackToggle = document.querySelector('#hic-toggle-ref-seq-genes-track')
+    refSeqGenesTrackToggle.addEventListener('click', async () => {
+
+        const browser = hic.getCurrentBrowser()
+        const refSeqGenesTrackPair = findTrackPairWithFormat(browser.trackPairs, 'refgene')
+
+        if (!refSeqGenesTrackToggle.checked && refSeqGenesTrackPair) {
+            browser.layoutController.removeTrackXYPair(refSeqGenesTrackPair)
+        } else if (undefined === refSeqGenesTrackPair) {
+
+            const trackConfigs = browser.getGenomeTrackConfigurations(browser.dataset.genomeId)
+
+            if (trackConfigs) {
+                await browser.loadTracks(trackConfigs)
+            }
+
+        }
+
+    })
+
+}
+
+function findTrackPairWithFormat(trackPairs, format) {
+
+    for (const trackPair of trackPairs) {
+        if (format === trackPair.track.format) {
+            return trackPair
+        }
+    }
+
+    return undefined
 }
 
 function createAnnotationDatalistModals(root) {

@@ -204,8 +204,24 @@
 
                     <div id="hic-track-dropdown-menu" class="dropdown-menu">
 
+                        <!-- toggle sequence track-->
+                        <div class="dropdown-item">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="hic-toggle-sequence-track">
+                                <label class="custom-control-label" for="hic-toggle-sequence-track">Toggle Sequence Track</label>
+                            </div>
+                        </div>
+
+                        <!-- toggle ref-seq-genes track-->
+                        <div class="dropdown-item">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="hic-toggle-ref-seq-genes-track">
+                                <label class="custom-control-label" for="hic-toggle-ref-seq-genes-track">Toggle Ref Seq Genes Track</label>
+                            </div>
+                        </div>
+
                         <!-- Local File -->
-                        <label class="dropdown-item btn btn-default btn-file">
+                        <label class="dropdown-item btn btn-secondary btn-file">
                             <div class="igv-app-dropdown-item-cloud-storage">
                                 <div>
                                     Local File ...
@@ -317,7 +333,7 @@
             <!-- App Clone -->
             <li class="nav-item">
                 <button id="juicebox-app-clone-button" type="button" class="btn btn-secondary btn-circle btn-sm ml-4 mt-2">
-                    <i class="fa fa-times"></i>
+                    <i class="fa fa-plus"></i>
                 </button>
             </li>
 
