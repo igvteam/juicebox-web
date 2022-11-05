@@ -120,17 +120,17 @@ function initializationHelper(container, config) {
 
     hic.EventBus.globalBus.subscribe("BrowserSelect", event => updateControlMapDropdown(event.data))
 
-    // hic.EventBus.globalBus.subscribe('TrackXYPairLoad', ({ data }) => {
-    //
-    //     if (data.track.format && 'refgene' === data.track.format) {
-    //         console.log(`TrackXYPairLoad with format(refgene) did load`)
-    //         document.querySelector('#hic-toggle-ref-seq-genes-track').checked = true
-    //     } else if (data.track.format && 'sequence' === data.track.format) {
-    //         console.log(`TrackXYPairLoad with format(sequence) did load`)
-    //         document.querySelector('#hic-toggle-sequence-track').checked = true
-    //     }
-    //
-    // })
+    hic.EventBus.globalBus.subscribe('TrackXYPairLoad', ({ data }) => {
+
+        if (data.track.format && 'refgene' === data.track.format) {
+            console.log(`TrackXYPairLoad with format(refgene) did load`)
+            document.querySelector('#hic-toggle-ref-seq-genes-track').checked = true
+        } else if (data.track.format && 'sequence' === data.track.format) {
+            console.log(`TrackXYPairLoad with format(sequence) did load`)
+            document.querySelector('#hic-toggle-sequence-track').checked = true
+        }
+
+    })
 }
 
 function configureSequenceAndRefSeqGeneTrackToggle() {
