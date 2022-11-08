@@ -2,7 +2,7 @@
  * Target for rollup to create babelized juicebox for embed.html
  */
 
-import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
+import hic from "../node_modules/juicebox.js/js/index.js";
 import {GoogleAuth} from "../node_modules/igv-utils/src/index.js"
 
 async function init(container, config) {
