@@ -92,26 +92,24 @@ function initializationHelper(container, config) {
         }
     });
 
-    const genomeChangeListener = event => {
+    const genomeChangeListener = ({ data }) => {
 
-        const { data:genomeId } = event;
+        if (currentGenomeId !== data.id) {
 
-        if (currentGenomeId !== genomeId) {
-
-            currentGenomeId = genomeId;
+            currentGenomeId = data.id
 
             if (config.trackMenu) {
 
-                let tracksURL = config.trackMenu.items.replace("$GENOME_ID", genomeId);
+                let tracksURL = config.trackMenu.items.replace("$GENOME_ID", data.id);
                 loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
             }
 
             if (config.trackMenu2D) {
-                let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", genomeId);
+                let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", data.id);
                 loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
             }
 
-            updateTrackMenus(genomeId, undefined, config.trackRegistryFile, $('#hic-track-dropdown-menu'))
+            updateTrackMenus(data.id, undefined, config.trackRegistryFile, $('#hic-track-dropdown-menu'))
 
         }
     }
@@ -153,6 +151,20 @@ function configureSequenceAndRefSeqGeneTrackToggle() {
         }
 
     })
+
+    const listener = ({ data }) => {
+
+        document.querySelector('#hic-track-dropdown-button').style['pointer-events'] = undefined === data.sequence ? 'none' : 'auto'
+
+        // if (undefined === data.sequence) {
+        //     console.log(`Sequence and Gene Track. I noticed the genome changed to NO_GENOME`)
+        // } else {
+        //     console.log(`Sequence and Gene Track. I noticed the genome changed ${ data.id }`)
+        // }
+
+    }
+
+    hic.EventBus.globalBus.subscribe("GenomeChange", listener)
 
 }
 
