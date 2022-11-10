@@ -154,7 +154,13 @@ function configureSequenceAndRefSeqGeneTrackToggle() {
 
     const listener = ({ data }) => {
 
-        document.querySelector('#hic-track-dropdown-button').style['pointer-events'] = undefined === data.sequence ? 'none' : 'auto'
+        if (undefined === data.sequence) {
+            document.querySelector('#hic-toggle-sequence-track').setAttribute('disabled', 'disabled')
+            document.querySelector('#hic-toggle-ref-seq-genes-track').setAttribute('disabled', 'disabled')
+        } else {
+            document.querySelector('#hic-toggle-sequence-track').removeAttribute('disabled')
+            document.querySelector('#hic-toggle-ref-seq-genes-track').removeAttribute('disabled')
+        }
 
         // if (undefined === data.sequence) {
         //     console.log(`Sequence and Gene Track. I noticed the genome changed to NO_GENOME`)
