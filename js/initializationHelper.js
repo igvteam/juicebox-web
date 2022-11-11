@@ -118,17 +118,17 @@ function initializationHelper(container, config) {
 
     hic.EventBus.globalBus.subscribe("BrowserSelect", event => updateControlMapDropdown(event.data))
 
-    hic.EventBus.globalBus.subscribe('TrackXYPairLoad', ({ data }) => {
-
-        if (data.track.format && 'refgene' === data.track.format) {
-            console.log(`TrackXYPairLoad with format(refgene) did load`)
-            document.querySelector('#hic-toggle-ref-seq-genes-track').checked = true
-        } else if (data.track.format && 'sequence' === data.track.format) {
-            console.log(`TrackXYPairLoad with format(sequence) did load`)
-            document.querySelector('#hic-toggle-sequence-track').checked = true
-        }
-
-    })
+    // hic.EventBus.globalBus.subscribe('TrackXYPairLoad', ({ data }) => {
+    //
+    //     if (data.track.format && 'refgene' === data.track.format) {
+    //         console.log(`TrackXYPairLoad with format(refgene) did load`)
+    //         document.querySelector('#hic-toggle-ref-seq-genes-track').checked = true
+    //     } else if (data.track.format && 'sequence' === data.track.format) {
+    //         console.log(`TrackXYPairLoad with format(sequence) did load`)
+    //         document.querySelector('#hic-toggle-sequence-track').checked = true
+    //     }
+    //
+    // })
 }
 
 function configureSequenceAndRefSeqGeneTrackToggle() {
@@ -155,34 +155,17 @@ function configureSequenceAndRefSeqGeneTrackToggle() {
     const listener = ({ data }) => {
 
         if (undefined === data.sequence) {
-            document.querySelector('#hic-toggle-sequence-track').setAttribute('disabled', 'disabled')
-            document.querySelector('#hic-toggle-ref-seq-genes-track').setAttribute('disabled', 'disabled')
+            sequenceTrackToggle.style.display = 'none'
+            refSeqGenesTrackToggle.style.display = 'none'
         } else {
-            document.querySelector('#hic-toggle-sequence-track').removeAttribute('disabled')
-            document.querySelector('#hic-toggle-ref-seq-genes-track').removeAttribute('disabled')
+            sequenceTrackToggle.style.display = 'block'
+            refSeqGenesTrackToggle.style.display = 'block'
         }
-
-        // if (undefined === data.sequence) {
-        //     console.log(`Sequence and Gene Track. I noticed the genome changed to NO_GENOME`)
-        // } else {
-        //     console.log(`Sequence and Gene Track. I noticed the genome changed ${ data.id }`)
-        // }
 
     }
 
     hic.EventBus.globalBus.subscribe("GenomeChange", listener)
 
-}
-
-function findTrackPairWithFormat(trackPairs, format) {
-
-    for (const trackPair of trackPairs) {
-        if (format === trackPair.track.format) {
-            return trackPair
-        }
-    }
-
-    return undefined
 }
 
 function createAnnotationDatalistModals(root) {
