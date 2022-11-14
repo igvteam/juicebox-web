@@ -47,7 +47,7 @@ function initializationHelper(container, config) {
         $('#hic-track-dropdown-dropbox-button'),
         config.googleEnabled,
         $('#hic-track-dropdown-google-drive-button'),
-        ['hic-encode-signal-modal', 'hic-encode-other-modal'],
+        ['hic-app-encode-signals-chip-modal', 'hic-app-encode-signals-other-modal', 'hic-app-encode-others-modal'],
         'track-load-url-modal',
         undefined,
         undefined,
