@@ -136,7 +136,9 @@ function configureSequenceAndRefSeqGeneTrackToggle() {
     // sequence track
     const sequenceTrackToggle = document.querySelector('#hic-toggle-sequence-track')
     sequenceTrackToggle.addEventListener('click', async () => {
-        await hic.getCurrentBrowser().loadTracks([ { type: 'sequence', format: 'sequence' } ])
+        const browser = hic.getCurrentBrowser()
+        const { file, indexFile } = browser.genome.sequence
+        await browser.loadTracks([ { url: file, indexURL: indexFile } ])
     })
 
     // ref seq gene track
