@@ -1,11 +1,13 @@
 import {GenericDataSource, ModalTable} from '../node_modules/data-modal/dist/data-modal.js'
 import {FileUtils, GooglePicker} from '../node_modules/igv-utils/src/index.js';
 import {aidenLabContactMapDatasourceConfigurator} from './aidenLabContactMapDatasourceConfig.js'
-import {encodeContactMapDatasourceConfiguration} from "./encodeContactMapDatasourceConfig.js"
+import {encodeContactMapDatasourceConfiguration} from './encodeContactMapDatasourceConfig.js'
+import { fourdnContactMapDatasourceConfiguration } from './fourdnContactMapDatasourceConfig.js';
 
 let mapType = undefined;
-let encodeHostedContactMapModal;
 let contactMapModal;
+let encodeHostedContactMapModal;
+let fourdnContactMapModal;
 
 function configureContactMapLoaders({
                                         rootContainer,
@@ -14,6 +16,7 @@ function configureContactMapLoaders({
                                         urlLoadModalId,
                                         dataModalId,
                                         encodeHostedModalId,
+                                        fourdnModalId,
                                         $dropboxButtons,
                                         $googleDriveButtons,
                                         googleEnabled,
@@ -111,24 +114,34 @@ function configureContactMapLoaders({
         contactMapModal.setDatasource(datasource)
     }
 
-
     const encodeModalTableConfig =
         {
             id: encodeHostedModalId,
             title: 'ENCODE Hosted Contact Map',
             selectionStyle: 'single',
             pageLength: 10,
-            okHandler: async ([{HREF, Description, nvi}]) => {
+            okHandler: async ([{ HREF, Description }]) => {
                 const urlPrefix = 'https://www.encodeproject.org'
                 const path = `${urlPrefix}${HREF}`
-                await loadHandler(path, Description, nvi, mapType)
+                await loadHandler(path, Description, mapType)
             }
         }
 
     encodeHostedContactMapModal = new ModalTable(encodeModalTableConfig)
+    encodeHostedContactMapModal.setDatasource( new GenericDataSource(encodeContactMapDatasourceConfiguration) )
 
-    const datasource = new GenericDataSource(encodeContactMapDatasourceConfiguration)
-    encodeHostedContactMapModal.setDatasource(datasource)
+
+    const fourdnModalTableConfig =
+        {
+            id: fourdnModalId,
+            title: '4DN Hosted Contact Map',
+            selectionStyle: 'single',
+            pageLength: 10,
+            okHandler: async ([{ url } ]) => await loadHandler(url, 'unnamed', mapType)
+        }
+
+    fourdnContactMapModal = new ModalTable(fourdnModalTableConfig)
+    fourdnContactMapModal.setDatasource( new GenericDataSource(fourdnContactMapDatasourceConfiguration) )
 
 }
 

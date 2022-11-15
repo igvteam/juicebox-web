@@ -66,11 +66,12 @@ function initializationHelper(container, config) {
             urlLoadModalId: 'hic-load-url-modal',
             dataModalId: 'hic-contact-map-modal',
             encodeHostedModalId: 'hic-encode-hosted-contact-map-modal',
+            fourdnModalId: 'hic-4dn-contact-map-modal',
             $dropboxButtons: $dropdowns.find('div[id$="-map-dropdown-dropbox-button"]'),
             $googleDriveButtons: $dropdowns.find('div[id$="-map-dropdown-google-drive-button"]'),
             googleEnabled: config.googleEnabled,
             mapMenu: config.mapMenu,
-            loadHandler: (path, name, nvi, mapType) => loadHicFile(path, name, nvi, mapType)
+            loadHandler: (path, name, mapType) => loadHicFile(path, name, mapType)
         };
 
     configureContactMapLoaders(contactMapLoadConfig);
@@ -275,7 +276,7 @@ function loadTracks(tracks) {
     hic.getCurrentBrowser().loadTracks(tracks);
 }
 
-async function loadHicFile(url, name, nvi, mapType) {
+async function loadHicFile(url, name, mapType) {
 
     try {
         const isControl = ('control-map' === mapType)
@@ -283,7 +284,6 @@ async function loadHicFile(url, name, nvi, mapType) {
             {
                 url,
                 name,
-                nvi,
                 isControl
             };
 
