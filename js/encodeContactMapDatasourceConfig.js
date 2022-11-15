@@ -13,7 +13,7 @@ const encodeContactMapDatasourceConfiguration =
                 'Lab',
                 'Accession',
                 'Experiment',
-                'nvi'
+                // 'nvi'
             ],
     }
 
