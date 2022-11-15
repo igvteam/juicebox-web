@@ -118,10 +118,10 @@ function configureContactMapLoaders({
             title: 'ENCODE Hosted Contact Map',
             selectionStyle: 'single',
             pageLength: 10,
-            okHandler: async ([{HREF, Description}]) => {
+            okHandler: async ([{HREF, Description, nvi}]) => {
                 const urlPrefix = 'https://www.encodeproject.org'
                 const path = `${urlPrefix}${HREF}`
-                await loadHandler(path, Description, mapType)
+                await loadHandler(path, Description, nvi, mapType)
             }
         }
 
