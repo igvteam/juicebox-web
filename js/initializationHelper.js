@@ -70,7 +70,7 @@ function initializationHelper(container, config) {
             $googleDriveButtons: $dropdowns.find('div[id$="-map-dropdown-google-drive-button"]'),
             googleEnabled: config.googleEnabled,
             mapMenu: config.mapMenu,
-            loadHandler: (path, name, mapType) => loadHicFile(path, name, mapType)
+            loadHandler: (path, name, nvi, mapType) => loadHicFile(path, name, nvi, mapType)
         };
 
     configureContactMapLoaders(contactMapLoadConfig);
@@ -275,13 +275,19 @@ function loadTracks(tracks) {
     hic.getCurrentBrowser().loadTracks(tracks);
 }
 
-async function loadHicFile(url, name, mapType) {
+async function loadHicFile(url, name, nvi, mapType) {
 
     try {
-        const isControl = ('control-map' === mapType);
-        const browser = hic.getCurrentBrowser();
-        const config = {url, name, isControl};
+        const isControl = ('control-map' === mapType)
+        const config =
+            {
+                url,
+                name,
+                nvi,
+                isControl
+            };
 
+        const browser = hic.getCurrentBrowser()
         if (isControl) {
             await browser.loadHicControlFile(config)
         } else {
