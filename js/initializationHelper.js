@@ -319,25 +319,29 @@ async function loadAnnotationDatalist($datalist, url, type) {
     } catch (e) {
         if (404 === e) {
             //  This is an expected condition, not all assemblies have track menus
-            console.warn(`No track menu found ${url}`);
+            console.warn(`No track menu found ${url}`)
+            return
         } else {
             console.log(`Error loading track menu: ${url} ${e}`);
             AlertSingleton.present(`Error loading track menu: ${url} ${e}`);
         }
     }
 
-    let lines = data ? StringUtils.splitLines(data) : [];
+    let lines = data ? StringUtils.splitLines(data) : []
     if (lines.length > 0) {
 
         for (let line of lines) {
 
-            const tokens = line.split('\t');
+            if ('' !== line) {
+                const tokens = line.split('\t');
 
-            if (tokens.length > 1) {
-                const [label, value] = tokens;
-                $datalist.append($(`<option data-url="${value}">${label}</option>`));
+                if (tokens.length > 1) {
+                    const [label, value] = tokens;
+                    $datalist.append($(`<option data-url="${value}">${label}</option>`));
 
+                }
             }
+
         }
     }
 
