@@ -93,7 +93,7 @@ function initializationHelper(container, config) {
         }
     });
 
-    const genomeChangeListener = ({ data }) => {
+    const genomeChangeListener = async ({ data }) => {
 
         if (currentGenomeId !== data.id) {
 
@@ -102,15 +102,24 @@ function initializationHelper(container, config) {
             if (config.trackMenu) {
 
                 let tracksURL = config.trackMenu.items.replace("$GENOME_ID", data.id);
-                loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
+                await loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
             }
 
             if (config.trackMenu2D) {
                 let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", data.id);
-                loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
+                await loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
             }
 
-            updateTrackMenus(data.id, undefined, config.trackRegistryFile, $('#hic-track-dropdown-menu'))
+
+            const response = await fetch(config.trackRegistryFile)
+            const hash = await response.json()
+
+            const $dropdownMenu = $('#hic-track-dropdown-menu')
+
+            if (hash[ data.id ]) {
+                updateTrackMenus(data.id, undefined, config.trackRegistryFile, $dropdownMenu)
+            }
+
 
         }
     }
@@ -308,9 +317,9 @@ async function loadAnnotationDatalist($datalist, url, type) {
     try {
         data = await igvxhr.loadString(url);
     } catch (e) {
-        if (e.message.includes("404")) {
+        if (404 === e) {
             //  This is an expected condition, not all assemblies have track menus
-            console.log(`No track menu found ${url}`);
+            console.warn(`No track menu found ${url}`);
         } else {
             console.log(`Error loading track menu: ${url} ${e}`);
             AlertSingleton.present(`Error loading track menu: ${url} ${e}`);
