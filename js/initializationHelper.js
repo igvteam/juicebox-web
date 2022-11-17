@@ -138,8 +138,8 @@ function configureSequenceAndRefSeqGeneTrackToggle() {
     const sequenceTrackToggle = document.querySelector('#hic-toggle-sequence-track')
     sequenceTrackToggle.addEventListener('click', async () => {
         const browser = hic.getCurrentBrowser()
-        const { file, indexFile } = browser.genome.sequence
-        await browser.loadTracks([ { url: file, indexURL: indexFile } ])
+        const { config } = browser.genome
+        await browser.loadTracks([ config ])
     })
 
     // ref seq gene track
@@ -147,17 +147,16 @@ function configureSequenceAndRefSeqGeneTrackToggle() {
     refSeqGenesTrackToggle.addEventListener('click', async () => {
 
         const browser = hic.getCurrentBrowser()
-        const trackConfigs = browser.getGenomeTrackConfigurations(browser.dataset.genomeId)
-
-        if (trackConfigs) {
-            await browser.loadTracks(trackConfigs)
+        const { config } = browser.genome
+        if (config.track) {
+            await browser.loadTracks([ config.track ])
         }
 
     })
 
     const listener = ({ data }) => {
 
-        if (undefined === data.sequence) {
+        if (undefined === data.config) {
             sequenceTrackToggle.style.display = 'none'
             refSeqGenesTrackToggle.style.display = 'none'
         } else {
