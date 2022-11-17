@@ -1,3 +1,11 @@
+#hic-toggle-sequence-track {
+  padding-left: 0;
+}
+
+#hic-toggle-ref-seq-genes-track {
+  padding-left: 0;
+}
+
 #hic-share-url-modal {
   color: #5f5f5f;
 }
