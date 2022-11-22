@@ -6,8 +6,9 @@
  */
 
 var juiceboxConfig = {
-    // width: 750,
-    // height: 750,
+
+    // genome:'https://igv.org/genomes/genomes.json',
+
     mapMenu: {
         id: 'contact-map-datalist',
         items: 'https://aidenlab.org/juicebox/res/hicfiles.json'
