@@ -16,6 +16,7 @@ import QRCode from "./qrcode.js";
 import configureContactMapLoaders from "./contactMapLoad.js";
 
 let currentGenomeId;
+let bigOleListOfGenomeDerivedTrackConfigurations = []
 
 function initializationHelper(container, config) {
 
@@ -99,6 +100,12 @@ function initializationHelper(container, config) {
 
             currentGenomeId = data.id
 
+            if (config.genome) {
+                const response = await fetch(config.genome)
+                const list = await response.json()
+                createBigOleListOfGenomeDerivedTrackConfigurations(currentGenomeId, list)
+            }
+
             if (config.trackMenu) {
 
                 let tracksURL = config.trackMenu.items.replace("$GENOME_ID", data.id);
@@ -109,7 +116,6 @@ function initializationHelper(container, config) {
                 let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", data.id);
                 await loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
             }
-
 
             const response = await fetch(config.trackRegistryFile)
             const hash = await response.json()
@@ -127,18 +133,27 @@ function initializationHelper(container, config) {
     hic.EventBus.globalBus.subscribe("GenomeChange", genomeChangeListener)
 
     hic.EventBus.globalBus.subscribe("BrowserSelect", event => updateControlMapDropdown(event.data))
+}
 
-    // hic.EventBus.globalBus.subscribe('TrackXYPairLoad', ({ data }) => {
-    //
-    //     if (data.track.format && 'refgene' === data.track.format) {
-    //         console.log(`TrackXYPairLoad with format(refgene) did load`)
-    //         document.querySelector('#hic-toggle-ref-seq-genes-track').checked = true
-    //     } else if (data.track.format && 'sequence' === data.track.format) {
-    //         console.log(`TrackXYPairLoad with format(sequence) did load`)
-    //         document.querySelector('#hic-toggle-sequence-track').checked = true
-    //     }
-    //
-    // })
+function createBigOleListOfGenomeDerivedTrackConfigurations(currentGenomeId, list) {
+
+    const genomeSpecific = list.filter(({ id }) => currentGenomeId === id)
+
+    const result = genomeSpecific.map(({ fastaURL, indexURL, tracks }) => {
+
+        return {
+                sequence:
+                    {
+                        fastaURL,
+                        indexURL
+                    },
+                annotations: tracks
+
+            }
+
+    })
+
+    return result
 }
 
 function configureSequenceAndRefSeqGeneTrackToggle() {
