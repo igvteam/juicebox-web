@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", async (event) => {
  * Initialize the app in the given container (dom element).
  *
  * @param container
- * @param embedded -- optional, if true initialize for embedding, essentially juicebox.js only with no "app" buttons
  * @returns {Promise<void>}
  */
 async function init(container) {
