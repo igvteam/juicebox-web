@@ -12,7 +12,8 @@ const encodeContactMapDatasourceConfiguration =
                 'TechRep',
                 'Lab',
                 'Accession',
-                'Experiment'
+                'Experiment',
+                // 'nvi'
             ],
     }
 

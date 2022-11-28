@@ -1,11 +1,10 @@
 /*
  * @author Jim Robinson Nov-2019
  */
-/*
- * @author Jim Robinson Nov-2019
- */
 
 var juiceboxConfig = {
+
+    genome:'https://igv.org/genomes/genomes.json',
 
     mapMenu: {
         id: 'contact-map-datalist',

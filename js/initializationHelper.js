@@ -16,8 +16,11 @@ import QRCode from "./qrcode.js";
 import configureContactMapLoaders from "./contactMapLoad.js";
 
 let currentGenomeId;
+let genomeDerivedTrackConfigurations = []
 
 function initializationHelper(container, config) {
+
+    configureSequenceAndRefSeqGeneTrackToggle()
 
     const $trackDropdownMenu = $('#hic-track-dropdown-menu')
 
@@ -45,7 +48,7 @@ function initializationHelper(container, config) {
         $('#hic-track-dropdown-dropbox-button'),
         config.googleEnabled,
         $('#hic-track-dropdown-google-drive-button'),
-        ['hic-encode-signal-modal', 'hic-encode-other-modal'],
+        ['hic-app-encode-signals-chip-modal', 'hic-app-encode-signals-other-modal', 'hic-app-encode-others-modal'],
         'track-load-url-modal',
         undefined,
         undefined,
@@ -54,7 +57,7 @@ function initializationHelper(container, config) {
 
     createAnnotationDatalistModals(container);
 
-    const $dropdowns = $('button[id$=-map-dropdown]').parent()
+    const $dropdowns = $('a[id$=-map-dropdown]').parent()
 
     const contactMapLoadConfig =
         {
@@ -64,6 +67,7 @@ function initializationHelper(container, config) {
             urlLoadModalId: 'hic-load-url-modal',
             dataModalId: 'hic-contact-map-modal',
             encodeHostedModalId: 'hic-encode-hosted-contact-map-modal',
+            fourdnModalId: 'hic-4dn-contact-map-modal',
             $dropboxButtons: $dropdowns.find('div[id$="-map-dropdown-dropbox-button"]'),
             $googleDriveButtons: $dropdowns.find('div[id$="-map-dropdown-google-drive-button"]'),
             googleEnabled: config.googleEnabled,
@@ -90,26 +94,38 @@ function initializationHelper(container, config) {
         }
     });
 
-    const genomeChangeListener = event => {
+    const genomeChangeListener = async ({ data }) => {
 
-        const { data:genomeId } = event;
+        if (currentGenomeId !== data.id) {
 
-        if (currentGenomeId !== genomeId) {
+            currentGenomeId = data.id
 
-            currentGenomeId = genomeId;
+            if (config.genome) {
+                const response = await fetch(config.genome)
+                const list = await response.json()
+                createGenomeDerivedTrackConfigurations(currentGenomeId, list)
+            }
 
             if (config.trackMenu) {
 
-                let tracksURL = config.trackMenu.items.replace("$GENOME_ID", genomeId);
-                loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
+                let tracksURL = config.trackMenu.items.replace("$GENOME_ID", data.id);
+                await loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
             }
 
             if (config.trackMenu2D) {
-                let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", genomeId);
-                loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
+                let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", data.id);
+                await loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
             }
 
-            updateTrackMenus(genomeId, undefined, config.trackRegistryFile, $('#hic-track-dropdown-menu'))
+            const response = await fetch(config.trackRegistryFile)
+            const hash = await response.json()
+
+            const $dropdownMenu = $('#hic-track-dropdown-menu')
+
+            if (hash[ data.id ]) {
+                updateTrackMenus(data.id, undefined, config.trackRegistryFile, $dropdownMenu)
+            }
+
 
         }
     }
@@ -117,6 +133,64 @@ function initializationHelper(container, config) {
     hic.EventBus.globalBus.subscribe("GenomeChange", genomeChangeListener)
 
     hic.EventBus.globalBus.subscribe("BrowserSelect", event => updateControlMapDropdown(event.data))
+}
+
+function createGenomeDerivedTrackConfigurations(currentGenomeId, list) {
+
+    const genomeSpecific = list.filter(({ id }) => currentGenomeId === id)
+
+    const result = genomeSpecific.map(({ fastaURL, indexURL, tracks }) => {
+
+        return {
+                sequence:
+                    {
+                        fastaURL,
+                        indexURL
+                    },
+                annotations: tracks
+
+            }
+
+    })
+
+    return result
+}
+
+function configureSequenceAndRefSeqGeneTrackToggle() {
+
+    // sequence track
+    const sequenceTrackToggle = document.querySelector('#hic-toggle-sequence-track')
+    sequenceTrackToggle.addEventListener('click', async () => {
+        const browser = hic.getCurrentBrowser()
+        const { config } = browser.genome
+        await browser.loadTracks([ config ])
+    })
+
+    // ref seq gene track
+    const refSeqGenesTrackToggle = document.querySelector('#hic-toggle-ref-seq-genes-track')
+    refSeqGenesTrackToggle.addEventListener('click', async () => {
+
+        const browser = hic.getCurrentBrowser()
+        const { config } = browser.genome
+        if (config.track) {
+            await browser.loadTracks([ config.track ])
+        }
+
+    })
+
+    const listener = ({ data }) => {
+
+        if (undefined === data.config) {
+            sequenceTrackToggle.style.display = 'none'
+            refSeqGenesTrackToggle.style.display = 'none'
+        } else {
+            sequenceTrackToggle.style.display = 'block'
+            refSeqGenesTrackToggle.style.display = 'block'
+        }
+
+    }
+
+    hic.EventBus.globalBus.subscribe("GenomeChange", listener)
 
 }
 
@@ -228,10 +302,15 @@ function loadTracks(tracks) {
 async function loadHicFile(url, name, mapType) {
 
     try {
-        const isControl = ('control-map' === mapType);
-        const browser = hic.getCurrentBrowser();
-        const config = {url, name, isControl};
+        const isControl = ('control-map' === mapType)
+        const config =
+            {
+                url,
+                name,
+                isControl
+            };
 
+        const browser = hic.getCurrentBrowser()
         if (isControl) {
             await browser.loadHicControlFile(config)
         } else {
@@ -253,27 +332,31 @@ async function loadAnnotationDatalist($datalist, url, type) {
     try {
         data = await igvxhr.loadString(url);
     } catch (e) {
-        if (e.message.includes("404")) {
+        if (404 === e) {
             //  This is an expected condition, not all assemblies have track menus
-            console.log(`No track menu found ${url}`);
+            console.warn(`No track menu found ${url}`)
+            return
         } else {
             console.log(`Error loading track menu: ${url} ${e}`);
             AlertSingleton.present(`Error loading track menu: ${url} ${e}`);
         }
     }
 
-    let lines = data ? StringUtils.splitLines(data) : [];
+    let lines = data ? StringUtils.splitLines(data) : []
     if (lines.length > 0) {
 
         for (let line of lines) {
 
-            const tokens = line.split('\t');
+            if ('' !== line) {
+                const tokens = line.split('\t');
 
-            if (tokens.length > 1) {
-                const [label, value] = tokens;
-                $datalist.append($(`<option data-url="${value}">${label}</option>`));
+                if (tokens.length > 1) {
+                    const [label, value] = tokens;
+                    $datalist.append($(`<option data-url="${value}">${label}</option>`));
 
+                }
             }
+
         }
     }
 
@@ -281,9 +364,9 @@ async function loadAnnotationDatalist($datalist, url, type) {
 
 function createAppCloneButton(container) {
 
-    $('.juicebox-app-clone-button').on('click', async () => {
+    document.querySelector('#juicebox-app-clone-button').addEventListener('click', async () => {
 
-        let browser = undefined;
+        let browser
         try {
             const { width, height } = hic.getCurrentBrowser().config
             browser = await hic.createBrowser(container, { width, height });
@@ -294,8 +377,7 @@ function createAppCloneButton(container) {
         if (browser) {
             hic.setCurrentBrowser(browser)
         }
-
-    });
+    })
 
 }
 
