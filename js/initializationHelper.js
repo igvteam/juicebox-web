@@ -16,7 +16,7 @@ import QRCode from "./qrcode.js";
 import configureContactMapLoaders from "./contactMapLoad.js";
 
 let currentGenomeId;
-let bigOleListOfGenomeDerivedTrackConfigurations = []
+let genomeDerivedTrackConfigurations = []
 
 function initializationHelper(container, config) {
 
@@ -103,7 +103,7 @@ function initializationHelper(container, config) {
             if (config.genome) {
                 const response = await fetch(config.genome)
                 const list = await response.json()
-                createBigOleListOfGenomeDerivedTrackConfigurations(currentGenomeId, list)
+                createGenomeDerivedTrackConfigurations(currentGenomeId, list)
             }
 
             if (config.trackMenu) {
@@ -135,7 +135,7 @@ function initializationHelper(container, config) {
     hic.EventBus.globalBus.subscribe("BrowserSelect", event => updateControlMapDropdown(event.data))
 }
 
-function createBigOleListOfGenomeDerivedTrackConfigurations(currentGenomeId, list) {
+function createGenomeDerivedTrackConfigurations(currentGenomeId, list) {
 
     const genomeSpecific = list.filter(({ id }) => currentGenomeId === id)
 
