@@ -13,7 +13,7 @@ import {
     googleDriveDropdownItem
 } from '../node_modules/igv-widgets/dist/igv-widgets.js'
 
-import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
+import hic from "../node_modules/juicebox.js/js/index.js";
 import QRCode from "./qrcode.js";
 import configureContactMapLoaders from "./contactMapLoad.js";
 
@@ -158,24 +158,38 @@ function createGenomeDerivedTrackConfigurations(currentGenomeId, list) {
     return result
 }
 
+let sequenceTrack
+let refSeqGenesTrack
 function configureSequenceAndRefSeqGeneTrackToggle() {
 
-    // sequence track
-    const sequenceTrackToggle = document.querySelector('#hic-toggle-sequence-track')
-    sequenceTrackToggle.addEventListener('click', async () => {
-        const browser = hic.getCurrentBrowser()
-        const { config } = browser.genome
-        await browser.loadTracks([ config ])
+    const sequenceTrackCheckbox = document.querySelector('#hic-sequence-track-checkbox')
+
+    sequenceTrackCheckbox.addEventListener('change', async e => {
+
+        if(e.target.checked){
+            const browser = hic.getCurrentBrowser()
+            const { config } = browser.genome
+            await browser.loadTracks([ config ])
+            e.target.disabled = 'disabled'
+        } else {
+            console.log('sequence track is toggled OFF')
+        }
+
     })
 
-    // ref seq gene track
-    const refSeqGenesTrackToggle = document.querySelector('#hic-toggle-ref-seq-genes-track')
-    refSeqGenesTrackToggle.addEventListener('click', async () => {
+    const refSeqGenesTrackCheckbox = document.querySelector('#hic-ref-seq-genes-track-checkbox')
 
-        const browser = hic.getCurrentBrowser()
-        const { config } = browser.genome
-        if (config.track) {
-            await browser.loadTracks([ config.track ])
+    refSeqGenesTrackCheckbox.addEventListener('change', async e => {
+
+        if(e.target.checked){
+            const browser = hic.getCurrentBrowser()
+            const { config } = browser.genome
+            if (config.track) {
+                await browser.loadTracks([ config.track ])
+                e.target.disabled = 'disabled'
+            }
+        } else {
+            console.log('ref seq gene track is toggled OFF')
         }
 
     })
@@ -183,16 +197,49 @@ function configureSequenceAndRefSeqGeneTrackToggle() {
     const listener = ({ data }) => {
 
         if (undefined === data.config) {
-            sequenceTrackToggle.style.display = 'none'
-            refSeqGenesTrackToggle.style.display = 'none'
+            sequenceTrackCheckbox.disabled = 'disabled'
+            refSeqGenesTrackCheckbox.disabled = 'disabled'
         } else {
-            sequenceTrackToggle.style.display = 'block'
-            refSeqGenesTrackToggle.style.display = 'block'
+            sequenceTrackCheckbox.disabled = ''
+            refSeqGenesTrackCheckbox.disabled = ''
+
+            sequenceTrackCheckbox.checked = false
+            refSeqGenesTrackCheckbox.checked = false
         }
 
     }
 
     hic.EventBus.globalBus.subscribe("GenomeChange", listener)
+
+    const seqListener = ({ data }) => {
+        console.log('Did load sequence track')
+        sequenceTrackCheckbox.disabled = 'disabled'
+        sequenceTrackCheckbox.checked = false
+    }
+
+    hic.EventBus.globalBus.subscribe("DidLoadSequenceTrack", seqListener)
+
+    const refGeneListener = ({ data }) => {
+        console.log('Did load ref gene track')
+        refSeqGenesTrackCheckbox.disabled = 'disabled'
+        refSeqGenesTrackCheckbox.checked = false
+    }
+
+    hic.EventBus.globalBus.subscribe("DidLoadRefGeneTrack", refGeneListener)
+
+    const trackPairListener = ({ data }) => {
+
+        if ('refgene' === data.track.config.format) {
+            refSeqGenesTrackCheckbox.disabled = ''
+            refSeqGenesTrackCheckbox.checked = false
+        } else if ('sequence' === data.track.config.format) {
+            sequenceTrackCheckbox.disabled = ''
+            sequenceTrackCheckbox.checked = false
+        }
+
+    }
+
+    hic.EventBus.globalBus.subscribe("DidRemoveTrackPair", trackPairListener)
 
 }
 
