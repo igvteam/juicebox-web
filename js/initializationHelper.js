@@ -11,7 +11,7 @@ import {
     googleDriveDropdownItem
 } from '../node_modules/igv-widgets/dist/igv-widgets.js'
 
-import hic from "../node_modules/juicebox.js/js/index.js";
+import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
 import QRCode from "./qrcode.js";
 import configureContactMapLoaders from "./contactMapLoad.js";
 
@@ -183,6 +183,7 @@ function configureSequenceAndRefSeqGeneTrackToggle() {
             const browser = hic.getCurrentBrowser()
             const { config } = browser.genome
             if (config.track) {
+                config.track.removable = true
                 await browser.loadTracks([ config.track ])
                 e.target.disabled = 'disabled'
             }
