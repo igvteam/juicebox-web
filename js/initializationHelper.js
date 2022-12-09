@@ -158,21 +158,24 @@ function createGenomeDerivedTrackConfigurations(currentGenomeId, list) {
     return result
 }
 
-let sequenceTrack
-let refSeqGenesTrack
+let sequenceTrackXYPair
+let refSeqGenesTrackXYPair
 function configureSequenceAndRefSeqGeneTrackToggle() {
 
     const sequenceTrackCheckbox = document.querySelector('#hic-sequence-track-checkbox')
 
     sequenceTrackCheckbox.addEventListener('change', async e => {
 
+        const browser = hic.getCurrentBrowser()
+
         if(e.target.checked){
-            const browser = hic.getCurrentBrowser()
+
             const { config } = browser.genome
+            config.removable = false
             await browser.loadTracks([ config ])
-            e.target.disabled = 'disabled'
+
         } else {
-            console.log('sequence track is toggled OFF')
+            browser.layoutController.removeTrackXYPair(sequenceTrackXYPair)
         }
 
     })
@@ -181,20 +184,58 @@ function configureSequenceAndRefSeqGeneTrackToggle() {
 
     refSeqGenesTrackCheckbox.addEventListener('change', async e => {
 
+        const browser = hic.getCurrentBrowser()
+
         if(e.target.checked){
-            const browser = hic.getCurrentBrowser()
+
             const { config } = browser.genome
             if (config.track) {
+                config.track.removable = false
                 await browser.loadTracks([ config.track ])
-                e.target.disabled = 'disabled'
             }
         } else {
-            console.log('ref seq gene track is toggled OFF')
+            browser.layoutController.removeTrackXYPair(refSeqGenesTrackXYPair)
         }
 
     })
 
-    const listener = ({ data }) => {
+    const trackXYPairLoadListener = ({ data }) => {
+
+        console.log(`did load trackXYPair with track(${ data.track.name })`)
+
+        if ('refgene' === data.track.config.format) {
+            refSeqGenesTrackCheckbox.disabled = ''
+            refSeqGenesTrackCheckbox.checked = true
+            refSeqGenesTrackXYPair = data
+        } else if ('sequence' === data.track.config.format) {
+            sequenceTrackCheckbox.disabled = ''
+            sequenceTrackCheckbox.checked = true
+            sequenceTrackXYPair = data
+        }
+
+    }
+
+    hic.EventBus.globalBus.subscribe("TrackXYPairLoad", trackXYPairLoadListener)
+
+    const trackXYPairRemovalListener = ({ data }) => {
+
+        console.log(`did remove trackXYPair with track(${ data.track.name })`)
+
+        if ('refgene' === data.track.config.format) {
+            refSeqGenesTrackCheckbox.disabled = ''
+            refSeqGenesTrackCheckbox.checked = false
+            refSeqGenesTrackXYPair = undefined
+        } else if ('sequence' === data.track.config.format) {
+            sequenceTrackCheckbox.disabled = ''
+            sequenceTrackCheckbox.checked = false
+            sequenceTrackXYPair = undefined
+        }
+
+    }
+
+    hic.EventBus.globalBus.subscribe("TrackXYPairRemoval", trackXYPairRemovalListener)
+
+    const genomeChangeListener = ({ data }) => {
 
         if (undefined === data.config) {
             sequenceTrackCheckbox.disabled = 'disabled'
@@ -209,37 +250,7 @@ function configureSequenceAndRefSeqGeneTrackToggle() {
 
     }
 
-    hic.EventBus.globalBus.subscribe("GenomeChange", listener)
-
-    const seqListener = ({ data }) => {
-        console.log('Did load sequence track')
-        sequenceTrackCheckbox.disabled = 'disabled'
-        sequenceTrackCheckbox.checked = false
-    }
-
-    hic.EventBus.globalBus.subscribe("DidLoadSequenceTrack", seqListener)
-
-    const refGeneListener = ({ data }) => {
-        console.log('Did load ref gene track')
-        refSeqGenesTrackCheckbox.disabled = 'disabled'
-        refSeqGenesTrackCheckbox.checked = false
-    }
-
-    hic.EventBus.globalBus.subscribe("DidLoadRefGeneTrack", refGeneListener)
-
-    const trackPairListener = ({ data }) => {
-
-        if ('refgene' === data.track.config.format) {
-            refSeqGenesTrackCheckbox.disabled = ''
-            refSeqGenesTrackCheckbox.checked = false
-        } else if ('sequence' === data.track.config.format) {
-            sequenceTrackCheckbox.disabled = ''
-            sequenceTrackCheckbox.checked = false
-        }
-
-    }
-
-    hic.EventBus.globalBus.subscribe("DidRemoveTrackPair", trackPairListener)
+    hic.EventBus.globalBus.subscribe("GenomeChange", genomeChangeListener)
 
 }
 
