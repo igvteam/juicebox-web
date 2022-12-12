@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 const fs = require('fs-extra');
-const templatePath =  __dirname + '/../index.html';
+const templatePath =  __dirname + '/../index_aiden_lab.html';
 const pj = require.resolve('../package.json');
 const jsonText = fs.readFileSync(pj, 'utf-8');
 const version = JSON.parse(jsonText).version;
 
 const lines = fs.readFileSync(templatePath, 'utf-8').split(/\r?\n/);
 
-const outputFileName = process.argv.length > 3 ? process.argv[3] : 'juicebox.html'
+const outputFileName = process.argv.length > 3 ? process.argv[3] : 'aidenLab.html'
 
 const out = __dirname + '/../dist/' + outputFileName;
 const fd = fs.openSync(out, 'w');
