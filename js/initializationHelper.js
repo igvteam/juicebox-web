@@ -17,8 +17,8 @@ import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js"
 import QRCode from "./qrcode.js";
 import configureContactMapLoaders from "./contactMapLoad.js";
 
-let currentGenomeId;
-let genomeDerivedTrackConfigurations = []
+let currentGenomeId
+let genomeDerivedTrackConfigurations
 
 function initializationHelper(container, config) {
 
@@ -98,24 +98,24 @@ function initializationHelper(container, config) {
 
     const genomeChangeListener = async ({ data }) => {
 
-        if (currentGenomeId !== data.id) {
+        if (currentGenomeId !== data) {
 
-            currentGenomeId = data.id
+            currentGenomeId = data
 
             if (config.genome) {
                 const response = await fetch(config.genome)
                 const list = await response.json()
-                createGenomeDerivedTrackConfigurations(currentGenomeId, list)
+                genomeDerivedTrackConfigurations = createGenomeDerivedTrackConfigurations(currentGenomeId, list)
             }
 
             if (config.trackMenu) {
 
-                let tracksURL = config.trackMenu.items.replace("$GENOME_ID", data.id);
+                let tracksURL = config.trackMenu.items.replace("$GENOME_ID", data);
                 await loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
             }
 
             if (config.trackMenu2D) {
-                let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", data.id);
+                let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", data);
                 await loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
             }
 
@@ -124,8 +124,8 @@ function initializationHelper(container, config) {
 
             const $dropdownMenu = $('#hic-track-dropdown-menu')
 
-            if (hash[ data.id ]) {
-                updateTrackMenus(data.id, undefined, config.trackRegistryFile, $dropdownMenu)
+            if (hash[ data ]) {
+                updateTrackMenus(data, undefined, config.trackRegistryFile, $dropdownMenu)
             }
 
 
@@ -141,12 +141,12 @@ function createGenomeDerivedTrackConfigurations(currentGenomeId, list) {
 
     const genomeSpecific = list.filter(({ id }) => currentGenomeId === id)
 
-    const result = genomeSpecific.map(({ fastaURL, indexURL, tracks }) => {
+    const [ result ] =  genomeSpecific.map(({ fastaURL, indexURL, tracks }) => {
 
         return {
                 sequence:
                     {
-                        fastaURL,
+                        url:fastaURL,
                         indexURL
                     },
                 annotations: tracks
@@ -169,9 +169,8 @@ function configureSequenceAndRefSeqGeneTrackToggle() {
         const browser = hic.getCurrentBrowser()
 
         if(e.target.checked){
-
-            const { config } = browser.genome
-            config.removable = false
+            const { sequence } = genomeDerivedTrackConfigurations
+            const config = Object.assign({ removable: false }, sequence)
             await browser.loadTracks([ config ])
 
         } else {
@@ -188,10 +187,11 @@ function configureSequenceAndRefSeqGeneTrackToggle() {
 
         if(e.target.checked){
 
-            const { config } = browser.genome
-            if (config.track) {
-                config.track.removable = false
-                await browser.loadTracks([ config.track ])
+            const { annotations } = genomeDerivedTrackConfigurations
+
+            if (annotations && annotations.length > 0) {
+                const config = Object.assign({ removable: false }, annotations[ 0 ])
+                await browser.loadTracks([ config ])
             }
         } else {
             browser.layoutController.removeTrackXYPair(refSeqGenesTrackXYPair)
@@ -237,16 +237,11 @@ function configureSequenceAndRefSeqGeneTrackToggle() {
 
     const genomeChangeListener = ({ data }) => {
 
-        if (undefined === data.config) {
-            sequenceTrackCheckbox.disabled = 'disabled'
-            refSeqGenesTrackCheckbox.disabled = 'disabled'
-        } else {
-            sequenceTrackCheckbox.disabled = ''
-            refSeqGenesTrackCheckbox.disabled = ''
+        sequenceTrackCheckbox.disabled = ''
+        refSeqGenesTrackCheckbox.disabled = ''
 
-            sequenceTrackCheckbox.checked = false
-            refSeqGenesTrackCheckbox.checked = false
-        }
+        sequenceTrackCheckbox.checked = false
+        refSeqGenesTrackCheckbox.checked = false
 
     }
 
