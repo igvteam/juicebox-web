@@ -137,7 +137,10 @@ function configureContactMapLoaders({
             title: '4DN Hosted Contact Map',
             selectionStyle: 'single',
             pageLength: 10,
-            okHandler: async ([{ url } ]) => await loadHandler(url, 'unnamed', mapType)
+            okHandler: async ([ item ]) => {
+                const { url, Dataset } = item
+                await loadHandler(url, Dataset, mapType)
+            }
         }
 
     fourdnContactMapModal = new ModalTable(fourdnModalTableConfig)
