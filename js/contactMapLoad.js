@@ -1,5 +1,8 @@
-import {GenericDataSource, ModalTable} from '../node_modules/data-modal/dist/data-modal.js'
-import {FileUtils, GooglePicker} from '../node_modules/igv-utils/src/index.js';
+import GenericDataSource from "../node_modules/data-modal/src/genericDataSource.js";
+import ModalTable from "../node_modules/data-modal/src/modalTable.js";
+
+import * as GooglePicker from '../node_modules/google-utils/src/googleFilePicker.js'
+import * as FileUtils from '../node_modules/igv-utils/src/fileUtils.js'
 import {aidenLabContactMapDatasourceConfigurator} from './aidenLabContactMapDatasourceConfig.js'
 import {encodeContactMapDatasourceConfiguration} from './encodeContactMapDatasourceConfig.js'
 import { fourdnContactMapDatasourceConfiguration } from './fourdnContactMapDatasourceConfig.js';

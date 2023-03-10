@@ -21,14 +21,14 @@
  *
  */
 
-import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
-import {GoogleAuth} from '../node_modules/igv-utils/src/index.js'
+import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js"
+import * as GoogleAuth from '../node_modules/google-utils/src/googleAuth.js'
 import {AlertSingleton} from '../node_modules/igv-widgets/dist/igv-widgets.js'
-import { initializationHelper}  from "./initializationHelper.js"
+import {initializationHelper} from "./initializationHelper.js"
 
 document.addEventListener("DOMContentLoaded", async (event) => {
-    await init(document.getElementById('app-container'));
-});
+    await init(document.getElementById('app-container'))
+})
 
 /**
  * Initialize the app in the given container (dom element).
@@ -40,10 +40,10 @@ async function init(container) {
 
     AlertSingleton.init(container)
 
-    const config = window.juiceboxConfig || {};   // From script include.  Optional.
+    const config = window.juiceboxConfig || {}   // From script include.  Optional.
 
-    const google = config.google;
-    config.googleEnabled = google && (window.location.protocol === "https:" || window.location.host === "localhost")
+    const google = config.google
+    config.googleEnabled = google && (window.location.protocol === "https:" || window.location.host.startsWith("localhost"))
     if (config.googleEnabled) {
         try {
             await GoogleAuth.init({
@@ -51,7 +51,7 @@ async function init(container) {
                 apiKey: google.apiKey,
                 scope: 'https://www.googleapis.com/auth/userinfo.profile'
             })
-            await GoogleAuth.signOut();   // The await is important !!!
+            await GoogleAuth.signOut()   // The await is important !!!
         } catch (e) {
             console.error(e)
             AlertSingleton.present(e.message)

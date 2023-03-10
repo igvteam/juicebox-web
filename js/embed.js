@@ -2,12 +2,12 @@
  * Target for rollup to create babelized juicebox for embed.html
  */
 
-import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
-import {GoogleAuth} from "../node_modules/igv-utils/src/index.js"
+import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js"
+import * as GoogleAuth from "../node_modules/google-utils/src/googleAuth.js"
 
 async function init(container, config) {
 
-    const google = config.google;
+    const google = config.google
     config.googleEnabled = google && (window.location.protocol === "https:" || window.location.host === "localhost")
     if (config.googleEnabled) {
         try {
@@ -25,4 +25,5 @@ async function init(container, config) {
     await hic.init(container, config)
 
 }
-export default {init};
+
+export default {init}

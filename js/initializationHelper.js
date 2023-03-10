@@ -1,4 +1,6 @@
-import {StringUtils, URLShortener, igvxhr} from '../node_modules/igv-utils/src/index.js'
+import {loadString} from "./stringLoader.js"
+import * as StringUtils from '../node_modules/igv-utils/src/stringUtils.js'
+
 
 import {
     AlertSingleton,
@@ -330,7 +332,7 @@ async function loadAnnotationDatalist($datalist, url, type) {
     let data = undefined;
 
     try {
-        data = await igvxhr.loadString(url);
+        data = await loadString(url);
     } catch (e) {
         if (404 === e) {
             //  This is an expected condition, not all assemblies have track menus
@@ -540,11 +542,27 @@ function updateControlMapDropdown(browser) {
     }
 }
 
-const urlShortener = URLShortener.getShortener({provider: "tinyURL"});
+/**
+ * Shorten the url
+ *
+ * TODO -- this should be configurable
+ * * *
+ * @param url
+ * @returns {Promise<string>}
+ */
+async function shortenURL (url) {
+    const enc = encodeURIComponent(url)
+    const response = await fetch(`https://2et6uxfezb.execute-api.us-east-1.amazonaws.com/dev/tinyurl/${enc}`)
+    if (response.ok) {
+        return response.text()
+    } else {
+        throw new Error(response.statusText)
+    }
+}
 
 async function shortJuiceboxURL(base) {
     const url = `${base}?${hic.compressedSession()}`;
-    return urlShortener.shortenURL(url);
+    return shortenURL(url);
 }
 
 export { initializationHelper }
