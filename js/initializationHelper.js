@@ -98,9 +98,9 @@ function initializationHelper(container, config) {
 
     const genomeChangeListener = async ({ data }) => {
 
-        if (currentGenomeId !== data.id) {
+        if (currentGenomeId !== data) {
 
-            currentGenomeId = data.id
+            currentGenomeId = data
 
             if (config.genome) {
                 const response = await fetch(config.genome)
@@ -110,12 +110,12 @@ function initializationHelper(container, config) {
 
             if (config.trackMenu) {
 
-                let tracksURL = config.trackMenu.items.replace("$GENOME_ID", data.id);
+                let tracksURL = config.trackMenu.items.replace("$GENOME_ID", data);
                 await loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
             }
 
             if (config.trackMenu2D) {
-                let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", data.id);
+                let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", data);
                 await loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
             }
 
@@ -124,8 +124,8 @@ function initializationHelper(container, config) {
 
             const $dropdownMenu = $('#hic-track-dropdown-menu')
 
-            if (hash[ data.id ]) {
-                updateTrackMenus(data.id, undefined, config.trackRegistryFile, $dropdownMenu)
+            if (hash[ data ]) {
+                updateTrackMenus(data, undefined, config.trackRegistryFile, $dropdownMenu)
             }
 
 
