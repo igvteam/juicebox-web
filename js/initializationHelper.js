@@ -13,12 +13,12 @@ import {
     googleDriveDropdownItem
 } from '../node_modules/igv-widgets/dist/igv-widgets.js'
 
-import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js";
+import hic from "../node_modules/juicebox.js/dist/juicebox.esm.js"
 import QRCode from "./qrcode.js";
 import configureContactMapLoaders from "./contactMapLoad.js";
 
-let currentGenomeId;
-let genomeDerivedTrackConfigurations = []
+let currentGenomeId
+let genomeDerivedTrackConfigurations
 
 function initializationHelper(container, config) {
 
@@ -98,24 +98,24 @@ function initializationHelper(container, config) {
 
     const genomeChangeListener = async ({ data }) => {
 
-        if (currentGenomeId !== data.id) {
+        if (currentGenomeId !== data) {
 
-            currentGenomeId = data.id
+            currentGenomeId = data
 
             if (config.genome) {
                 const response = await fetch(config.genome)
                 const list = await response.json()
-                createGenomeDerivedTrackConfigurations(currentGenomeId, list)
+                genomeDerivedTrackConfigurations = createGenomeDerivedTrackConfigurations(currentGenomeId, list)
             }
 
             if (config.trackMenu) {
 
-                let tracksURL = config.trackMenu.items.replace("$GENOME_ID", data.id);
+                let tracksURL = config.trackMenu.items.replace("$GENOME_ID", data);
                 await loadAnnotationDatalist($(`#${config.trackMenu.id}`), tracksURL, "1D");
             }
 
             if (config.trackMenu2D) {
-                let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", data.id);
+                let annotations2dURL = config.trackMenu2D.items.replace("$GENOME_ID", data);
                 await loadAnnotationDatalist($(`#${config.trackMenu2D.id}`), annotations2dURL, "2D");
             }
 
@@ -124,8 +124,8 @@ function initializationHelper(container, config) {
 
             const $dropdownMenu = $('#hic-track-dropdown-menu')
 
-            if (hash[ data.id ]) {
-                updateTrackMenus(data.id, undefined, config.trackRegistryFile, $dropdownMenu)
+            if (hash[ data ]) {
+                updateTrackMenus(data, undefined, config.trackRegistryFile, $dropdownMenu)
             }
 
 
@@ -141,12 +141,12 @@ function createGenomeDerivedTrackConfigurations(currentGenomeId, list) {
 
     const genomeSpecific = list.filter(({ id }) => currentGenomeId === id)
 
-    const result = genomeSpecific.map(({ fastaURL, indexURL, tracks }) => {
+    const [ result ] =  genomeSpecific.map(({ fastaURL, indexURL, tracks }) => {
 
         return {
                 sequence:
                     {
-                        fastaURL,
+                        url:fastaURL,
                         indexURL
                     },
                 annotations: tracks
@@ -158,41 +158,94 @@ function createGenomeDerivedTrackConfigurations(currentGenomeId, list) {
     return result
 }
 
+let sequenceTrackXYPair
+let refSeqGenesTrackXYPair
 function configureSequenceAndRefSeqGeneTrackToggle() {
 
-    // sequence track
-    const sequenceTrackToggle = document.querySelector('#hic-toggle-sequence-track')
-    sequenceTrackToggle.addEventListener('click', async () => {
-        const browser = hic.getCurrentBrowser()
-        const { config } = browser.genome
-        await browser.loadTracks([ config ])
-    })
+    const sequenceTrackCheckbox = document.querySelector('#hic-sequence-track-checkbox')
 
-    // ref seq gene track
-    const refSeqGenesTrackToggle = document.querySelector('#hic-toggle-ref-seq-genes-track')
-    refSeqGenesTrackToggle.addEventListener('click', async () => {
+    sequenceTrackCheckbox.addEventListener('change', async e => {
 
         const browser = hic.getCurrentBrowser()
-        const { config } = browser.genome
-        if (config.track) {
-            await browser.loadTracks([ config.track ])
+
+        if(e.target.checked){
+            const { sequence } = genomeDerivedTrackConfigurations
+            const config = Object.assign({ removable: false }, sequence)
+            await browser.loadTracks([ config ])
+
+        } else {
+            browser.layoutController.removeTrackXYPair(sequenceTrackXYPair)
         }
 
     })
 
-    const listener = ({ data }) => {
+    const refSeqGenesTrackCheckbox = document.querySelector('#hic-ref-seq-genes-track-checkbox')
 
-        if (undefined === data.config) {
-            sequenceTrackToggle.style.display = 'none'
-            refSeqGenesTrackToggle.style.display = 'none'
+    refSeqGenesTrackCheckbox.addEventListener('change', async e => {
+
+        const browser = hic.getCurrentBrowser()
+
+        if(e.target.checked){
+
+            const { annotations } = genomeDerivedTrackConfigurations
+
+            if (annotations && annotations.length > 0) {
+                const config = Object.assign({ removable: false }, annotations[ 0 ])
+                await browser.loadTracks([ config ])
+            }
         } else {
-            sequenceTrackToggle.style.display = 'block'
-            refSeqGenesTrackToggle.style.display = 'block'
+            browser.layoutController.removeTrackXYPair(refSeqGenesTrackXYPair)
+        }
+
+    })
+
+    const trackXYPairLoadListener = ({ data }) => {
+
+        console.log(`did load trackXYPair with track(${ data.track.name })`)
+
+        if ('refgene' === data.track.config.format) {
+            refSeqGenesTrackCheckbox.disabled = ''
+            refSeqGenesTrackCheckbox.checked = true
+            refSeqGenesTrackXYPair = data
+        } else if ('sequence' === data.track.config.format) {
+            sequenceTrackCheckbox.disabled = ''
+            sequenceTrackCheckbox.checked = true
+            sequenceTrackXYPair = data
         }
 
     }
 
-    hic.EventBus.globalBus.subscribe("GenomeChange", listener)
+    hic.EventBus.globalBus.subscribe("TrackXYPairLoad", trackXYPairLoadListener)
+
+    const trackXYPairRemovalListener = ({ data }) => {
+
+        console.log(`did remove trackXYPair with track(${ data.track.name })`)
+
+        if ('refgene' === data.track.config.format) {
+            refSeqGenesTrackCheckbox.disabled = ''
+            refSeqGenesTrackCheckbox.checked = false
+            refSeqGenesTrackXYPair = undefined
+        } else if ('sequence' === data.track.config.format) {
+            sequenceTrackCheckbox.disabled = ''
+            sequenceTrackCheckbox.checked = false
+            sequenceTrackXYPair = undefined
+        }
+
+    }
+
+    hic.EventBus.globalBus.subscribe("TrackXYPairRemoval", trackXYPairRemovalListener)
+
+    const genomeChangeListener = ({ data }) => {
+
+        sequenceTrackCheckbox.disabled = ''
+        refSeqGenesTrackCheckbox.disabled = ''
+
+        sequenceTrackCheckbox.checked = false
+        refSeqGenesTrackCheckbox.checked = false
+
+    }
+
+    hic.EventBus.globalBus.subscribe("GenomeChange", genomeChangeListener)
 
 }
 
