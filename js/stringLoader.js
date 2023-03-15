@@ -3,13 +3,8 @@
  * Widgets do not need the services provided by that object *
  */
 
-async function loadJson (url, options) {
-    options = options || {}
-    const method = options.method || (options.sendData ? "POST" : "GET")
-    if (method === "POST") {
-        options.contentType = "application/json"
-    }
-    const result = await this.loadString(url, options)
+async function loadJson (url) {
+    const result = await this.loadString(url)
     if (result) {
         return JSON.parse(result)
     } else {
@@ -17,16 +12,15 @@ async function loadJson (url, options) {
     }
 }
 
-async function loadString (path, options) {
-    options = options || {}
+async function loadString (path) {
     if (path instanceof File) {
-        return loadStringFromFile(path, options)
+        return loadStringFromFile(path)
     } else {
-        return loadStringFromUrl(path, options)
+        return loadStringFromUrl(path)
     }
 }
 
-async function loadStringFromFile(localfile, options) {
+async function loadStringFromFile(localfile) {
 
     const blob = localfile
     const arrayBuffer = await blob.arrayBuffer()
@@ -35,7 +29,6 @@ async function loadStringFromFile(localfile, options) {
 
 
 async function loadStringFromUrl(url) {
-    options.responseType = "arraybuffer"
     const response = await fetch(url)
     const data = await response.arrayBuffer()
     return arrayBufferToString(data)
