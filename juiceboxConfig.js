@@ -33,4 +33,7 @@ var juiceboxConfig = {
     //             'https://www.googleapis.com/auth/drive.readonly'
     //         ]
     // }
+
+    width: 1560,
+    height: 560
 }
