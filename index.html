@@ -30,7 +30,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 
     <!-- Dropbox Chooser API-->
-    <script src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="8glijwyao9fq8we"></script>
+    <script src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs"
+            data-app-key="8glijwyao9fq8we"></script>
 
     <!-- Datatables JS -->
     <script src="https://cdn.datatables.net/v/dt/dt-1.10.20/sl-1.3.1/datatables.min.js"></script>
@@ -67,7 +68,8 @@
 
             <!-- App Clone -->
             <li class="nav-item">
-                <button id="juicebox-app-clone-button" type="button" class="btn btn-secondary btn-circle btn-sm ml-4 mt-2">
+                <button id="juicebox-app-clone-button" type="button"
+                        class="btn btn-secondary btn-circle btn-sm ml-4 mt-2">
                     <i class="fa fa-plus"></i>
                 </button>
             </li>
@@ -83,20 +85,20 @@
 
                     <div id="hic-contact-map-dropdown-menu" class="dropdown-menu">
 
-<!--                        &lt;!&ndash; Select &ndash;&gt;
-                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-contact-map-modal">
-                            Juicebox Archive
-                        </a>
+                        <!--                        &lt;!&ndash; Select &ndash;&gt;
+                                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-contact-map-modal">
+                                                    Juicebox Archive
+                                                </a>
 
-                        &lt;!&ndash; ENCODE hosted maps &ndash;&gt;
-                        <button id="hic-encode-hosted-contact-map-presentation-button" class="dropdown-item disabled" type="button" data-toggle="modal" data-target="#hic-encode-hosted-contact-map-modal">
-                            ENCODE
-                        </button>
+                                                &lt;!&ndash; ENCODE hosted maps &ndash;&gt;
+                                                <button id="hic-encode-hosted-contact-map-presentation-button" class="dropdown-item disabled" type="button" data-toggle="modal" data-target="#hic-encode-hosted-contact-map-modal">
+                                                    ENCODE
+                                                </button>
 
-                        &lt;!&ndash; 4DN maps &ndash;&gt;
-                        <button class="dropdown-item" type="button" data-toggle="modal" data-target="#hic-4dn-contact-map-modal">
-                            4DN
-                        </button>-->
+                                                &lt;!&ndash; 4DN maps &ndash;&gt;
+                                                <button class="dropdown-item" type="button" data-toggle="modal" data-target="#hic-4dn-contact-map-modal">
+                                                    4DN
+                                                </button>-->
 
                         <!-- Local Map File -->
                         <label class="dropdown-item btn btn-default btn-file">
@@ -113,7 +115,8 @@
                         <!-- Dropbox -->
                         <div class="dropdown-item">
 
-                            <div id="hic-contact-map-dropdown-dropbox-button" class="igv-app-dropdown-item-cloud-storage">
+                            <div id="hic-contact-map-dropdown-dropbox-button"
+                                 class="igv-app-dropdown-item-cloud-storage">
 
                                 <div>Dropbox File</div>
                                 <div>
@@ -127,7 +130,8 @@
 
                         <!-- Google Drive -->
                         <div class="dropdown-item">
-                            <div id="hic-contact-map-dropdown-google-drive-button" class="igv-app-dropdown-item-cloud-storage">
+                            <div id="hic-contact-map-dropdown-google-drive-button"
+                                 class="igv-app-dropdown-item-cloud-storage">
                                 <div>Google Drive File</div>
                                 <div><img src="./img/googledrive-dropdown-menu-item.png" width="18" height="18"></div>
                                 <!--                        <div>...</div>-->
@@ -148,7 +152,8 @@
 
                 <div class="dropdown ml-2 mt-1">
 
-                    <a id="hic-control-map-dropdown" href="#" class="nav-link dropdown-toggle disabled" data-toggle="dropdown">
+                    <a id="hic-control-map-dropdown" href="#" class="nav-link dropdown-toggle disabled"
+                       data-toggle="dropdown">
                         Load "B" Map
                     </a>
 
@@ -160,12 +165,14 @@
                         </a>
 
                         <!-- ENCODE hosted maps -->
-                        <button id="hic-encode-hosted-control-map-presentation-button" class="dropdown-item" type="button" data-toggle="modal" data-target="#hic-encode-hosted-contact-map-modal">
+                        <button id="hic-encode-hosted-control-map-presentation-button" class="dropdown-item"
+                                type="button" data-toggle="modal" data-target="#hic-encode-hosted-contact-map-modal">
                             ENCODE
                         </button>
 
                         <!-- 4DN maps -->
-                        <button class="dropdown-item" type="button" data-toggle="modal" data-target="#hic-4dn-contact-map-modal">
+                        <button class="dropdown-item" type="button" data-toggle="modal"
+                                data-target="#hic-4dn-contact-map-modal">
                             4DN
                         </button>
 
@@ -184,7 +191,8 @@
                         <!-- Dropbox -->
                         <div class="dropdown-item">
 
-                            <div id="hic-control-map-dropdown-dropbox-button" class="igv-app-dropdown-item-cloud-storage">
+                            <div id="hic-control-map-dropdown-dropbox-button"
+                                 class="igv-app-dropdown-item-cloud-storage">
 
                                 <div>Dropbox File</div>
                                 <div>
@@ -198,7 +206,8 @@
 
                         <!-- Google Drive -->
                         <div class="dropdown-item">
-                            <div id="hic-control-map-dropdown-google-drive-button" class="igv-app-dropdown-item-cloud-storage">
+                            <div id="hic-control-map-dropdown-google-drive-button"
+                                 class="igv-app-dropdown-item-cloud-storage">
                                 <div>Google Drive File</div>
                                 <div><img src="./img/googledrive-dropdown-menu-item.png" width="18" height="18"></div>
                                 <!--                        <div>...</div>-->
@@ -273,21 +282,25 @@
 
                         <!-- Google Drive -->
                         <div class="dropdown-item">
-                            <div id="hic-track-dropdown-google-drive-button" class="igv-app-dropdown-item-cloud-storage">
+                            <div id="hic-track-dropdown-google-drive-button"
+                                 class="igv-app-dropdown-item-cloud-storage">
                                 <div>Google Drive File</div>
                                 <div><img id="igv-app-track-google-drive-button-image" width="18" height="18"></div>
                             </div>
                         </div>
 
                         <!-- URL -->
-                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#track-load-url-modal">URL ...</a>
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#track-load-url-modal">URL
+                            ...</a>
 
                         <!-- Genome Annotations (Frequently Used) -->
-                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-annotation-datalist-modal">Frequently
+                        <a class="dropdown-item" href="#" data-toggle="modal"
+                           data-target="#hic-annotation-datalist-modal">Frequently
                             Used</a>
 
                         <!-- 2D Annotations -->
-                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#hic-annotation-2D-datalist-modal">2D
+                        <a class="dropdown-item" href="#" data-toggle="modal"
+                           data-target="#hic-annotation-2D-datalist-modal">2D
                             Annotations</a>
 
                         <div id="hic-annotations-section" class="dropdown-divider">
@@ -303,12 +316,13 @@
             <li class="nav-item">
 
                 <div class="dropdown ml-2 mt-1">
-                    <a id="hic-share-button" href="#" class="nav-link" data-toggle="modal" data-target="#hic-share-url-modal">
+                    <a id="hic-share-button" href="#" class="nav-link" data-toggle="modal"
+                       data-target="#hic-share-url-modal">
                         Share
                     </a>
                 </div>
 
-<!--                <button id="hic-share-button" class="btn btn-outline-light btn-sm ml-2 mt-2" type="button" data-toggle="modal" data-target="#hic-share-url-modal">Share</button>-->
+                <!--                <button id="hic-share-button" class="btn btn-outline-light btn-sm ml-2 mt-2" type="button" data-toggle="modal" data-target="#hic-share-url-modal">Share</button>-->
             </li>
 
             <!-- Session -->
@@ -328,7 +342,8 @@
                                     Local File ...
                                 </div>
                                 <div>
-                                    <input id="igv-app-dropdown-local-session-file-input" type="file" name="file" style="display: none;">
+                                    <input id="igv-app-dropdown-local-session-file-input" type="file" name="file"
+                                           style="display: none;">
                                 </div>
                             </div>
                         </label>
@@ -338,14 +353,16 @@
                         <!-- Session Google Drive -->
 
                         <!-- Session URL -->
-                        <button class="dropdown-item" type="button" data-toggle="modal" data-target="#spacewalk-session-url-modal">
+                        <button class="dropdown-item" type="button" data-toggle="modal"
+                                data-target="#spacewalk-session-url-modal">
                             Load URL ...
                         </button>
 
                         <div class="dropdown-divider"></div>
 
                         <!-- Save Session Local file -->
-                        <button id="igv-app-save-session-button" class="dropdown-item" type="button" data-toggle="modal" data-target="#igv-app-session-save-modal">
+                        <button id="igv-app-save-session-button" class="dropdown-item" type="button" data-toggle="modal"
+                                data-target="#igv-app-session-save-modal">
                             Save ...
                         </button>
 
@@ -382,8 +399,11 @@
                 </div>
 
                 <!-- caption -->
-                <div id="hic-caption" class="hic-caption-container" contenteditable="true">
+                <div>
+                    <h4 for="hic-caption">Notes:</h4>
+                    <div id="hic-caption" class="hic-caption-container" contenteditable="true" >
 
+                    </div>
                 </div>
 
             </div>

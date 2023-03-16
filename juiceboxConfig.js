@@ -34,6 +34,4 @@ var juiceboxConfig = {
     //         ]
     // }
 
-    width: 1560,
-    height: 560
 }
