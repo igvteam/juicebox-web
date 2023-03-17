@@ -7,10 +7,10 @@ const version = JSON.parse(jsonText).version;
 
 const lines = fs.readFileSync(templatePath, 'utf-8').split(/\r?\n/);
 
-const outputFileName = process.argv[ 3 ]
+const outputFileName = 4 === process.argv.length ? process.argv[ 3 ] : process.argv[ 2 ]
 
-// node scripts/generateHtml.js ./navbars/aidenlab.html juicebox.html
-console.log(`argv ${ process.argv.length } aiden lab additions ${ process.argv[ 2 ] } output file ${ outputFileName }`)
+// node scripts/generateHtml.js (./aiden_lab_navbar_additions.html) index.html
+// console.log(`argv length ${ process.argv.length }. output file ${ outputFileName }`)
 
 const out = __dirname + '/../dist/' + outputFileName;
 const fd = fs.openSync(out, 'w');
@@ -31,14 +31,14 @@ for (let line of lines) {
         fs.writeSync(fd, line + '\n', null, 'utf-8');
     }
 
-    else if (line.includes("<!--AIDEN_LAB-->")) {
+    else if (4 === process.argv.length && line.includes("<!--AIDEN_LAB-->")) {
         const file = require.resolve(process.argv[ 2 ]);
         const aidenLabAdditions = fs.readFileSync(file, 'utf-8');
         fs.writeSync(fd, aidenLabAdditions, null, 'utf-8');
         skipAidenLabAdditions = true;
     }
 
-    else if(skipAidenLabAdditions) {
+    else if(4 === process.argv.length && skipAidenLabAdditions) {
         if(line.includes("<!--AIDEN_LAB")) {
             skipAidenLabAdditions = false;
         }

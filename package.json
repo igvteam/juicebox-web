@@ -11,7 +11,7 @@
     }
   ],
   "scripts": {
-    "build": "npx rollup -c && node scripts/generateHtml.js ./aiden_lab_navbar_additions.html aidenLab.html"
+    "build": "npx rollup -c && node scripts/generateHtml.js juicebox.html && node scripts/generateHtml.js ./aiden_lab_navbar_additions.html aidenLab.html"
   },
   "devDependencies": {
     "@babel/core": "^7.13.16",
