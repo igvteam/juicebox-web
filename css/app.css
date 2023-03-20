@@ -50,6 +50,11 @@ a#emailButton:active {
   font-weight: 700;
 }
 
+.btn-outline-light {
+  color: #f8f9fa;
+  border-color: transparent;
+}
+
 .btn-circle {
   width: 28px;
   height: 28px;
