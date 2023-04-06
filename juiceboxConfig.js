@@ -25,12 +25,6 @@ var juiceboxConfig = {
     // enable loading of public Google files without login.
     // google: {
     //     clientId: "GOOGLE CLIENT ID",
-    //     apiKey: "GOOGLE API KEY",
-    //     scope:
-    //         [
-    //             'https://www.googleapis.com/auth/devstorage.read_only',
-    //             'https://www.googleapis.com/auth/userinfo.profile',
-    //             'https://www.googleapis.com/auth/drive.readonly'
-    //         ]
+    //     apiKey: "GOOGLE API KEY"
     // }
 }
