@@ -449,7 +449,7 @@ function configureSessionWidgets(container, googleEnabled) {
         'igv-app-dropdown-google-drive-session-file-button',
         'igv-app-session-url-modal',
         'igv-app-session-save-modal',
-        googleEnabled,
+        /*googleEnabled*/false,
         async config => await hic.restoreSession(container, config),
         () => hic.toJSON()
     )
