@@ -1,5 +1,6 @@
 import {loadTrackMenu} from "./trackMenu.js"
-import {loadTracks} from "./trackLoad.js"
+import {loadIntoTargets, loadMenuTracks, targetsOf} from "./trackLoad.js"
+import {BrowserTrackIndex} from "./browserTrackIndex.js"
 
 import {createSessionWidgets} from './widgets/sessionWidgets.js'
 import {createTrackWidgetsWithTrackRegistry, updateTrackMenus} from './widgets/trackWidgets.js'
@@ -164,91 +165,130 @@ function createGenomeDerivedTrackConfigurations(currentGenomeId, list) {
     return result
 }
 
-let sequenceTrackXYPair
-let refSeqGenesTrackXYPair
+/**
+ * The sequence and RefSeq-genes toggles, over the same target set as every other load.
+ *
+ * These two are the only load surfaces in the shell that also *un*load, and that is the whole
+ * difficulty. The load fans out through `trackLoad.js` like a menu's does; the removal cannot,
+ * because taking a track away is a per-panel operation on that panel's own trackXYPair. So each
+ * checkbox keeps a `BrowserTrackIndex` — which panels hold its track, and which pair in each — and
+ * unchecking walks the same target set the check would have loaded into.
+ *
+ * A checkbox is one control describing many panels, so it reads the *current* browser: checked
+ * means "this panel has the track". It follows the selection, which is why `BrowserSelect` refreshes
+ * it — without that, aiming at two panels and clicking between them would leave the box asserting
+ * something about a panel the user is no longer looking at.
+ */
 function configureSequenceAndRefSeqGeneTrackToggle() {
 
-    const sequenceTrackCheckbox = document.querySelector('#hic-sequence-track-checkbox')
-
-    sequenceTrackCheckbox.addEventListener('change', async e => {
-
-        const browser = hic.getCurrentBrowser()
-
-        if(e.target.checked){
-            const { sequence } = genomeDerivedTrackConfigurations
-            const config = Object.assign({ removable: false }, sequence)
-            await browser.loadTracks([ config ])
-
-        } else {
-            browser.layoutController.removeTrackXYPair(sequenceTrackXYPair)
-        }
-
-    })
-
-    const refSeqGenesTrackCheckbox = document.querySelector('#hic-ref-seq-genes-track-checkbox')
-
-    refSeqGenesTrackCheckbox.addEventListener('change', async e => {
-
-        const browser = hic.getCurrentBrowser()
-
-        if(e.target.checked){
-
-            const { annotations } = genomeDerivedTrackConfigurations
-
-            if (annotations && annotations.length > 0) {
-                const config = Object.assign({ removable: false }, annotations[ 0 ])
-                await browser.loadTracks([ config ])
+    const toggles = [
+        {
+            checkbox: document.querySelector('#hic-sequence-track-checkbox'),
+            format: 'sequence',
+            index: new BrowserTrackIndex(),
+            configFor: () => {
+                const { sequence } = genomeDerivedTrackConfigurations
+                return sequence ? Object.assign({ removable: false }, sequence) : undefined
             }
-        } else {
-            browser.layoutController.removeTrackXYPair(refSeqGenesTrackXYPair)
+        },
+        {
+            checkbox: document.querySelector('#hic-ref-seq-genes-track-checkbox'),
+            format: 'refgene',
+            index: new BrowserTrackIndex(),
+            configFor: () => {
+                const { annotations } = genomeDerivedTrackConfigurations
+                return annotations && annotations.length > 0 ? Object.assign({ removable: false }, annotations[ 0 ]) : undefined
+            }
         }
+    ]
 
-    })
+    const toggleForFormat = format => toggles.find(toggle => format === toggle.format)
+
+    // What the box asserts is a fact about the current panel, so re-read it from there rather than
+    // trusting whatever the last event happened to set.
+    const refresh = () => {
+        const browser = hic.getCurrentBrowser()
+        for (const { checkbox, index } of toggles) {
+            checkbox.checked = undefined !== browser && index.has(browser)
+        }
+    }
+
+    for (const toggle of toggles) {
+
+        toggle.checkbox.addEventListener('change', async e => {
+
+            const browser = hic.getCurrentBrowser()
+
+            if (undefined === browser) {
+                AlertSingleton.present('Contact map must be loaded and selected before loading tracks')
+                e.target.checked = false
+                return
+            }
+
+            if (e.target.checked) {
+
+                const config = toggle.configFor()
+
+                if (undefined === config) {
+                    e.target.checked = false
+                    return
+                }
+
+                // Deliberately not through loadMenuTracks: these configs are genome-derived and have
+                // never carried the menus' autoscale/COLLAPSED defaults.
+                await loadIntoTargets([ config ], {
+                    getCurrentBrowser: () => hic.getCurrentBrowser(),
+                    presentAlert: message => AlertSingleton.present(message)
+                })
+
+            } else {
+                toggle.index.removeFrom(targetsOf(browser))
+            }
+
+            refresh()
+        })
+    }
 
     const trackXYPairLoadListener = ({ data }) => {
 
-        console.log(`did load trackXYPair with track(${ data.track.name })`)
+        const toggle = toggleForFormat(data.track.config.format)
 
-        if ('refgene' === data.track.config.format) {
-            refSeqGenesTrackCheckbox.disabled = ''
-            refSeqGenesTrackCheckbox.checked = true
-            refSeqGenesTrackXYPair = data
-        } else if ('sequence' === data.track.config.format) {
-            sequenceTrackCheckbox.disabled = ''
-            sequenceTrackCheckbox.checked = true
-            sequenceTrackXYPair = data
+        if (toggle) {
+            toggle.index.record(data)
+            toggle.checkbox.disabled = ''
+            refresh()
         }
-
     }
 
     hic.EventBus.globalBus.subscribe("TrackXYPairLoad", trackXYPairLoadListener)
 
     const trackXYPairRemovalListener = ({ data }) => {
 
-        console.log(`did remove trackXYPair with track(${ data.track.name })`)
+        const toggle = toggleForFormat(data.track.config.format)
 
-        if ('refgene' === data.track.config.format) {
-            refSeqGenesTrackCheckbox.disabled = ''
-            refSeqGenesTrackCheckbox.checked = false
-            refSeqGenesTrackXYPair = undefined
-        } else if ('sequence' === data.track.config.format) {
-            sequenceTrackCheckbox.disabled = ''
-            sequenceTrackCheckbox.checked = false
-            sequenceTrackXYPair = undefined
+        if (toggle) {
+            toggle.index.forget(data)
+            toggle.checkbox.disabled = ''
+            refresh()
         }
-
     }
 
     hic.EventBus.globalBus.subscribe("TrackXYPairRemoval", trackXYPairRemovalListener)
 
-    const genomeChangeListener = ({ data }) => {
+    // A panel becoming current makes the boxes describe a different panel.
+    hic.EventBus.globalBus.subscribe("BrowserSelect", refresh)
 
-        sequenceTrackCheckbox.disabled = ''
-        refSeqGenesTrackCheckbox.disabled = ''
+    const genomeChangeListener = () => {
 
-        sequenceTrackCheckbox.checked = false
-        refSeqGenesTrackCheckbox.checked = false
+        // The tracks are gone and said nothing: a genome change tears panels down through
+        // `removeAllTrackXYPairs`, which posts no removal event. Clearing here is what the old
+        // force-uncheck was doing, now that the answer is per panel.
+        for (const { checkbox, index } of toggles) {
+            checkbox.disabled = ''
+            index.clear()
+        }
 
+        refresh()
     }
 
     hic.EventBus.globalBus.subscribe("GenomeChange", genomeChangeListener)
@@ -357,7 +397,7 @@ function createGenericDataListModal(id, input_id, datalist_id, placeholder) {
  * fan-out would leave the panels it reached with no way back.
  */
 function loadTracksIntoTargets(configs) {
-    return loadTracks(configs, {
+    return loadMenuTracks(configs, {
         getCurrentBrowser: () => hic.getCurrentBrowser(),
         presentAlert: message => AlertSingleton.present(message)
     })

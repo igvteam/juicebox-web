@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { loadTracks } from '../js/trackLoad.js'
+import { loadMenuTracks as loadTracks } from '../js/trackLoad.js'
 
 /**
  * A stand-in for a juicebox.js BrowserRegistry, implementing only the declared surface this module

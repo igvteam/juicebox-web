@@ -74,8 +74,13 @@ function summaryMessage({ loaded, failed, skipped }) {
  *
  * With no aim in progress the target set resolves to `[currentBrowser]`, so this is the previous
  * single-browser behaviour — the feature is opt-in at the *gesture*, not at this call site.
+ *
+ * Takes the configs as given. The menu defaults are a separate wrapper because not every load
+ * surface wants them: the sequence and RefSeq-genes checkboxes load a fixed, genome-derived config
+ * that has never carried them, and quietly acquiring `autoscale` on a sequence track by routing it
+ * through here would be a behaviour change smuggled in with a bug fix.
  */
-async function loadTracks(configs, { getCurrentBrowser, presentAlert }) {
+async function loadIntoTargets(configs, { getCurrentBrowser, presentAlert }) {
 
     const browser = getCurrentBrowser()
 
@@ -84,7 +89,7 @@ async function loadTracks(configs, { getCurrentBrowser, presentAlert }) {
         return
     }
 
-    const summary = await browser.registry.loadTracksIntoTargets(applyDefaults(configs))
+    const summary = await browser.registry.loadTracksIntoTargets(configs)
 
     const message = summaryMessage(summary)
 
@@ -95,4 +100,22 @@ async function loadTracks(configs, { getCurrentBrowser, presentAlert }) {
     return summary
 }
 
-export { loadTracks, applyDefaults, summaryMessage }
+/**
+ * The same fan-out, with the defaults the shell's track menus have always set.
+ */
+async function loadMenuTracks(configs, options) {
+    return loadIntoTargets(applyDefaults(configs), options)
+}
+
+/**
+ * The browsers a load issued now would reach, for a gesture that has to *undo* one.
+ *
+ * Removal is not a load and does not go through the registry — `layoutController` removes a pair
+ * from one browser — but it has to reach the same set, or checking a box and unchecking it would
+ * not be inverses.
+ */
+function targetsOf(browser) {
+    return undefined === browser ? [] : browser.registry.targetedBrowsers
+}
+
+export { loadIntoTargets, loadMenuTracks, targetsOf, applyDefaults, summaryMessage }
