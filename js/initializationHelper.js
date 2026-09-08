@@ -1,4 +1,5 @@
 import {loadTrackMenu} from "./trackMenu.js"
+import {loadTracks} from "./trackLoad.js"
 
 import {createSessionWidgets} from './widgets/sessionWidgets.js'
 import {createTrackWidgetsWithTrackRegistry, updateTrackMenus} from './widgets/trackWidgets.js'
@@ -65,7 +66,7 @@ function initializationHelper(container, config) {
         'track-load-url-modal',
         undefined,
         config.trackRegistryFile,
-        configurations => loadTracks(configurations))
+        configurations => loadTracksIntoTargets(configurations))
 
     createAnnotationDatalistModals(container);
 
@@ -281,7 +282,7 @@ function createAnnotationDatalistModals(root) {
             if (path && path.indexOf("hgdownload.cse.ucsc.edu") > 0) {
                 config.indexed = false
             }
-            loadTracks([config]);
+            loadTracksIntoTargets([config]);
         }
 
         bootstrap.Modal.getInstance(document.querySelector('#hic-annotation-datalist-modal')).hide();
@@ -305,7 +306,7 @@ function createAnnotationDatalistModals(root) {
             const option = Array.from(document.querySelectorAll('#annotation-2D-datalist option'))
                 .find(o => o.textContent.trim() === name);
             const path = option ? option.dataset.url : undefined;
-            loadTracks([{url: path, name}]);
+            loadTracksIntoTargets([{url: path, name}]);
         }
 
         bootstrap.Modal.getInstance(document.querySelector('#hic-annotation-2D-datalist-modal')).hide();
@@ -344,13 +345,22 @@ function createGenericDataListModal(id, input_id, datalist_id, placeholder) {
     return generic_select_modal_string;
 }
 
-function loadTracks(tracks) {
-    // Set some juicebox specific defaults
-    for (let t of tracks) {
-        t.autoscale = true;
-        t.displayMode = "COLLAPSED"
-    }
-    hic.getCurrentBrowser().loadTracks(tracks);
+/**
+ * Every track and 2D-annotation menu in the shell loads through here.
+ *
+ * The fan-out itself, and the reporting rule, live in `trackLoad.js`; this is only where the app's
+ * juicebox namespace and alert dialog get bound to it. With no aim in progress the target set is
+ * just the current browser, so an ordinary single-panel load is unchanged.
+ *
+ * The sequence and RefSeq-genes checkboxes deliberately do *not* come through here: each is a
+ * per-panel toggle that remembers the one trackXYPair it added so it can remove it again, and a
+ * fan-out would leave the panels it reached with no way back.
+ */
+function loadTracksIntoTargets(configs) {
+    return loadTracks(configs, {
+        getCurrentBrowser: () => hic.getCurrentBrowser(),
+        presentAlert: message => AlertSingleton.present(message)
+    })
 }
 
 async function loadHicFile(url, name, mapType) {
