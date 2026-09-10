@@ -52,16 +52,6 @@ class BrowserTrackIndex {
     }
 
     /**
-     * Take the track out of each of `browsers` that has one.
-     *
-     * A browser with no entry is skipped rather than erroring, mirroring the skip-don't-throw rule
-     * the library's own fan-out follows: an aim spanning a panel that never got the track is an
-     * ordinary thing for a user to have, not a mistake.
-     *
-     * Entries are collected before any removal runs, because `removeTrackXYPair` posts
-     * `TrackXYPairRemoval` synchronously and the listener on the far side calls `forget`.
-     */
-    /**
      * Forget every entry, because the tracks are gone by a route that announces nothing.
      *
      * `layoutController.removeAllTrackXYPairs` — what a genome change and a browser reset go
@@ -73,6 +63,16 @@ class BrowserTrackIndex {
         this.#pairs = new WeakMap()
     }
 
+    /**
+     * Take the track out of each of `browsers` that has one.
+     *
+     * A browser with no entry is skipped rather than erroring, mirroring the skip-don't-throw rule
+     * the library's own fan-out follows: an aim spanning a panel that never got the track is an
+     * ordinary thing for a user to have, not a mistake.
+     *
+     * Entries are collected before any removal runs, because `removeTrackXYPair` posts
+     * `TrackXYPairRemoval` synchronously and the listener on the far side calls `forget`.
+     */
     removeFrom(browsers) {
 
         const removals = browsers
