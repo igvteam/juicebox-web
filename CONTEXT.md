@@ -11,8 +11,28 @@ The juicebox.js library instance that draws contact maps and tracks. Everything 
 _Avoid_: juicebox, the app, hic
 
 **Browser**:
-A single viewer panel with its own loaded map, tracks, and locus. Several can be open at once; exactly one is current, and menu actions apply to it.
+A single viewer panel with its own loaded map, tracks, and locus. Several can be open at once.
 _Avoid_: panel, instance, window
+
+**Current browser**:
+The browser the shell's menus read: the one whose genome, map and size they interrogate to decide what to offer. Exactly one whenever any browser exists, and shown by its border. It is what a menu is *about*, which is no longer the same as what a load *reaches* — see Target set.
+_Avoid_: selected browser, active browser, focused browser
+
+**Target set**:
+The browsers a track load reaches: the current browser, plus any others the user has aimed at. Aiming is shift-click on a browser's navbar; a plain click clears the aim. Owned by juicebox.js — the shell asks for the set, it does not maintain one.
+_Avoid_: multi-select, selection, selected browsers. Not a *sync group*: a target set is what a **track load** reaches and the user picks it; a sync group is what a **locus change** reaches and nobody picks it.
+
+**Aim**:
+The act of choosing a target set, and the state of having chosen one. A user aims at browsers; a load then reaches them.
+_Avoid_: multi-selecting, targeting
+
+**Sync group**:
+The browsers whose locus follows one another's. Membership is derived, not chosen: juicebox.js pairs two browsers when their maps are the same assembly and carry the same chromosomes. It is settled when a map loads and does not change as the user pans, so a browser is either in a group for as long as that map is loaded, or in none. Distinct from a target set in both what it carries and who decides it.
+_Avoid_: linked panels, locked panels, target set
+
+**Sync refusal**:
+The state of a browser that belongs to no sync group while other browsers are open — because its map is a different assembly, because it lacks chromosomes the others carry, or because the host opted it out. Shown on the panel itself, by the viewer. A browser that is merely the only one open has not been refused; there is nothing to sync with.
+_Avoid_: sync error, unsynced, sync failure
 
 **Shell**:
 The parts of the page this repo owns — menus, modals, widgets, and the catalogs behind them. Distinct from the viewer it surrounds.
@@ -75,8 +95,12 @@ The mapping from genome to the ENCODE track catalogs available for it. Determine
 _Avoid_: track index, catalog
 
 **Genome-derived track**:
-A track that comes from the genome definition rather than a catalog — the reference sequence and its gene annotation. Toggled on and off rather than loaded and removed.
+A track that comes from the genome definition rather than a catalog — the reference sequence and its gene annotation. Toggled on and off rather than loaded and removed. There are exactly two, one per checkbox in the track menu.
 _Avoid_: built-in track, default track
+
+**Toggle**:
+A checkbox in the track menu standing for a genome-derived track. Unlike every other load surface in the shell it both loads and unloads, which is what makes it the hard case under an aim: one control describing, and acting on, a whole target set.
+_Avoid_: switch, button, control
 
 ### Session and sharing
 

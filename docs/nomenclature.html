@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Juicebox Web — Nomenclature</title>
+<style>
+
+/* ------------------------------------------------------------------ *
+ * A deliberately single-look page, after Edward Tufte: the cream
+ * ground, one serif face, a wide margin carrying notes beside the
+ * text they annotate, and hairlines instead of boxes.
+ * ------------------------------------------------------------------ */
+
+:root {
+  color-scheme: light;
+  --paper:   #fffff8;
+  --ink:     #111111;
+  --muted:   #6f6f66;
+  --rule:    #d6d6c8;
+  --accent:  #a00000;
+  --anchor:  #3a8ab4;   /* .hic-root-target-anchor / .hic-root-targeted */
+  --current: #5f5f5f;   /* .hic-root-selected */
+}
+
+html { background: var(--paper); }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "ETBembo", Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  font-size: 17px;
+  line-height: 1.55;
+  margin: 0;
+  padding-block: 4rem 6rem;
+  padding-left: 16px;
+  padding-right: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The Tufte measure: a narrow text column, a wide margin for notes. */
+.sheet { max-width: 1400px; margin: 0 auto; }
+
+.band {
+  display: grid;
+  grid-template-columns: minmax(0, 34rem) minmax(0, 17rem);
+  column-gap: 2.5rem;
+  align-items: start;
+}
+
+.band > .wide { grid-column: 1 / -1; }
+
+h1 {
+  font-weight: 400;
+  font-size: 2.6rem;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.4rem;
+}
+
+.subtitle {
+  font-style: italic;
+  color: var(--muted);
+  font-size: 1.15rem;
+  margin: 0 0 2.5rem;
+  max-width: 34rem;
+}
+
+h2 {
+  font-weight: 400;
+  font-style: italic;
+  font-size: 1.5rem;
+  margin: 3.5rem 0 0.9rem;
+}
+
+h3 {
+  font-weight: 400;
+  font-style: italic;
+  font-size: 1.15rem;
+  margin: 2rem 0 0.5rem;
+}
+
+p { margin: 0 0 1.1rem; max-width: 34rem; }
+
+a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule); }
+a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+
+code {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.82em;
+  color: var(--muted);
+}
+
+em.term { font-style: normal; font-variant: small-caps; letter-spacing: 0.06em; }
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 3rem 0;
+}
+
+/* A margin note, set small beside the prose it belongs to. */
+.marginnote {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--muted);
+  max-width: 17rem;
+}
+.marginnote strong { color: var(--ink); font-weight: 400; font-variant: small-caps; letter-spacing: 0.06em; }
+
+/* ------------------------------------------------------------------ *
+ * The mock-up
+ * ------------------------------------------------------------------ */
+
+figure { margin: 2rem 0 0; }
+
+figcaption {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 0.9rem;
+  max-width: 40rem;
+}
+
+.scroller { overflow-x: auto; padding-bottom: 0.5rem; }
+
+.mock {
+  min-width: 900px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  border: 1px solid var(--rule);
+  background: #ffffff;
+  position: relative;
+}
+
+/* --- the shell's top navigation ---------------------------------- */
+
+.mock-nav {
+  background: #212529;
+  color: #dee2e6;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 9px 14px;
+  position: relative;
+}
+.mock-brand { font-weight: 600; color: #fff; margin-right: 6px; }
+.mock-nav .item { position: relative; white-space: nowrap; }
+.mock-nav .item.dim { color: #6c757d; }
+.mock-nav .caret::after { content: " ▾"; opacity: 0.6; }
+.mock-clone {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #6c757d; color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px; line-height: 1; position: relative;
+}
+
+/* --- the region the shell hands to the library -------------------- */
+
+.mock-stage {
+  padding: 22px 18px 26px;
+  background: #fafaf7;
+  display: flex;
+  gap: 16px;
+  position: relative;
+}
+
+/* One viewer panel. Borders mirror the shipping CSS exactly. */
+.panel {
+  flex: 1;
+  background: #fff;
+  border: 2px solid var(--current);
+  padding: 0;
+  position: relative;
+}
+.panel.anchor  { border-color: var(--anchor); outline: 3px dashed var(--anchor); outline-offset: -3px; }
+.panel.aimed   { outline: 3px dashed var(--anchor); outline-offset: -3px; }
+.panel.idle    { border-color: #bfbfbf; }
+
+.panel-bar {
+  border-bottom: 1px solid #e3e3dd;
+  padding: 5px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+.panel-title { font-weight: 600; font-size: 11px; }
+.nosync {
+  font-size: 9px; letter-spacing: 0.04em;
+  color: #8a5a00; border: 1px solid #d9b877; background: #fdf6e6;
+  border-radius: 2px; padding: 0 4px; white-space: nowrap;
+}
+.panel-tools { color: #9a9a90; letter-spacing: 2px; }
+.panel-locus {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 10px;
+  color: #55555a;
+  padding: 4px 8px;
+  border-bottom: 1px solid #eeeee8;
+  display: flex; justify-content: space-between;
+  position: relative;
+}
+
+.panel-body { display: flex; }
+.panel-yaxis { width: 13px; background: linear-gradient(#e8e8e0, #f6f6f0); border-right: 1px solid #eeeee8; }
+.panel-canvas-wrap { flex: 1; position: relative; }
+
+/* A stand-in for the contact matrix: a symmetric diagonal wash. */
+.matrix {
+  height: 118px;
+  background:
+    linear-gradient(135deg,
+      rgba(178,24,43,0.85) 0%,
+      rgba(214,96,77,0.45) 6%,
+      rgba(244,165,130,0.22) 14%,
+      rgba(255,255,255,0.02) 34%),
+    linear-gradient(45deg,
+      rgba(178,24,43,0.85) 0%,
+      rgba(214,96,77,0.45) 6%,
+      rgba(244,165,130,0.22) 14%,
+      rgba(255,255,255,0.02) 34%),
+    #fdfdfa;
+  position: relative;
+}
+.matrix.b-map::after {
+  content: "B";
+  position: absolute; right: 5px; bottom: 4px;
+  font-size: 9px; color: #8a8a80; font-weight: 600;
+}
+
+/* Track lanes drawn beneath the matrix. */
+.lane {
+  height: 11px;
+  border-top: 1px solid #f0f0ea;
+  background: repeating-linear-gradient(90deg, #7d9fc4 0 3px, transparent 3px 13px);
+  position: relative;
+}
+.lane.genes { background: repeating-linear-gradient(90deg, #4a7a4a 0 6px, transparent 6px 21px); }
+.lane-label {
+  position: absolute; left: 3px; top: -1px;
+  font-size: 8px; color: #3c3c38; background: rgba(255,255,255,0.82); padding: 0 2px;
+}
+
+/* A 2D annotation: a box on the face of the map, not a lane. */
+.anno2d {
+  position: absolute;
+  border: 1.5px solid #2f6f2f;
+  width: 26px; height: 26px;
+  left: 38px; top: 38px;
+}
+
+.caption-strip {
+  border-top: 1px solid var(--rule);
+  padding: 7px 14px;
+  color: #6f6f66;
+  font-style: italic;
+  font-size: 11px;
+  position: relative;
+}
+
+/* --- keyed markers ------------------------------------------------ */
+
+.k {
+  position: absolute;
+  z-index: 5;
+  min-width: 17px; height: 17px;
+  padding: 0 3px;
+  box-sizing: border-box;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 17px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--paper);
+}
+
+/* --- the key ------------------------------------------------------ */
+
+.key {
+  margin: 2.2rem 0 0;
+  columns: 3 17rem;
+  column-gap: 2.5rem;
+}
+
+.key .entry {
+  break-inside: avoid;
+  margin: 0 0 1.15rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  max-width: 22rem;
+}
+.key .entry .n {
+  display: inline-block;
+  min-width: 17px; height: 17px; padding: 0 3px; box-sizing: border-box;
+  border-radius: 9px; background: var(--accent); color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 10px; font-weight: 600; line-height: 17px; text-align: center;
+  margin-right: 0.45rem; vertical-align: 0.08em;
+}
+.key .entry b { font-weight: 400; font-variant: small-caps; letter-spacing: 0.07em; font-size: 1.02em; }
+.key .entry .avoid { display: block; color: var(--muted); font-style: italic; font-size: 0.94em; margin-top: 0.15rem; }
+
+/* --- the not-pictured table --------------------------------------- */
+
+table { border-collapse: collapse; width: 100%; max-width: 53rem; margin: 1.2rem 0 0; font-size: 0.9rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.55rem 1.2rem 0.55rem 0; border-bottom: 1px solid var(--rule); }
+th { font-weight: 400; font-variant: small-caps; letter-spacing: 0.07em; color: var(--muted); border-bottom-color: var(--ink); }
+td:first-child { white-space: nowrap; font-variant: small-caps; letter-spacing: 0.06em; }
+td .avoid { color: var(--muted); font-style: italic; }
+
+/* --- the boundary diagram ----------------------------------------- */
+
+.boundary {
+  margin: 1.5rem 0 0;
+  max-width: 53rem;
+  border: 1px solid var(--rule);
+  background: #fff;
+}
+.boundary .b-shell { padding: 12px; }
+.boundary .b-tag {
+  font-size: 0.72rem; font-variant: small-caps; letter-spacing: 0.1em; color: var(--muted);
+  margin-bottom: 8px;
+}
+.boundary .b-viewer {
+  border: 2px dashed var(--anchor);
+  padding: 12px;
+  background: #fafcfe;
+}
+.boundary ul { margin: 0; padding-left: 1.1rem; font-size: 0.86rem; color: #33332e; }
+.boundary li { margin-bottom: 0.15rem; }
+
+@media (max-width: 900px) {
+  .band { grid-template-columns: minmax(0, 1fr); }
+  .band > .marginnote { margin: 0 0 1.6rem; max-width: 34rem; }
+  .key { columns: 1; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+<div class="band">
+  <div class="wide">
+    <h1>Juicebox&nbsp;Web: a nomenclature</h1>
+    <p class="subtitle">The words in <code>CONTEXT.md</code>, placed on the thing each one names.</p>
+  </div>
+</div>
+
+<div class="band">
+  <div>
+    <p>Every term below is defined in this repository&rsquo;s <a href="../CONTEXT.md"><code>CONTEXT.md</code></a>, which is the authority. This page adds nothing to it; it only points. Where the glossary lists words to <em>avoid</em>, they are repeated here, because most confusion arrives through a synonym rather than through the term itself.</p>
+    <p>The mock-up shows three viewer panels, because the vocabulary that gives the most trouble &mdash; <em class="term">current browser</em>, <em class="term">target set</em>, <em class="term">aim</em> &mdash; is invisible when only one panel is open. Borders and outlines are reproduced at their shipping values.</p>
+  </div>
+  <aside class="marginnote">
+    <strong>On the two repositories.</strong> This vocabulary is <em>juicebox-web&rsquo;s</em>. The library it wraps, juicebox.js, keeps a glossary of its own, and the two do not always agree &mdash; where they collide, the collision is noted rather than smoothed over.
+  </aside>
+</div>
+
+<div class="band">
+<figure class="wide">
+
+<div class="scroller">
+<div class="mock">
+
+  <!-- ============ shell: top navigation ============ -->
+  <div class="mock-nav">
+    <span class="k" style="left:-9px; top:-9px;">1</span>
+    <span class="k" style="left:146px; top:-9px;">3</span>
+
+    <span class="mock-brand">Juicebox Web App</span>
+
+    <span class="mock-clone">+</span>
+
+    <span class="item caret">Load Map</span>
+    <span class="item caret">Load &ldquo;B&rdquo; Map</span>
+
+    <span class="item caret">Load Tracks
+      <span class="k" style="left:6px; top:20px;">12</span>
+    </span>
+
+    <span class="item">Share
+      <span class="k" style="left:6px; top:20px;">17</span>
+    </span>
+
+    <span class="item caret">Session
+      <span class="k" style="left:14px; top:20px;">16</span>
+    </span>
+  </div>
+
+  <!-- ============ the region handed to the library ============ -->
+  <div class="mock-stage">
+
+    <span class="k" style="left:-9px; top:44px;">2</span>
+
+    <!-- panel A: current browser AND head of the target set -->
+    <div class="panel anchor">
+      <span class="k" style="left:-9px; top:-9px;">4</span>
+      <span class="k" style="left:-9px; top:14px;">5</span>
+
+      <div class="panel-bar">
+        <span class="panel-title">GM12878 in situ MboI</span>
+        <span class="panel-tools">&#9776;</span>
+        <span class="k" style="right:-9px; top:-9px;">6</span>
+      </div>
+
+      <div class="panel-locus"><span>chr8:127.2&ndash;128.4 Mb</span><span>5 kb</span>
+        <span class="k" style="right:-9px; top:-2px;">11</span>
+      </div>
+
+      <div class="panel-body">
+        <div class="panel-yaxis"></div>
+        <div class="panel-canvas-wrap">
+          <div class="matrix">
+            <span class="k" style="left:-9px; top:34px;">9</span>
+            <div class="anno2d"></div>
+            <span class="k" style="left:56px; top:56px;">14</span>
+          </div>
+          <div class="lane"><span class="lane-label">CTCF ChIP</span>
+            <span class="k" style="right:-9px; top:-3px;">13</span>
+          </div>
+          <div class="lane genes"><span class="lane-label">Genes</span>
+            <span class="k" style="right:-9px; top:-3px;">15</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- panel B: aimed at, but not current -->
+    <div class="panel aimed">
+      <span class="k" style="left:-9px; top:-9px;">7</span>
+
+      <div class="panel-bar">
+        <span class="panel-title">K562 in situ MboI</span>
+        <span class="panel-tools">&#9776;</span>
+      </div>
+
+      <div class="panel-locus"><span>chr8:127.2&ndash;128.4 Mb</span><span>5 kb</span>
+        <span class="k" style="left:-9px; top:-2px;">19</span>
+      </div>
+
+      <div class="panel-body">
+        <div class="panel-yaxis"></div>
+        <div class="panel-canvas-wrap">
+          <div class="matrix b-map">
+            <span class="k" style="right:-9px; top:34px;">10</span>
+          </div>
+          <div class="lane"><span class="lane-label">CTCF ChIP</span></div>
+          <div class="lane genes"><span class="lane-label">Genes</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- panel C: open, but not aimed at -->
+    <div class="panel idle">
+      <span class="k" style="left:-9px; top:-9px;">8</span>
+
+      <div class="panel-bar">
+        <span class="panel-title">S2 in situ DpnII</span>
+        <span class="nosync" title="no other panel holds a compatible map (this is dm6; the others are hg38)">not syncing</span>
+        <span class="panel-tools">&#9776;</span>
+        <span class="k" style="right:-9px; top:-9px;">20</span>
+      </div>
+
+      <div class="panel-locus"><span>chr2L:8.4&ndash;9.9 Mb</span><span>25 kb</span></div>
+
+      <div class="panel-body">
+        <div class="panel-yaxis"></div>
+        <div class="panel-canvas-wrap">
+          <div class="matrix"></div>
+          <div class="lane"><span class="lane-label">CTCF ChIP</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="caption-strip">Figure caption &mdash; editable, saved with the session
+    <span class="k" style="right:-9px; top:-9px;">18</span>
+  </div>
+
+</div>
+</div>
+
+<figcaption>Three <em>browsers</em> open in one <em>viewer</em>. Panel&nbsp;1 is the <em>current browser</em> and the head of the <em>target set</em>; panel&nbsp;2 has been aimed at as well; panel&nbsp;3 is open but outside the aim, so a track load will not reach it. Panels&nbsp;1 and&nbsp;2 are hg38 and form a <em>sync group</em> &mdash; they hold the same locus because one of them was panned there. Panel&nbsp;3 is dm6, belongs to no group, and says so. Note that the two groupings are independent: panel&nbsp;3 is outside the aim <em>and</em> outside the sync group, but for unrelated reasons.</figcaption>
+
+<div class="key">
+
+  <p class="entry"><span class="n">1</span><b>Shell</b> &mdash; the parts of the page this repo owns: menus, modals, widgets, and the catalogs behind them. Distinct from the viewer it surrounds.
+    <span class="avoid">not: chrome, wrapper, frontend</span></p>
+
+  <p class="entry"><span class="n">2</span><b>Viewer</b> &mdash; the juicebox.js library instance that draws contact maps and tracks. Everything it renders is the library&rsquo;s responsibility, not this repo&rsquo;s.
+    <span class="avoid">not: juicebox, the app, hic</span></p>
+
+  <p class="entry"><span class="n">3</span><b>Clone</b> &mdash; the control that opens another browser. One viewer, several browsers.</p>
+
+  <p class="entry"><span class="n">4</span><b>Browser</b> &mdash; a single viewer panel with its own loaded map, tracks, and locus. Several can be open at once.
+    <span class="avoid">not: panel, instance, window</span></p>
+
+  <p class="entry"><span class="n">5</span><b>Current browser</b> &mdash; the browser the shell&rsquo;s menus read: the one whose genome, map and size they interrogate to decide what to offer. Exactly one whenever any browser exists, and shown by its border. It is what a menu is <em>about</em>, which is no longer the same as what a load <em>reaches</em>.
+    <span class="avoid">not: selected browser, active browser, focused browser</span></p>
+
+  <p class="entry"><span class="n">6</span><b>Widget</b> &mdash; a shell-owned interface element for getting data into the viewer. The panel&rsquo;s own controls are the viewer&rsquo;s, and are not widgets.
+    <span class="avoid">not: component, control</span></p>
+
+  <p class="entry"><span class="n">7</span><b>Target set</b> &mdash; the browsers a track load reaches: the current browser, plus any others the user has aimed at. Shown by the dashed blue outline. Owned by juicebox.js &mdash; the shell asks for the set, it does not maintain one.
+    <span class="avoid">not: multi-select, selection, selected browsers, sync group</span></p>
+
+  <p class="entry"><span class="n">8</span><b>Aim</b> &mdash; the act of choosing a target set, and the state of having chosen one. Shift-click a browser&rsquo;s navbar to aim; a plain click clears the aim. Panel&nbsp;3 is not aimed at, so a load will not reach it.
+    <span class="avoid">not: multi-selecting, targeting</span></p>
+
+  <p class="entry"><span class="n">9</span><b>Contact map</b> &mdash; a Hi-C dataset (a <code>.hic</code> file) giving contact frequency between every pair of genomic loci in a genome. The primary thing a user loads.
+    <span class="avoid">not: heatmap, matrix, hic file, dataset</span></p>
+
+  <p class="entry"><span class="n">10</span><b>Control map</b> &mdash; a second contact map loaded alongside the first for comparison. The interface calls the pair &ldquo;A&rdquo; and &ldquo;B&rdquo;; the control map is B.
+    <span class="avoid">not: B map, comparison map, secondary map</span></p>
+
+  <p class="entry"><span class="n">11</span><b>Resolution</b> &mdash; the bin size at which a contact map is displayed. Changing it changes counts per bin, so the color scale must change with it.
+    <span class="avoid">not: zoom level, granularity</span></p>
+
+  <p class="entry"><span class="n">12</span><b>Track menu</b> &mdash; the genome-keyed catalog of curated tracks and 2D annotations offered for the currently loaded genome.
+    <span class="avoid">not: annotation datalist, track list</span></p>
+
+  <p class="entry"><span class="n">13</span><b>Track</b> &mdash; a one-dimensional annotation displayed along a map axis, positioned by a single genomic interval.
+    <span class="avoid">not: 1D track, signal, feature track</span></p>
+
+  <p class="entry"><span class="n">14</span><b>2D annotation</b> &mdash; an annotation positioned by a <em>pair</em> of intervals, so it draws on the face of the map rather than along an axis. Loops and domains are 2D annotations.
+    <span class="avoid">not: 2D track, feature pair, overlay</span></p>
+
+  <p class="entry"><span class="n">15</span><b>Genome-derived track</b> &mdash; a track that comes from the genome definition rather than a catalog: the reference sequence and its gene annotation. There are exactly two, one per <b>toggle</b> &mdash; a checkbox in the track menu which, unlike every other load surface, both loads and unloads.
+    <span class="avoid">not: built-in track, default track; not: switch, button, control</span></p>
+
+  <p class="entry"><span class="n">16</span><b>Session</b> &mdash; the complete restorable state of the shell and its viewers: maps loaded, tracks loaded, loci, color scales. Saved to and loaded from a JSON file.
+    <span class="avoid">not: state, workspace, config</span></p>
+
+  <p class="entry"><span class="n">17</span><b>Share URL</b> &mdash; a session compressed into a link, shortened for distribution and also offered as a QR code. Opening one restores the session it encodes.
+    <span class="avoid">not: permalink, session link, short URL</span></p>
+
+  <p class="entry"><span class="n">18</span><b>Caption</b> &mdash; shell-owned editable text beneath the stage. Outside the viewer&rsquo;s DOM, and therefore this repo&rsquo;s to draw.</p>
+
+  <p class="entry"><span class="n">19</span><b>Sync group</b> &mdash; the browsers whose locus follows one another&rsquo;s. Membership is <em>derived</em>, not chosen: the library pairs two browsers when their maps are the same assembly and carry the same chromosomes. Settled when a map loads, and unchanged as the user pans.
+    <span class="avoid">not: linked panels, locked panels, target set</span></p>
+
+  <p class="entry"><span class="n">20</span><b>Sync refusal</b> &mdash; a browser belonging to no sync group while other browsers are open, because its map is a different assembly, lacks chromosomes the others carry, or was opted out by the host. Marked on the panel, by the viewer. A browser that is merely the <em>only</em> one open has not been refused &mdash; there is nothing to sync with.
+    <span class="avoid">not: sync error, unsynced, sync failure</span></p>
+
+</div>
+</figure>
+</div>
+
+<hr>
+
+<h2>Where the shell stops</h2>
+
+<div class="band">
+  <div>
+    <p>The distinction between <em class="term">shell</em> and <em class="term">viewer</em> is not a figure of speech. It is a line in the DOM. <code>js/app.js</code> calls <code>hic.init(container, config)</code> on <code>#app-container</code>; from that call onward, everything inside that element belongs to the library. The shell owns what surrounds it.</p>
+    <p>This is why a question like &ldquo;can we put a badge on the panel?&rdquo; has an answer before it has a design: not from this repository, it cannot. The panel, its navbar, its borders and its locus box are all drawn by juicebox.js. A shell-owned notice must either live outside the stage, or the library must grow the surface itself.</p>
+  </div>
+  <aside class="marginnote">
+    <strong>Practical test.</strong> If you would change it by editing a file in this repository, it is the shell. If you would change it by opening a pull request against juicebox.js, it is the viewer. There is no third category.
+  </aside>
+</div>
+
+<div class="boundary">
+  <div class="b-shell">
+    <div class="b-tag">Shell &mdash; this repository</div>
+    <ul>
+      <li>The top navigation, and every dropdown hanging off it</li>
+      <li>Modals: the map menu, ENCODE and 4DN tables, URL entry, share, session save</li>
+      <li><code>AlertSingleton</code>, the one notification surface the shell has</li>
+      <li>The caption strip, the page footer, the entry pages per distribution</li>
+    </ul>
+    <div class="b-tag" style="margin-top:14px;">Viewer &mdash; juicebox.js, inside <code>#app-container</code></div>
+    <div class="b-viewer">
+      <ul>
+        <li>Every browser panel: its navbar, borders, locus box, and menu</li>
+        <li>The contact matrix, its color scale, its axes and track lanes</li>
+        <li>The current-browser border and the target-set outline</li>
+        <li>Sync between browsers, and the compatibility rules that govern it</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<h2>Not pictured</h2>
+
+<div class="band">
+  <div class="wide">
+    <p>Four terms name things a single screenshot cannot show &mdash; they are either behind a modal, or chosen at build time.</p>
+  </div>
+</div>
+
+<table>
+  <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Map&nbsp;menu</td>
+      <td>The curated, searchable catalog of published contact maps offered in the load menu, each entry carrying its publication, organism, cell type, and protocol. <span class="avoid">not: map list, file list, hicfiles</span></td>
+    </tr>
+    <tr>
+      <td>Datasource</td>
+      <td>An adapter that turns one external catalog &mdash; the curated map menu, ENCODE-hosted maps, 4DN maps &mdash; into rows of a searchable table. One per catalog; they differ in columns and in how they are queried. <span class="avoid">not: provider, backend, source, repository</span></td>
+    </tr>
+    <tr>
+      <td>Distribution</td>
+      <td>A build of the shell for a particular deployment &mdash; the default one and the AidenLab one, which differ in branding and entry page. Selected by build mode, not at runtime. <span class="avoid">not: flavor, variant, target, environment</span></td>
+    </tr>
+    <tr>
+      <td>Embed</td>
+      <td>A page that hosts a bare viewer with no shell &mdash; no menus, no catalogs &mdash; for placing a map inside someone else&rsquo;s page. <span class="avoid">not: iframe, widget mode</span></td>
+    </tr>
+    <tr>
+      <td>Genome</td>
+      <td>The reference assembly a contact map is aligned to, named by its identifier (<code>hg19</code>, <code>mm10</code>). It is the key to nearly every catalog in the shell: switching genomes re-derives the track menus. <span class="avoid">not: assembly, reference, build</span></td>
+    </tr>
+    <tr>
+      <td>Track&nbsp;registry</td>
+      <td>The mapping from genome to the ENCODE track catalogs available for it. Determines which ENCODE load options a genome offers at all. <span class="avoid">not: track index, catalog</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+
+<h2>Two groupings, and why they are not one</h2>
+
+<div class="band">
+  <div>
+    <p>The mock-up carries two different groupings of panels, and they are the pair most often confused for each other. A <em class="term">target set</em> is what a <strong>track load</strong> reaches: the user picks it by shift-clicking, and it is drawn as the dashed blue outline. A <em class="term">sync group</em> is what a <strong>locus change</strong> reaches: nobody picks it, the library derives it from whether two maps are the same assembly carrying the same chromosomes, and it has no outline at all.</p>
+    <p>Neither implies the other. Two panels can sync without being aimed at together, and two panels can be aimed at together while one of them cannot sync with anything. In the figure, panel&nbsp;3 is outside both &mdash; but for unrelated reasons, and fixing one would not fix the other.</p>
+    <p>The glossary keeps both terms and lists each under the other&rsquo;s <em>avoid</em> line, which is the only entry in this repository&rsquo;s vocabulary where two live terms are mutually excluded. That is deliberate: the error worth guarding against is not using the wrong word, it is believing there is only one thing to name.</p>
+  </div>
+  <aside class="marginnote">
+    <strong>Practical consequence.</strong> Aiming at a panel does not make it follow. No amount of shift-clicking will sync a dm6 map to an hg38 one, and the panel says so rather than leaving the user to guess.
+  </aside>
+</div>
+
+<div class="band">
+  <div class="wide">
+    <table style="margin-top:1.6rem;">
+      <thead><tr><th></th><th>Target set</th><th>Sync group</th></tr></thead>
+      <tbody>
+        <tr><td>Answers</td><td>where does this load land?</td><td>whose view follows mine?</td></tr>
+        <tr><td>Membership</td><td>an explicit user gesture</td><td>a derived rule &mdash; same assembly, same chromosomes</td></tr>
+        <tr><td>Carries</td><td>tracks and 2D annotations</td><td>locus, resolution, and other canonical state</td></tr>
+        <tr><td>Shown by</td><td>the dashed blue outline</td><td>nothing &mdash; only the absence of a group is marked</td></tr>
+        <tr><td>Lifetime</td><td>until the user re-aims</td><td>as long as the loaded maps stay compatible</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="band">
+  <div class="wide">
+    <p class="marginnote" style="max-width:34rem; margin-top:2rem;"><strong>Status.</strong> The <em>sync refusal</em> mark on panel&nbsp;3 is a proposed behaviour, not shipped &mdash; see <a href="https://github.com/aidenlab/juicebox.js/issues/632">aidenlab/juicebox.js#632</a> and ADR-0016. Until it lands, a panel that cannot sync gives no indication beyond a warning in the developer console. Every other part of this figure describes the application as it is today.</p>
+  </div>
+</div>
+
+<hr>
+
+<div class="band">
+  <div class="wide">
+    <p class="marginnote" style="max-width:34rem;">Definitions are quoted from <code>CONTEXT.md</code>, which remains the single source of truth. When a term changes there, change it here.</p>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
